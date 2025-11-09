@@ -751,3 +751,64 @@ export const incrementUsage = onRequest({ cors: true, invoker: "public" }, async
     res.json({ ok: true });
   });
 });
+
+// Best Days endpoint - returns favorable transit days for the week
+export const bestDaysForWeek = onRequest({ cors: true, invoker: "public" }, async (req, res) => {
+  return cors(req, res, async () => {
+    const { uid, birthISO } = req.body || {};
+
+    if (!uid) return res.status(400).json({ error: "uid required" });
+
+    // TODO: Calculate actual favorable transits based on natal chart
+    // For now, return placeholder data
+    const now = new Date();
+    const days = [];
+
+    // Generate next 7 days
+    for (let i = 1; i <= 7; i++) {
+      const date = new Date(now);
+      date.setDate(date.getDate() + i);
+      
+      // Placeholder logic: alternate between different types
+      const types = [
+        { title: "Best day for risks", reason: "Mars trine Sun" },
+        { title: "Great day for therapy", reason: "Moon conjunct Neptune" },
+        { title: "Good day for decisions", reason: "Mercury sextile Jupiter" },
+        { title: "Perfect for creativity", reason: "Venus trine Neptune" }
+      ];
+      
+      const typeIndex = i % types.length;
+      
+      days.push({
+        date: date.toISOString().split('T')[0],
+        title: types[typeIndex].title,
+        reason: types[typeIndex].reason,
+        dreamContext: null // Will be populated when dream analysis is integrated
+      });
+    }
+
+    // Return top 2 favorable days
+    res.json({ days: days.slice(0, 2) });
+  });
+});
+
+// Submit accuracy feedback endpoint
+export const submitAccuracyFeedback = onRequest({ cors: true, invoker: "public" }, async (req, res) => {
+  return cors(req, res, async () => {
+    const { uid, areaId, horoscopeDate, accurate } = req.body || {};
+
+    if (!uid || !areaId || horoscopeDate === undefined || accurate === undefined) {
+      return res.status(400).json({ error: "uid, areaId, horoscopeDate, and accurate are required" });
+    }
+
+    await db.collection("feedback").add({
+      uid,
+      areaId,
+      horoscopeDate: new Date(horoscopeDate),
+      accurate: Boolean(accurate),
+      timestamp: FieldValue.serverTimestamp()
+    });
+
+    res.json({ success: true });
+  });
+});

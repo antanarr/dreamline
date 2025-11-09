@@ -1,6 +1,6 @@
 import Foundation
 
-struct HoroscopeArea: Codable, Hashable {
+struct HoroscopeArea: Codable, Hashable, Identifiable {
   let id: String
   let title: String
   let score: Double

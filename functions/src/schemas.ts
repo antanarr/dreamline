@@ -7,6 +7,8 @@ export const HoroscopeSchema = {
       summary:  { type: "string" },
       areas: {
         type: "array",
+        minItems: 6,
+        maxItems: 6,
         items: {
           type: "object",
           properties: {

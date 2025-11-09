@@ -93,6 +93,55 @@ final class HoroscopeService: ObservableObject {
         let anchorKey = Self.makeAnchorKey(uid: uid, period: period, tzIdentifier: tz)
         return cached(anchorKey: anchorKey)
     }
+    
+    func fetchBestDays(uid: String = "me") async throws -> [BestDayInfo] {
+        guard let baseURL = baseURL else { throw URLError(.badURL) }
+        
+        let endpoint = baseURL.appendingPathComponent("bestDaysForWeek")
+        
+        var request = URLRequest(url: endpoint)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let payload: [String: Any] = [
+            "uid": uid,
+            "birthISO": "" // TODO: Get from user profile
+        ]
+        
+        request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw URLError(.badServerResponse)
+        }
+        
+        struct BestDaysResponse: Decodable {
+            let days: [BestDayResponseItem]
+            
+            struct BestDayResponseItem: Decodable {
+                let date: String
+                let title: String
+                let reason: String
+                let dreamContext: String?
+            }
+        }
+        
+        let decoder = JSONDecoder()
+        let envelope = try decoder.decode(BestDaysResponse.self, from: data)
+        
+        let dateFormatter = ISO8601DateFormatter()
+        
+        return envelope.days.compactMap { day in
+            guard let date = dateFormatter.date(from: day.date) else { return nil }
+            return BestDayInfo(
+                date: date,
+                title: day.title,
+                reason: day.reason,
+                dreamContext: day.dreamContext
+            )
+        }
+    }
 
     func readOrCompose(period: HoroscopeRange, tz: String, uid: String = "me", force: Bool = false) async throws -> HoroscopeStructured {
         guard baseURL != nil else { throw URLError(.badURL) }
