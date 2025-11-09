@@ -16,29 +16,24 @@ struct TodayView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    // Dream Streak
-                    if currentStreak > 0 {
-                        streakCard
-                    }
-                    
-                    // Hero: Your Day + Log Dream
-                    YourDayHeroCard(
-                        headline: horoscopeVM.item?.headline ?? "Loading your day...",
-                        dreamEnhancement: dreamEnhancement,
-                        onLogDream: {
-                            startRecordingOnCompose = true
-                            showRecorder = true
-                        }
-                    )
-                    
-                    // Areas of Life
+                VStack(alignment: .leading, spacing: 24) {
+                    // Horoscope hero FIRST
                     if let item = horoscopeVM.item {
-                        areasOfLifeSection(item: item)
+                        YourDayHeroCard(
+                            headline: item.headline,
+                            summary: item.summary,
+                            dreamEnhancement: dreamEnhancement,
+                            showLogButton: false
+                        )
                     } else if horoscopeVM.loading {
                         loadingShimmer
                     } else {
                         emptyState
+                    }
+                    
+                    // Areas of Life
+                    if let item = horoscopeVM.item {
+                        areasOfLifeSection(item: item)
                     }
                     
                     // Behind This Forecast
@@ -70,12 +65,24 @@ struct TodayView: View {
                         }
                     )
                 }
+                .padding(.top, 8)
             }
             .background(
                 Color.clear
                     .dreamlineScreenBackground()
             )
             .navigationTitle("Today")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        startRecordingOnCompose = false
+                        showRecorder = true
+                    } label: {
+                        Label("Log", systemImage: "plus")
+                    }
+                    .accessibilityLabel("Log a dream")
+                }
+            }
             .refreshable {
                 await refreshContent()
             }
@@ -117,67 +124,10 @@ struct TodayView: View {
         DreamStreakService.shared.calculateStreak(from: store.entries)
     }
     
-    private var streakCard: some View {
-        HStack(spacing: 16) {
-            // Streak number with emoji
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.dlAmber.opacity(0.2), Color.dlAmber.opacity(0.1)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 64, height: 64)
-                
-                VStack(spacing: 2) {
-                    Text("\(currentStreak)")
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
-                        .foregroundStyle(Color.dlAmber)
-                    
-                    Image(systemName: "flame.fill")
-                        .font(.caption)
-                        .foregroundStyle(Color.dlAmber)
-                }
-            }
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Dream Streak")
-                    .font(DLFont.title(18))
-                    .fontWeight(.semibold)
-                
-                Text(DreamStreakService.shared.motivationalMessage(for: currentStreak))
-                    .font(DLFont.body(14))
-                    .foregroundStyle(.secondary)
-            }
-            
-            Spacer()
-            
-            Image(systemName: "chevron.right")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-        .padding(20)
-        .background(theme.palette.cardFillPrimary)
-        .overlay(
-            Rectangle()
-                .fill(theme.palette.separator)
-                .frame(height: 1),
-            alignment: .bottom
-        )
-        .onTapGesture {
-            // Haptic feedback
-            let generator = UIImpactFeedbackGenerator(style: .light)
-            generator.impactOccurred()
-            // TODO: Navigate to profile or stats view
-        }
-    }
-    
     private var dreamEnhancement: String? {
         // Get most recent dream from today
         let today = Calendar.current.startOfDay(for: Date())
-        let todayDreams = store.entries.filter { 
+        let todayDreams = store.entries.filter {
             Calendar.current.isDate($0.createdAt, inSameDayAs: today)
         }
         
@@ -231,17 +181,13 @@ struct TodayView: View {
     }
     
     private func refreshContent() async {
-        // Add haptic feedback for pull-to-refresh
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
         
-        // Reload all content
         await vm.load(dreamStore: store)
         await horoscopeVM.load(period: .day, tz: TimeZone.current.identifier, force: true)
-        // TODO: Fetch best days from backend
-        bestDays = [] // Placeholder
+        bestDays = []
         
-        // Success haptic
         let successGenerator = UINotificationFeedbackGenerator()
         successGenerator.notificationOccurred(.success)
     }

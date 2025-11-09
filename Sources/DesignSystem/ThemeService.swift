@@ -100,20 +100,20 @@ private struct DreamlineScreenBackground: ViewModifier {
         switch scheme {
         case .light:
             backgroundGradient = [
-                Color(hex: 0xF4F6FF),
-                Color(hex: 0xEAF3FF),
-                Color(hex: 0xEAE4FF)
+                Color(hex: 0xF7F8FB),
+                Color(hex: 0xF1F4FA),
+                Color(hex: 0xECEFF7)
             ]
-            starOpacity = 0.08
-            noiseOpacity = 0.05
+            starOpacity = 0.06
+            noiseOpacity = 0.04
         default:
             backgroundGradient = [
-                .dlSpace,
-                Color(hex: 0x141B33, alpha: 0.95),
-                Color(hex: 0x4C4FD6, alpha: 0.24)
+                Color(hex: 0x0E1224),
+                Color(hex: 0x121836, alpha: 0.94),
+                Color(hex: 0x4C4FD6, alpha: 0.18)
             ]
-            starOpacity = 0.18
-            noiseOpacity = 0.12
+            starOpacity = 0.10
+            noiseOpacity = 0.06
         }
         
         return content
