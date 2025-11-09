@@ -2,10 +2,6 @@
   "images": [
     {
       "idiom": "universal",
-      "filename": "oracle_hero_square.svg"
-    },
-    {
-      "idiom": "universal",
       "filename": "oracle_hero_square@1x.png",
       "scale": "1x"
     },
@@ -23,8 +19,5 @@
   "info": {
     "version": 1,
     "author": "xcode"
-  },
-  "properties": {
-    "preserves-vector-representation": true
   }
 }

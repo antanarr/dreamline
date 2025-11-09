@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="14" y="14" width="228" height="228" rx="48" fill="#EEF0FF"/>
+  <path d="M84 150L116 118C125.941 108.059 142.059 108.059 152 118L188 154V186H68V158C68 150.268 74.268 144 82 144H84V150Z" fill="#656BFF"/>
+  <path d="M116 118L132 134L156 110C162.627 103.373 173.373 103.373 180 110C185.23 115.23 186.183 123.35 182.848 129.729L158 186H108L84 150L116 118Z" fill="#8A90FF"/>
+  <rect x="92" y="162" width="24" height="32" rx="12" fill="white" opacity="0.6"/>
+  <rect x="124" y="168" width="24" height="26" rx="12" fill="white" opacity="0.6"/>
+  <rect x="156" y="158" width="24" height="36" rx="12" fill="white" opacity="0.6"/>
+  <path d="M68 120C68 97.9086 85.9086 80 108 80H132V112H108C100.268 112 94 118.268 94 126V146H84C75.1634 146 68 138.837 68 130V120Z" fill="#B8BDFF"/>
+  <circle cx="172" cy="92" r="20" fill="#FFB457"/>
+</svg>
+

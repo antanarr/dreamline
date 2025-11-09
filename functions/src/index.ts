@@ -60,10 +60,45 @@ const HoroscopeSchema = z.object({
 
 // Helpers
 async function callResponses(model: string, input: any, OPENAI: string): Promise<any> {
+  // Transform response_format to text.format for Responses API
+  const payload: any = { model, max_output_tokens: 1200 };
+  
+  // Map the input messages to the Responses API format
+  if (input.input) {
+    payload.input = input.input;
+  }
+  
+  // Handle response_format -> text format transformation for Responses API
+  if (input.response_format) {
+    // Old format: { type: "json_schema", json_schema: { name, schema, strict } }
+    // New format: { text: { format: { type, name, schema, strict } } }
+    const rf = input.response_format;
+    if (rf.type === "json_schema" && rf.json_schema) {
+      payload.text = {
+        format: {
+          type: "json_schema",
+          name: rf.json_schema.name,
+          schema: rf.json_schema.schema,
+          strict: rf.json_schema.strict
+        }
+      };
+    } else {
+      // If it's not json_schema, just pass it through
+      payload.text = {
+        format: rf
+      };
+    }
+  }
+  
+  // Pass through other parameters like temperature
+  if (input.temperature !== undefined) {
+    payload.temperature = input.temperature;
+  }
+  
   const res = await fetch(`${OPENAI_BASE}/v1/responses`, {
     method: "POST",
     headers: { "Authorization": `Bearer ${OPENAI}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ model, ...input, max_output_tokens: 1200 })
+    body: JSON.stringify(payload)
   });
   if (!res.ok) {
     const body = await res.text();
@@ -576,7 +611,7 @@ export const horoscopeCompose = onRequest({ secrets: [OPENAI_KEY], cors: true, i
     };
 
     // Cache the result
-    const cacheRef = db.doc(`users/${uid}/cache/horoscope/${range}_${anchorKey}`);
+    const cacheRef = db.doc(`users/${uid}/horoscope-cache/${range}_${anchorKey}`);
     await cacheRef.set({ 
       item, 
       _ts: FieldValue.serverTimestamp(), 

@@ -2,10 +2,6 @@
   "images": [
     {
       "idiom": "universal",
-      "filename": "icon_oracle.svg"
-    },
-    {
-      "idiom": "universal",
       "filename": "icon_oracle@1x.png",
       "scale": "1x"
     },
@@ -25,7 +21,6 @@
     "author": "xcode"
   },
   "properties": {
-    "preserves-vector-representation": true,
     "template-rendering-intent": "template"
   }
 }

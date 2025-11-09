@@ -3,6 +3,7 @@ import Observation
 
 #if canImport(FirebaseFirestore)
 import FirebaseFirestore
+import FirebaseCore
 #endif
 
 @Observable final class DreamStore {
@@ -12,7 +13,14 @@ import FirebaseFirestore
     private let localCacheKey = "dreamline.dreams.cache.v1"
     
     #if canImport(FirebaseFirestore)
-    private let db = Firestore.firestore()
+    private var db: Firestore? {
+        guard FirebaseApp.app() != nil else {
+            print("DreamStore: Firestore requested before FirebaseApp.configure()")
+            return nil
+        }
+        return Firestore.firestore()
+    }
+    
     private var uid: String { "me" } // TODO: Replace with real auth UID
     #endif
     
@@ -69,6 +77,7 @@ import FirebaseFirestore
     
     #if canImport(FirebaseFirestore)
     private func syncFromFirestore() async {
+        guard let db = db else { return }
         do {
             let snapshot = try await db.collection("users").document(uid)
                 .collection("dreams")
@@ -102,6 +111,7 @@ import FirebaseFirestore
     }
     
     private func persistToFirestore(_ entry: DreamEntry) async {
+        guard let db = db else { return }
         do {
             try db.collection("users").document(uid)
                 .collection("dreams")
@@ -113,6 +123,7 @@ import FirebaseFirestore
     }
     
     private func deleteFromFirestore(_ id: String) async {
+        guard let db = db else { return }
         do {
             try await db.collection("users").document(uid)
                 .collection("dreams")

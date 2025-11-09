@@ -24,7 +24,7 @@ export const HoroscopeSchema = {
               additionalProperties: false
             }
           },
-          required: ["id","title","score","bullets"],
+          required: ["id","title","score","bullets","actions"],
           additionalProperties: false
         }
       }
