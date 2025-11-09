@@ -251,8 +251,8 @@ private struct InsightsHeroCard: View {
     
     private var heroBackground: some View {
         let shape = RoundedRectangle(cornerRadius: 28, style: .continuous)
-        let topColor = theme.mode == .dawn ? Color(hex: 0xF5F4FF, alpha: 0.95) : Color.dlSpace.opacity(0.9)
-        let bottomColor = theme.mode == .dawn ? Color(hex: 0xE5ECFF, alpha: 0.85) : Color.dlViolet.opacity(0.48)
+        let topColor = theme.isLight ? Color(hex: 0xF5F4FF, alpha: 0.95) : Color.dlSpace.opacity(0.9)
+        let bottomColor = theme.isLight ? Color(hex: 0xE5ECFF, alpha: 0.85) : Color.dlViolet.opacity(0.48)
         return shape
             .fill(
                 LinearGradient(
@@ -264,7 +264,7 @@ private struct InsightsHeroCard: View {
             .overlay(
                 Image("pattern_gradientnoise_tile")
                     .resizable(resizingMode: .tile)
-                    .opacity(theme.mode == .dawn ? 0.08 : 0.18)
+                    .opacity(theme.isLight ? 0.08 : 0.18)
                     .blendMode(.plusLighter)
                     .clipShape(shape)
             )
@@ -321,8 +321,8 @@ private struct InsightsTopSymbolsCard: View {
     
     private var symbolsBackground: some View {
         let shape = RoundedRectangle(cornerRadius: 24, style: .continuous)
-        let topColor = theme.mode == .dawn ? Color(hex: 0xF4F2FF, alpha: 0.92) : Color.dlSpace.opacity(0.9)
-        let bottomColor = theme.mode == .dawn ? Color(hex: 0xE2ECFF, alpha: 0.82) : Color.dlIndigo.opacity(0.4)
+        let topColor = theme.isLight ? Color(hex: 0xF4F2FF, alpha: 0.92) : Color.dlSpace.opacity(0.9)
+        let bottomColor = theme.isLight ? Color(hex: 0xE2ECFF, alpha: 0.82) : Color.dlIndigo.opacity(0.4)
         return shape
             .fill(
                 LinearGradient(
@@ -334,7 +334,7 @@ private struct InsightsTopSymbolsCard: View {
             .overlay(
                 Image("pattern_stargrid_tile")
                     .resizable(resizingMode: .tile)
-                    .opacity(theme.mode == .dawn ? 0.08 : 0.18)
+                    .opacity(theme.isLight ? 0.08 : 0.18)
                     .blendMode(.screen)
                     .clipShape(shape)
             )

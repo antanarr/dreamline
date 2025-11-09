@@ -288,13 +288,13 @@ private struct JournalEntryCard: View {
             
             Image("pattern_stargrid_tile")
                 .resizable(resizingMode: .tile)
-                .opacity(theme.mode == .dawn ? 0.06 : 0.18)
+                .opacity(theme.isLight ? 0.06 : 0.18)
                 .blendMode(.screen)
                 .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
             
             Image("pattern_gradientnoise_tile")
                 .resizable(resizingMode: .tile)
-                .opacity(theme.mode == .dawn ? 0.05 : 0.12)
+                .opacity(theme.isLight ? 0.05 : 0.12)
                 .blendMode(.plusLighter)
                 .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
         }
@@ -718,14 +718,14 @@ struct ComposeDreamView: View {
                 .overlay(
                     Image("pattern_stargrid_tile")
                         .resizable(resizingMode: .tile)
-                        .opacity(theme.mode == .dawn ? 0.05 : 0.16)
+                        .opacity(theme.isLight ? 0.05 : 0.16)
                         .blendMode(.screen)
                         .clipShape(shape)
                 )
                 .overlay(
                     Image("pattern_gradientnoise_tile")
                         .resizable(resizingMode: .tile)
-                        .opacity(theme.mode == .dawn ? 0.04 : 0.1)
+                        .opacity(theme.isLight ? 0.04 : 0.1)
                         .blendMode(.plusLighter)
                         .clipShape(shape)
                 )
@@ -736,11 +736,11 @@ struct ComposeDreamView: View {
     }
     
     private var footerBackground: Color {
-        theme.mode == .dawn ? Color(hex: 0xEEF2FF, alpha: 0.92) : Color(hex: 0x0C1122, alpha: 0.9)
+        theme.isLight ? Color(hex: 0xEEF2FF, alpha: 0.92) : Color(hex: 0x0C1122, alpha: 0.9)
     }
     
     private var placeholderColor: Color {
-        theme.mode == .dawn ? Color(hex: 0x6E7198, alpha: 0.7) : Color.white.opacity(0.38)
+        theme.isLight ? Color(hex: 0x6E7198, alpha: 0.7) : Color.white.opacity(0.38)
     }
     
     private func saveDreamWithInterpretation() async {

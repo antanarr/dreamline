@@ -128,7 +128,7 @@ struct TodayRangeView: View {
     }
     
     private var overlayScrim: Color {
-        theme.mode == .dawn ? Color.black.opacity(0.08) : Color.black.opacity(0.18)
+        theme.isLight ? Color.black.opacity(0.08) : Color.black.opacity(0.18)
     }
     
     private func refresh(force: Bool = false) {

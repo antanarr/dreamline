@@ -5,7 +5,7 @@ import Observation
 @Observable
 final class ThemeService {
     enum Mode: String, CaseIterable, Identifiable {
-        case system, light, dark, dawn, midnight
+        case system, light, dark
         
         var id: String { rawValue }
         
@@ -16,8 +16,6 @@ final class ThemeService {
             case .system: return "Auto"
             case .light: return "Light"
             case .dark: return "Dark"
-            case .dawn: return "Dawn"
-            case .midnight: return "Midnight"
             }
         }
     }
@@ -94,16 +92,20 @@ final class ThemeService {
     var colorScheme: ColorScheme? {
         switch mode {
         case .system: return nil
-        case .light, .dawn: return .light
-        case .dark, .midnight: return .dark
+        case .light: return .light
+        case .dark: return .dark
         }
     }
 
     private var effectiveColorScheme: ColorScheme {
         switch mode {
         case .system: return .dark
-        case .light, .dawn: return .light
-        case .dark, .midnight: return .dark
+        case .light: return .light
+        case .dark: return .dark
         }
     }
+
+    // Expose convenience flags so views don't need to know about custom modes
+    var isLight: Bool { effectiveColorScheme == .light }
+    var isDark: Bool { effectiveColorScheme == .dark }
 }

@@ -237,14 +237,14 @@ struct QuickReadView: View {
                     .overlay(
                         Image("pattern_stargrid_tile")
                             .resizable(resizingMode: .tile)
-                            .opacity(theme.mode == .dawn ? 0.06 : 0.18)
+                            .opacity(theme.isLight ? 0.06 : 0.18)
                             .blendMode(.screen)
                             .clipShape(shape)
                     )
                     .overlay(
                         Image("pattern_gradientnoise_tile")
                             .resizable(resizingMode: .tile)
-                            .opacity(theme.mode == .dawn ? 0.05 : 0.12)
+                            .opacity(theme.isLight ? 0.05 : 0.12)
                             .blendMode(.plusLighter)
                             .clipShape(shape)
                     )

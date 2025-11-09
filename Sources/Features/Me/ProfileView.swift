@@ -599,8 +599,8 @@ struct ProfileView: View {
     
     private var heroBackground: some View {
         let shape = RoundedRectangle(cornerRadius: 28, style: .continuous)
-        let topColor = theme.mode == .dawn ? Color(hex: 0xF4F4FF, alpha: 0.95) : Color.dlSpace.opacity(0.96)
-        let bottomColor = theme.mode == .dawn ? Color(hex: 0xE3ECFF, alpha: 0.85) : Color.dlSpace.opacity(0.8)
+        let topColor = theme.isLight ? Color(hex: 0xF4F4FF, alpha: 0.95) : Color.dlSpace.opacity(0.96)
+        let bottomColor = theme.isLight ? Color(hex: 0xE3ECFF, alpha: 0.85) : Color.dlSpace.opacity(0.8)
         return shape
             .fill(
                 LinearGradient(
@@ -612,7 +612,7 @@ struct ProfileView: View {
             .overlay(
                 Image("pattern_stargrid_tile")
                     .resizable(resizingMode: .tile)
-                    .opacity(theme.mode == .dawn ? 0.08 : 0.14)
+                    .opacity(theme.isLight ? 0.08 : 0.14)
                     .blendMode(.screen)
                     .clipShape(shape)
             )
@@ -625,8 +625,8 @@ struct ProfileView: View {
     
     private var oracleCardBackground: some View {
         let shape = RoundedRectangle(cornerRadius: 26, style: .continuous)
-        let topColor = theme.mode == .dawn ? Color(hex: 0xF3F3FF, alpha: 0.92) : Color.dlSpace.opacity(0.95)
-        let bottomColor = theme.mode == .dawn ? Color(hex: 0xE4EDFF, alpha: 0.82) : Color.dlIndigo.opacity(0.45)
+        let topColor = theme.isLight ? Color(hex: 0xF3F3FF, alpha: 0.92) : Color.dlSpace.opacity(0.95)
+        let bottomColor = theme.isLight ? Color(hex: 0xE4EDFF, alpha: 0.82) : Color.dlIndigo.opacity(0.45)
         return shape
             .fill(
                 LinearGradient(
@@ -638,7 +638,7 @@ struct ProfileView: View {
             .overlay(
                 Image("pattern_gradientnoise_tile")
                     .resizable(resizingMode: .tile)
-                    .opacity(theme.mode == .dawn ? 0.08 : 0.18)
+                    .opacity(theme.isLight ? 0.08 : 0.18)
                     .blendMode(.plusLighter)
                     .clipShape(shape)
             )

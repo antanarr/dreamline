@@ -134,14 +134,14 @@ struct TodayStructuredView: View {
             .overlay(
                 Image("pattern_stargrid_tile")
                     .resizable(resizingMode: .tile)
-                    .opacity(theme.mode == .dawn ? 0.08 : 0.2)
+                    .opacity(theme.isLight ? 0.08 : 0.2)
                     .blendMode(.screen)
                     .clipShape(shape)
             )
             .overlay(
                 Image("pattern_gradientnoise_tile")
                     .resizable(resizingMode: .tile)
-                    .opacity(theme.mode == .dawn ? 0.06 : 0.14)
+                    .opacity(theme.isLight ? 0.06 : 0.14)
                     .blendMode(.plusLighter)
                     .clipShape(shape)
             )
