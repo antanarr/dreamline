@@ -1,0 +1,143 @@
+import SwiftUI
+
+extension Color {
+    init(hex: UInt, alpha: Double = 1.0) {
+        let r = Double((hex >> 16) & 0xff) / 255
+        let g = Double((hex >> 8) & 0xff) / 255
+        let b = Double(hex & 0xff) / 255
+        self = Color(.sRGB, red: r, green: g, blue: b, opacity: alpha)
+    }
+    
+    static let dlViolet = Color(hex: 0x7A5CFF)
+    static let dlLilac  = Color(hex: 0xC9B6FF)
+    static let dlMint   = Color(hex: 0x3CE6A8)
+    static let dlAmber  = Color(hex: 0xFFAC5F)
+}
+
+enum DLFont {
+    static func title(_ size: CGFloat) -> Font { .system(size: size, weight: .semibold, design: .serif) }
+    static func body(_ size: CGFloat) -> Font { .system(size: size, weight: .regular, design: .rounded) }
+    static let chip = Font.system(size: 14, weight: .medium, design: .rounded)
+}
+
+enum DLGradients {
+    static let oracle = LinearGradient(colors: [.dlIndigo, .dlViolet], startPoint: .topLeading, endPoint: .bottomTrailing)
+}
+
+struct DLCard<Content: View>: View {
+    var content: () -> Content
+    
+    var body: some View {
+        content()
+            .padding(16)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.white.opacity(0.06)))
+    }
+}
+
+struct Shimmer: ViewModifier {
+    @State private var phase: CGFloat = 0
+    var duration: Double = 1.5
+    
+    func body(content: Content) -> some View {
+        content
+            .overlay(
+                GeometryReader { geometry in
+                    LinearGradient(
+                        colors: [
+                            Color.clear,
+                            Color.white.opacity(0.3),
+                            Color.clear
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                    .frame(width: geometry.size.width * 2)
+                    .offset(x: -geometry.size.width + (geometry.size.width * 2 * phase))
+                }
+                .allowsHitTesting(false)
+            )
+            .mask(content)
+            .onAppear {
+                withAnimation(.linear(duration: duration).repeatForever(autoreverses: false)) {
+                    phase = 1.0
+                }
+            }
+    }
+}
+
+extension View {
+    func shimmer() -> some View {
+        modifier(Shimmer())
+    }
+    
+    func oracleShimmer(_ animate: Bool) -> some View {
+        Group {
+            if animate {
+                shimmer()
+            } else {
+                self
+            }
+        }
+    }
+    
+    func dreamlineScreenBackground(patternScale: CGFloat = 1.0) -> some View {
+        modifier(DreamlineScreenBackground(patternScale: patternScale))
+    }
+}
+
+private struct DreamlineScreenBackground: ViewModifier {
+    @Environment(ThemeService.self) private var theme
+    var patternScale: CGFloat
+    
+    func body(content: Content) -> some View {
+        let scheme = theme.colorScheme ?? .dark
+        
+        let backgroundGradient: [Color]
+        let starOpacity: Double
+        let noiseOpacity: Double
+        
+        switch scheme {
+        case .light:
+            backgroundGradient = [
+                Color(hex: 0xF4F6FF),
+                Color(hex: 0xEAF3FF),
+                Color(hex: 0xEAE4FF)
+            ]
+            starOpacity = 0.08
+            noiseOpacity = 0.05
+        default:
+            backgroundGradient = [
+                .dlSpace,
+                Color(hex: 0x141B33, alpha: 0.95),
+                Color(hex: 0x4C4FD6, alpha: 0.24)
+            ]
+            starOpacity = 0.18
+            noiseOpacity = 0.12
+        }
+        
+        return content
+            .background(
+                ZStack {
+                    LinearGradient(
+                        colors: backgroundGradient,
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    
+                    Image("pattern_stargrid_tile")
+                        .resizable(resizingMode: .tile)
+                        .scaleEffect(patternScale)
+                        .opacity(starOpacity)
+                        .blendMode(.screen)
+                    
+                    Image("pattern_gradientnoise_tile")
+                        .resizable(resizingMode: .tile)
+                        .scaleEffect(patternScale)
+                        .opacity(noiseOpacity)
+                        .blendMode(.plusLighter)
+                }
+                .ignoresSafeArea()
+            )
+    }
+}

@@ -1,0 +1,95 @@
+# Xcode
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+*.xcworkspace/*
+!*.xcworkspace/contents.xcworkspacedata
+!*.xcworkspace/xcshareddata/
+*.xcuserdata/
+*.xcuserstate
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Build
+build/
+DerivedData/
+*.swiftpm
+
+# Firebase & Secrets
+Config/GoogleService-Info.plist
+**/GoogleService-Info.plist
+*.plist.bak
+
+# Environment
+.env
+.env.local
+*.key
+*.pem
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# CocoaPods
+Pods/
+*.podspec
+
+# Swift Package Manager
+.swiftpm/
+.spm/
+.build/
+SourcePackages/
+PackageCache/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Node tooling
+node_modules/
+.npm-cache/
+
+# Secrets and local config
+.env
+.env.*
+!.env.example
+fastlane/Auth/AuthKey_*.p8
+*.p8
+*.keystore
+*.jks
+GoogleService-Info*.plist
+Artwork_Archive/
+Artwork_Inbox/
+artwork_manifest.json
+artwork_ingest_cache.json
+artwork_ingest_report.json
+
+
+# Ignore Xcode user data
+**/xcuserdata/
