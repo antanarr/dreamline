@@ -467,12 +467,18 @@ const BirthSchema = z.object({
 });
 
 const HoroscopeComposeSchema = z.object({
-  range: z.enum(["day", "week", "month", "year"]).default("day"),
-  items: z.array(HoroscopeItemSchema).min(1),
+  range: z.enum(["day", "week", "month", "year"]).optional().default("day"),
+  period: z.enum(["day", "week", "month", "year"]).optional(), // Swift app sends "period" instead of "range"
+  items: z.array(HoroscopeItemSchema).optional(), // Make optional - fetch from Firestore if not provided
   history: MotifHistorySchema.optional(),
   birth: BirthSchema.optional(),
+  birthInstantUTC: z.number().optional(), // Swift app format
+  tzID: z.string().optional(), // Swift app format
+  placeText: z.string().optional(), // Swift app format
+  timeKnown: z.boolean().optional(), // Swift app format
   model: z.string().optional(),
   uid: z.string().optional(),
+  force: z.boolean().optional(), // Swift app sends "force"
   forceRefresh: z.boolean().optional(),
   tz: z.string().optional()
 });
@@ -506,14 +512,40 @@ export const horoscopeCompose = onRequest({ secrets: [OPENAI_KEY], cors: true, i
       return res.status(400).json({ error: parsed.error.flatten() });
     }
 
-    const { range, items, history, birth, model: requestedModel, uid = "me", forceRefresh, tz: tzInput } = parsed.data;
-    const tz = (tzInput || 'UTC') as string;
-    const anchorKey = anchorKeyFor(range, new Date(), tz);
-    const force = forceRefresh === true;
+    // Handle both Swift app format (period) and standard format (range)
+    const rangeValue = parsed.data.range || parsed.data.period || "day";
+    const forceValue = parsed.data.forceRefresh === true || parsed.data.force === true;
+    
+    const { items, history, birth, birthInstantUTC, tzID, placeText, timeKnown, model: requestedModel, uid = "me", tz: tzInput } = parsed.data;
+    const tz = (tzInput || tzID || 'UTC') as string;
+    const anchorKey = anchorKeyFor(rangeValue as any, new Date(), tz);
+    const force = forceValue;
+    
+    // If no items provided, fetch recent dreams from Firestore
+    let dreamItems = items;
+    if (!dreamItems || dreamItems.length === 0) {
+      try {
+        const dreamsSnap = await db.collection(`users/${uid}/dreams`)
+          .orderBy('createdAt', 'desc')
+          .limit(7)
+          .get();
+        dreamItems = dreamsSnap.docs.map(doc => {
+          const data = doc.data();
+          return {
+            dateISO: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+            headline: data.title || data.headline || "Dream",
+            bullets: data.symbols || data.themes || data.motifs || []
+          };
+        });
+      } catch (err) {
+        // If no dreams found, use empty array (will generate generic horoscope)
+        dreamItems = [];
+      }
+    }
 
     // Check cache unless force refresh
     if (!force) {
-      const cacheRef = db.doc(`users/${uid}/horoscope-cache/${range}_${anchorKey}`);
+      const cacheRef = db.doc(`users/${uid}/horoscope-cache/${rangeValue}_${anchorKey}`);
       const cacheSnap = await cacheRef.get();
       if (cacheSnap.exists) {
         const d = cacheSnap.data() as any;
@@ -536,7 +568,7 @@ export const horoscopeCompose = onRequest({ secrets: [OPENAI_KEY], cors: true, i
     // Convert transit items to Transit format for structured output
     // Extract aspects from items (assuming items come from astroTransitsRange which includes aspects)
     const transits: any[] = [];
-    for (const item of items) {
+    for (const item of (dreamItems || [])) {
       // If items have aspects array (from DailyTransitSummary), use them
       const itemWithAspects = item as any;
       if (itemWithAspects.aspects && Array.isArray(itemWithAspects.aspects)) {
@@ -581,7 +613,7 @@ export const horoscopeCompose = onRequest({ secrets: [OPENAI_KEY], cors: true, i
     
     const usr = {
       instruction: `Produce JSON that matches the provided schema. Include 6 areas with short bullets and practical do/don't.`,
-      range, anchorKey, tz,
+      range: rangeValue, anchorKey, tz,
       motifs: ctx.motifs,
       transits: ctx.transits
     };
@@ -602,7 +634,7 @@ export const horoscopeCompose = onRequest({ secrets: [OPENAI_KEY], cors: true, i
     const json = JSON.parse((resp as any).output_text || "{}");
     
     const item: HoroscopeStructured = {
-      range, anchorKey, model,
+      range: rangeValue, anchorKey, model,
       headline: json.headline || "A clear window opens.",
       summary: json.summary || "Take one small, deliberate step.",
       areas: json.areas || [],
@@ -611,11 +643,11 @@ export const horoscopeCompose = onRequest({ secrets: [OPENAI_KEY], cors: true, i
     };
 
     // Cache the result
-    const cacheRef = db.doc(`users/${uid}/horoscope-cache/${range}_${anchorKey}`);
+    const cacheRef = db.doc(`users/${uid}/horoscope-cache/${rangeValue}_${anchorKey}`);
     await cacheRef.set({ 
       item, 
       _ts: FieldValue.serverTimestamp(), 
-      range, 
+      range: rangeValue, 
       anchorKey, 
       model 
     }, { merge: true });
