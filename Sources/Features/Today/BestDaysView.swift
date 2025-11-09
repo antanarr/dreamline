@@ -12,7 +12,7 @@ struct BestDaysView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("YOUR BEST DAYS")
-                    .font(DLFont.caption(12))
+                    .font(DLFont.body(12))
                     .foregroundStyle(.secondary)
                     .kerning(1.2)
                     .textCase(.uppercase)
@@ -22,7 +22,7 @@ struct BestDaysView: View {
                 if !isPro {
                     Button(action: onUnlock) {
                         Text("PRO")
-                            .font(DLFont.caption(10))
+                            .font(DLFont.body(10))
                             .fontWeight(.semibold)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
@@ -134,7 +134,7 @@ private struct BestDayRow: View {
         HStack(alignment: .top, spacing: 12) {
             VStack(spacing: 4) {
                 Text(dayName)
-                    .font(DLFont.caption(11))
+                    .font(DLFont.body(11))
                     .foregroundStyle(.secondary)
                     .textCase(.uppercase)
                 
@@ -159,7 +159,7 @@ private struct BestDayRow: View {
                             Image(systemName: "moon.stars.fill")
                                 .font(.caption2)
                             Text(context)
-                                .font(DLFont.caption(12))
+                                .font(DLFont.body(12))
                         }
                         .foregroundStyle(Color.dlMint)
                         .padding(.horizontal, 8)

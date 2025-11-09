@@ -39,7 +39,7 @@ struct ZodiacSeasonCard: View {
                         .font(DLFont.title(24))
                     
                     Text(sign.dateRange)
-                        .font(DLFont.caption(12))
+                        .font(DLFont.body(12))
                         .foregroundStyle(.secondary)
                 }
             }
@@ -94,7 +94,7 @@ struct DreamPatternsCard: View {
                 
                 if !isPro {
                     Text("PRO")
-                        .font(DLFont.caption(10))
+                        .font(DLFont.body(10))
                         .fontWeight(.semibold)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
@@ -206,7 +206,7 @@ private struct PatternRow: View {
                 
                 if pattern.daySpan > 7 {
                     Text("Recurring over \(pattern.daySpan) days suggests a deepening theme")
-                        .font(DLFont.caption(12))
+                        .font(DLFont.body(12))
                         .foregroundStyle(Color.dlIndigo)
                         .italic()
                 }

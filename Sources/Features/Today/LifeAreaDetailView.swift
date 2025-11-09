@@ -33,7 +33,7 @@ struct LifeAreaDetailView: View {
             }
             .padding(24)
         }
-        .background(theme.palette.background)
+        .background(Color(theme.palette.background))
         .navigationTitle(lifeArea.displayTitle)
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -48,10 +48,10 @@ struct LifeAreaDetailView: View {
                 Text(area.title)
                     .font(DLFont.title(24))
                 
-                if let score = area.score as? Double, score > 0 {
+                if area.score > 0 {
                     HStack(spacing: 4) {
                         ForEach(0..<5) { index in
-                            Image(systemName: index < Int(score / 20) ? "star.fill" : "star")
+                            Image(systemName: index < Int(area.score / 20) ? "star.fill" : "star")
                                 .font(.caption)
                                 .foregroundStyle(Color.dlMint)
                         }
@@ -64,7 +64,7 @@ struct LifeAreaDetailView: View {
     private var bulletsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("TODAY'S GUIDANCE")
-                .font(DLFont.caption(12))
+                .font(DLFont.body(12))
                 .foregroundStyle(.secondary)
                 .kerning(1.2)
                 .textCase(.uppercase)
@@ -98,7 +98,7 @@ struct LifeAreaDetailView: View {
     private var transitSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("BEHIND THIS FORECAST")
-                .font(DLFont.caption(12))
+                .font(DLFont.body(12))
                 .foregroundStyle(.secondary)
                 .kerning(1.2)
                 .textCase(.uppercase)

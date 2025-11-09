@@ -18,7 +18,7 @@ struct AccuracyFeedbackView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("WAS THIS ACCURATE?")
-                .font(DLFont.caption(12))
+                .font(DLFont.body(12))
                 .foregroundStyle(.secondary)
                 .kerning(1.2)
                 .textCase(.uppercase)
@@ -41,7 +41,7 @@ struct AccuracyFeedbackView: View {
             
             if let feedback = feedback {
                 Text(feedback == .accurate ? "Thanks for the feedback!" : "We'll work on improving this.")
-                    .font(DLFont.caption(11))
+                    .font(DLFont.body(11))
                     .foregroundStyle(.secondary)
                     .transition(.opacity)
             }
@@ -56,7 +56,7 @@ struct AccuracyFeedbackView: View {
                 Image(systemName: icon)
                     .font(.caption)
                 Text(label)
-                    .font(DLFont.caption(11))
+                    .font(DLFont.body(11))
                     .fontWeight(.semibold)
             }
             .padding(.horizontal, 12)

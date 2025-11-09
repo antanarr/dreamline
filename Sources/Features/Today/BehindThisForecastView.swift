@@ -8,7 +8,7 @@ struct BehindThisForecastView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("BEHIND THIS FORECAST")
-                .font(DLFont.caption(12))
+                .font(DLFont.body(12))
                 .foregroundStyle(.secondary)
                 .kerning(1.2)
                 .textCase(.uppercase)

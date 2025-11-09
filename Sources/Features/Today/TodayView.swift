@@ -70,7 +70,7 @@ struct TodayView: View {
             .navigationTitle("Today")
             .task {
                 await vm.load(dreamStore: store)
-                await horoscopeVM.fetch(selection: .day, tzIdentifier: TimeZone.current.identifier)
+                await horoscopeVM.load(period: .day, tz: TimeZone.current.identifier)
                 // TODO: Fetch best days from backend
                 bestDays = [] // Placeholder
             }
@@ -89,12 +89,7 @@ struct TodayView: View {
                 }
             }
             .sheet(isPresented: $showPaywall) {
-                if let context = paywallContext {
-                    PaywallView(context: context, onDismiss: {
-                        showPaywall = false
-                        paywallContext = nil
-                    })
-                }
+                PaywallView()
             }
             .onReceive(NotificationCenter.default.publisher(for: .dlStartVoiceCapture)) { _ in
                 startRecordingOnCompose = true
@@ -127,7 +122,7 @@ struct TodayView: View {
     private func areasOfLifeSection(item: HoroscopeStructured) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("AREAS OF YOUR LIFE")
-                .font(DLFont.caption(12))
+                .font(DLFont.body(12))
                 .foregroundStyle(.secondary)
                 .kerning(1.2)
                 .textCase(.uppercase)
