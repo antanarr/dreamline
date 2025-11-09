@@ -6,6 +6,7 @@ struct YourDayHeroCard: View {
     let onLogDream: () -> Void
     
     @Environment(ThemeService.self) private var theme: ThemeService
+    @State private var isPressed = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -16,8 +17,10 @@ struct YourDayHeroCard: View {
                 .textCase(.uppercase)
             
             Text(headline)
-                .font(DLFont.title(28))
+                .font(DLFont.title(34))
+                .fontWeight(.bold)
                 .fixedSize(horizontal: false, vertical: true)
+                .lineSpacing(4)
             
             if let enhancement = dreamEnhancement {
                 Text(enhancement)
@@ -26,11 +29,19 @@ struct YourDayHeroCard: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             
-            Button(action: onLogDream) {
+            Button(action: {
+                // Haptic feedback
+                let generator = UIImpactFeedbackGenerator(style: .medium)
+                generator.impactOccurred()
+                
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                    onLogDream()
+                }
+            }) {
                 HStack(spacing: 8) {
                     Image(systemName: "moon.stars.fill")
                         .font(.body.weight(.semibold))
-                    Text("Log Dream")
+                    Text("Capture Your Night")
                         .font(DLFont.body(16))
                         .fontWeight(.semibold)
                 }
@@ -45,29 +56,39 @@ struct YourDayHeroCard: View {
                     in: RoundedRectangle(cornerRadius: 16, style: .continuous)
                 )
                 .foregroundStyle(Color.white)
+                .scaleEffect(isPressed ? 0.95 : 1.0)
             }
             .buttonStyle(.plain)
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { _ in
+                        withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
+                            isPressed = true
+                        }
+                    }
+                    .onEnded { _ in
+                        withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
+                            isPressed = false
+                        }
+                    }
+            )
         }
         .padding(24)
-        .background(cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(theme.palette.cardStroke)
+        .background(
+            theme.palette.cardFillPrimary
+                .overlay(
+                    Image("pattern_stargrid_tile")
+                        .resizable(resizingMode: .tile)
+                        .opacity(theme.mode == .dawn ? 0.08 : 0.2)
+                        .blendMode(.screen)
+                )
         )
-    }
-    
-    private var cardBackground: some View {
-        let shape = RoundedRectangle(cornerRadius: 28, style: .continuous)
-        return shape
-            .fill(theme.palette.cardFillPrimary)
-            .overlay(
-                Image("pattern_stargrid_tile")
-                    .resizable(resizingMode: .tile)
-                    .opacity(theme.mode == .dawn ? 0.08 : 0.2)
-                    .blendMode(.screen)
-                    .clipShape(shape)
-            )
+        .overlay(
+            Rectangle()
+                .fill(theme.palette.separator)
+                .frame(height: 1),
+            alignment: .bottom
+        )
     }
 }
 

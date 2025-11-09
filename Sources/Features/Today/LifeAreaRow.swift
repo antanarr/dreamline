@@ -6,9 +6,18 @@ struct LifeAreaRow: View {
     let onTap: () -> Void
     
     @Environment(ThemeService.self) private var theme: ThemeService
+    @State private var isPressed = false
     
     var body: some View {
-        Button(action: onTap) {
+        Button(action: {
+            // Haptic feedback
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+            
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                onTap()
+            }
+        }) {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: lifeArea.iconSystemName)
                     .font(.system(size: 20, weight: .semibold))
@@ -40,18 +49,32 @@ struct LifeAreaRow: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(theme.palette.cardFillSecondary)
-            )
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+            .background(theme.palette.cardFillSecondary)
             .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(theme.palette.cardStroke)
+                Rectangle()
+                    .fill(theme.palette.separator)
+                    .frame(height: 1),
+                alignment: .bottom
             )
-            .opacity(isLocked ? 0.6 : 1.0)
+            .opacity(isLocked ? 0.7 : 1.0)
+            .scaleEffect(isPressed ? 0.98 : 1.0)
         }
         .buttonStyle(.plain)
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in
+                    withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
+                        isPressed = true
+                    }
+                }
+                .onEnded { _ in
+                    withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
+                        isPressed = false
+                    }
+                }
+        )
     }
     
     private var lifeArea: LifeArea {

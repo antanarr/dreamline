@@ -16,7 +16,7 @@ struct TodayView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 16) {
                     // Hero: Your Day + Log Dream
                     YourDayHeroCard(
                         headline: horoscopeVM.item?.headline ?? "Loading your day...",
@@ -30,6 +30,10 @@ struct TodayView: View {
                     // Areas of Life
                     if let item = horoscopeVM.item {
                         areasOfLifeSection(item: item)
+                    } else if horoscopeVM.loading {
+                        loadingShimmer
+                    } else {
+                        emptyState
                     }
                     
                     // Behind This Forecast
@@ -61,13 +65,15 @@ struct TodayView: View {
                         }
                     )
                 }
-                .padding()
             }
             .background(
                 Color.clear
                     .dreamlineScreenBackground()
             )
             .navigationTitle("Today")
+            .refreshable {
+                await refreshContent()
+            }
             .task {
                 await vm.load(dreamStore: store)
                 await horoscopeVM.load(period: .day, tz: TimeZone.current.identifier)
@@ -120,14 +126,17 @@ struct TodayView: View {
     
     @ViewBuilder
     private func areasOfLifeSection(item: HoroscopeStructured) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 0) {
             Text("AREAS OF YOUR LIFE")
                 .font(DLFont.body(12))
                 .foregroundStyle(.secondary)
                 .kerning(1.2)
                 .textCase(.uppercase)
+                .padding(.horizontal, 20)
+                .padding(.top, 24)
+                .padding(.bottom, 16)
             
-            VStack(spacing: 12) {
+            VStack(spacing: 0) {
                 ForEach(Array(item.areas.enumerated()), id: \.element.id) { index, area in
                     let isLocked = !isPro && index >= 2
                     
@@ -146,5 +155,85 @@ struct TodayView: View {
                 }
             }
         }
+        .background(theme.palette.cardFillSecondary)
+        .overlay(
+            Rectangle()
+                .fill(theme.palette.separator)
+                .frame(height: 1),
+            alignment: .bottom
+        )
+    }
+    
+    private func refreshContent() async {
+        // Add haptic feedback for pull-to-refresh
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.impactOccurred()
+        
+        // Reload all content
+        await vm.load(dreamStore: store)
+        await horoscopeVM.load(period: .day, tz: TimeZone.current.identifier, force: true)
+        // TODO: Fetch best days from backend
+        bestDays = [] // Placeholder
+        
+        // Success haptic
+        let successGenerator = UINotificationFeedbackGenerator()
+        successGenerator.notificationOccurred(.success)
+    }
+    
+    private var loadingShimmer: some View {
+        VStack(spacing: 0) {
+            ForEach(0..<4, id: \.self) { _ in
+                HStack(spacing: 12) {
+                    Circle()
+                        .fill(Color.gray.opacity(0.3))
+                        .frame(width: 32, height: 32)
+                    
+                    VStack(alignment: .leading, spacing: 6) {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.gray.opacity(0.3))
+                            .frame(width: 120, height: 16)
+                        
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.gray.opacity(0.2))
+                            .frame(width: 200, height: 14)
+                    }
+                    
+                    Spacer()
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
+            }
+        }
+        .background(theme.palette.cardFillSecondary)
+        .shimmer()
+    }
+    
+    private var emptyState: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "sparkles")
+                .font(.system(size: 64))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color.dlIndigo, Color.dlViolet],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+            
+            VStack(spacing: 8) {
+                Text("Your Cosmic Forecast")
+                    .font(DLFont.title(24))
+                    .fontWeight(.semibold)
+                
+                Text("Pull down to refresh and see what the stars have aligned for you today.")
+                    .font(DLFont.body(16))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(40)
+        .background(theme.palette.cardFillSecondary)
     }
 }
