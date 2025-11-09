@@ -347,6 +347,8 @@ struct ComposeDreamView: View {
     @State private var isTranscribingAudio = false
     @State private var transcriptionError: String?
     @State private var lastTranscription: String?
+    @State private var savedEntry: DreamEntry?
+    @State private var showQuickRead = false
 
     let store: DreamStore
     @State private var shouldAutoStartRecording: Bool
@@ -418,6 +420,11 @@ struct ComposeDreamView: View {
                     audioURL = nil
                 default:
                     break
+                }
+            }
+            .sheet(isPresented: $showQuickRead) {
+                if let entry = savedEntry {
+                    QuickReadView(entry: entry)
                 }
             }
         }
@@ -749,10 +756,45 @@ struct ComposeDreamView: View {
         }
         
         let storedURL = audioURL.flatMap(persistRecording)
+        
+        // Create and save the entry
+        let entry = DreamEntry(rawText: trimmed, transcriptURL: storedURL)
         store.add(rawText: trimmed, transcriptURL: storedURL)
+        
+        // Extract quick motifs for the Quick Read
+        var quickEntry = entry
+        quickEntry.extractedSymbols = extractQuickMotifs(from: trimmed)
+        
         Feedback.success()
+        
+        // Show Quick Read before dismissing
+        savedEntry = quickEntry
+        showQuickRead = true
+        
+        // Dismiss the compose view (Quick Read will be shown as a sheet)
         dismiss()
     }
+    
+    private func extractQuickMotifs(from text: String) -> [String] {
+        // Simple keyword extraction for Quick Read
+        let words = text
+            .lowercased()
+            .components(separatedBy: CharacterSet.alphanumerics.inverted)
+            .filter { $0.count > 4 }
+            .filter { !commonWords.contains($0) }
+        
+        return Array(Set(words)).prefix(3).map { $0.capitalized }
+    }
+    
+    private let commonWords: Set<String> = [
+        "about", "after", "again", "before", "being", "could", "did", "does",
+        "doing", "down", "during", "each", "from", "have", "having", "into",
+        "more", "most", "other", "should", "such", "than", "that", "their",
+        "them", "then", "there", "these", "they", "this", "through", "under",
+        "very", "what", "when", "where", "which", "while", "will", "with",
+        "would", "your", "dream", "dreamed", "dreaming", "dreams", "remember",
+        "remembered", "felt", "feel", "feeling", "think", "thought", "seemed"
+    ]
     
     private func persistRecording(_ url: URL) -> URL {
         let fileManager = FileManager.default

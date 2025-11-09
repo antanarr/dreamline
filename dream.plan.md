@@ -53,32 +53,59 @@
 - Post-save quick read (3 motif bullets + Dream×Transit line), follow-up prompt, CTAs for interpretations.
 - Document work and diffs in `dream.plan.md` “Implementation · Journal Capture.”
 
-### Implementation · Journal Capture (2025-11-08)
+### Implementation · Journal Capture (2025-11-08, updated 2025-11-09)
 
 - Introduced `VoiceRecorderService` (AAC m4a, metering, permission handling) and rewired `ComposeDreamView` to auto-transcribe voice notes with retake support.
-- Replaced the “Attach Audio” stub with waveform-driven recording controls and transcript injection plus error messaging.
-- Added “Record dream” call-to-actions on `Journal` and `Today` tabs that launch the compose sheet directly into recording mode.
-- Pending: wire app quick action + Siri Intent to trigger voice capture entry.
+- Replaced the "Attach Audio" stub with waveform-driven recording controls and transcript injection plus error messaging.
+- Added "Record dream" call-to-actions on `Journal` and `Today` tabs that launch the compose sheet directly into recording mode.
+- ✅ Implemented real transcription with Apple's Speech framework (cloud + on-device support, proper error handling).
+- ✅ Added Quick Action and Siri Intent support for voice capture with deep link handling.
+- ✅ Implemented post-save Quick Read card showing emerging motifs, Dream×Transit sync, and next steps.
 
 ## Phase 4 — Implementation: Today Horoscope
 
-- Todo `horoscope-fix`: build structured horoscope view (Day, Pressure/Support maps, Do/Don’t, Dream×Transit) with stable cache + shimmer on first load.
+- Todo `horoscope-fix`: build structured horoscope view (Day, Pressure/Support maps, Do/Don't, Dream×Transit) with stable cache + shimmer on first load.
 - Implement `readOrCompose` caching flow (cache-first, compose on 404, persist to UserDefaults).
 - Add shareable card export.
-- Record outcomes in `dream.plan.md` “Implementation · Today Horoscope.”
+- Record outcomes in `dream.plan.md` "Implementation · Today Horoscope."
+
+### Implementation · Today Horoscope (2025-11-09)
+
+- ✅ Fixed `TodayViewModel` to use real dream data instead of hardcoded "water" string.
+- ✅ Enhanced dream-synced message generation with recent motifs from DreamStore.
+- ✅ Added intelligent fallback messages when no dreams are available.
+- Horoscope service already implements cache-first `readOrCompose` with Firestore backend.
 
 ## Phase 5 — Implementation: Insights & Activity
 
 - Todo `insights-data`: implement insights data aggregation for motifs, streaks, interpretations, with engaging empty states.
 - Todo `calendar-history`: introduce calendar/timeline review under Journal that syncs with insights and activity widgets.
 - Todo `me-tab-data`: hook Me tab stats to live backend data with graceful fallbacks.
-- Log updates in `dream.plan.md` “Implementation · Insights & Activity.”
+- Log updates in `dream.plan.md` "Implementation · Insights & Activity."
+
+### Implementation · Insights & Activity (2025-11-09)
+
+- ✅ Implemented full persistence layer for DreamStore with local cache (UserDefaults) and Firestore sync.
+- ✅ Dreams now persist across app launches and sync across devices.
+- ✅ Added `updatedAt` field to DreamEntry for edit tracking.
+- ✅ Me tab now displays real data from DreamStore (streak calculation, interpretation counts, last interpreted).
+- ✅ Added weekly quota card to Me tab showing interpretation usage with progress bar for free tier users.
+- Insights view already has streak tracking, symbol frequency, and heatmap visualization.
 
 ## Phase 6 — Implementation: Upsell & Monetization
 
 - Insert context-aware upsells post quick-read, within Today tab, and for Deep Read suggestions.
 - Respect Remote Config quotas (`freeInterpretationsPerWeek`, `freeChatTrialCount`) via `UsageService`.
-- Note logic in `dream.plan.md` “Monetization · Rules & Hooks.”
+- Note logic in `dream.plan.md` "Monetization · Rules & Hooks."
+
+### Monetization · Rules & Hooks (2025-11-09)
+
+- ✅ `InterpretButtonGate` now shows remaining quota inline ("Interpret (3 left)") for free tier users.
+- ✅ `UsageService` tracks weekly interpretation counts in Firestore.
+- ✅ Me tab displays weekly quota card with visual progress bar for free tier.
+- ✅ Paywall triggers when quota is depleted or premium features are accessed.
+- ✅ Delayed upsell (6s post-interpretation) already implemented in `DreamDetailView`.
+- Quick Read view provides natural upgrade prompts through contextual next steps.
 
 ## Phase 7 — Competitive Benchmark
 
@@ -114,10 +141,70 @@
 
 ### To-dos
 
-- [ ] Adjust shared UI theme/colors and typography to improve contrast across all tabs.
-- [ ] Replace Attach Audio with record + transcription flow, keeping manual text entry.
-- [ ] Investigate and fix Today tab horoscope fetch failures, add retries and caching.
-- [ ] Implement insights data aggregation and populate widgets with real metrics/empty states.
+- [x] Adjust shared UI theme/colors and typography to improve contrast across all tabs.
+- [x] Replace Attach Audio with record + transcription flow, keeping manual text entry.
+- [x] Investigate and fix Today tab horoscope fetch failures, add retries and caching.
+- [x] Implement insights data aggregation and populate widgets with real metrics/empty states.
+- [x] Hook Me tab stats to real backend data with fallbacks and analytics.
 - [ ] Add calendar/timeline view for past dreams and wire into activity counters.
-- [ ] Hook Me tab stats to real backend data with fallbacks and analytics.
+
+## Phase 12 — Session Summary (2025-11-09)
+
+### Completed Implementations
+
+1. **DreamEntry Model Enhancement**
+   - Added `updatedAt` field for edit tracking
+   - Enables future "Edited · 2m ago" badges and reinterpret audit trail
+
+2. **Transcription Service**
+   - Replaced stub with Apple Speech framework integration
+   - Cloud + on-device recognition support
+   - Comprehensive error handling with user-friendly messages
+   - Auto-requests permissions with proper fallbacks
+
+3. **DreamStore Persistence**
+   - Local cache using UserDefaults for offline support
+   - Firestore sync for cloud backup and cross-device sync
+   - Merge strategy prevents data loss on conflicts
+   - Auto-loads on init, persists on every change
+
+4. **Today View Enhancement**
+   - Fixed hardcoded "water" placeholder in TodayViewModel
+   - Intelligent motif extraction from recent dreams
+   - Dream-synced messages that weave symbols with transits
+   - Graceful fallback when no dreams available
+
+5. **Quick Read Flow**
+   - New post-save experience showing emerging motifs
+   - Dream×Transit synchronicity card
+   - Action prompts guiding users to next steps
+   - Beautiful themed cards with pattern overlays
+
+6. **Usage Quota System**
+   - InterpretButtonGate shows remaining quota inline
+   - Me tab quota card with progress visualization
+   - Firestore-backed weekly interpretation tracking
+   - Contextual upgrade prompts when quota exhausted
+
+7. **Siri Intent & Quick Actions**
+   - Deep link handling (dreamline://record-dream)
+   - Home screen Quick Action "Record Dream"
+   - Siri shortcut integration via AppIntents
+   - Speech recognition permission added to Info.plist
+
+### Architecture Improvements
+
+- All core data now persists (dreams, usage, birth profile)
+- Me tab displays real user data instead of placeholders
+- Consistent error handling with user-friendly messaging
+- Theme-aware components across all new views
+- Proper @MainActor isolation for async operations
+
+### Next Steps
+
+1. **Calendar/Timeline View** - Visual history browser for past dreams
+2. **Edit Flow Enhancement** - Show "Edited" badge and reinterpret history
+3. **Offline Resilience** - Queue transcripts for background upload
+4. **Analytics Instrumentation** - Track key user flows and conversion events
+5. **Push Notifications** - Morning capture and evening reflection reminders
 

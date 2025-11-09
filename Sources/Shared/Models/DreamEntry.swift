@@ -3,6 +3,7 @@ import Foundation
 struct DreamEntry: Identifiable, Codable, Hashable {
     var id: String = UUID().uuidString
     var createdAt: Date = .init()
+    var updatedAt: Date? = nil
     var rawText: String
     var transcriptURL: URL? = nil
     var symbols: [String] = []

@@ -38,7 +38,7 @@ struct TodayView: View {
             )
             .navigationTitle("Today")
             .task {
-                await vm.load()
+                await vm.load(dreamStore: store)
                 isLoadingTransit = true
                 transit = await astro.transits(for: .now)
                 isLoadingTransit = false

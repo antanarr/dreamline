@@ -8,21 +8,23 @@
 
 /* Begin PBXBuildFile section */
 		0356C22E838247689A8C6792 /* InsightsHeatmapSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A9B0C1D2E3F4A5B6C7D8E9F /* InsightsHeatmapSection.swift */; };
-		7C350A43F33E40A4BDBAB9C6 /* SymbolSeasonalityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE5D781995B4B64A55C2638 /* SymbolSeasonalityDetailView.swift */; };
 		05358BFB70209254EA33A1D2 /* DreamEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA63262E7068CBD5081F58F5 /* DreamEntry.swift */; };
 		12DE67D82F51E7B68B722C32 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 62EABE4BE781CC2C4E82A18E /* README.md */; };
-		FE2C2A1B9D4E8F7C0A1B2C3D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = FE2C2A1B9D4E8F7C0A1B2C3E /* GoogleService-Info.plist */; };
 		179FD4B77773418D962583E4 /* SymbolHeatmapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09F7BB2925C947BB81DBB13E /* SymbolHeatmapView.swift */; };
 		1B8B297B979698E24E895008 /* AppEnv.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB7A4A2D534E142CE71FDA9 /* AppEnv.swift */; };
+		1C2D3E4F5A6B7C8D9E0F1A2C /* ColorTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C2D3E4F5A6B7C8D9E0F1A2B /* ColorTokens.swift */; };
 		1E650A1D4E257F57FAA59640 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 51153838FCC526CD33479F93 /* FirebaseFirestore */; };
+		2A3B4C5D6E7F8091A2B3C4D6 /* ThemeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A3B4C5D6E7F8091A2B3C4D5 /* ThemeService.swift */; };
 		2E4892FD18196F1649CF8FBD /* SymbolExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A47D006D8A8BCC84656501B /* SymbolExtractor.swift */; };
 		327B5C8C870C1DC9944FBD66 /* InsightsGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66027D041FEEE34D4E8467B0 /* InsightsGate.swift */; };
 		337D6CAD85882AFE166049DE /* AppLockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21E60B9072239A340ADB490A /* AppLockService.swift */; };
+		3BF331AE8B9C4BCB8656FAF5 /* OracleShimmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF6A3824F2164F6FB264D1A8 /* OracleShimmer.swift */; };
 		415952ABE53F5E81855815E6 /* FirebaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29AE82C180EEBF259A9DD9C2 /* FirebaseService.swift */; };
 		440C691717584556AD64B107 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887E0F168FD8290C58FFDA87 /* TodayView.swift */; };
 		4F6543490A8467B3CF905304 /* DreamStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06EA441B1A159BD5FE16FD39 /* DreamStore.swift */; };
 		5351F603D1A9D1A9D043D15B /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557A8B5B088EEAA529DE7C8E /* JournalView.swift */; };
 		598E2B2205BACB28ED393E0D /* IAPIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB853D90E0102838F0F5AF1E /* IAPIDs.swift */; };
+		59A59A8E2EC06D1100B6D122 /* QuickReadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A59A8D2EC06D1100B6D122 /* QuickReadView.swift */; };
 		59E88E4E2EBAACB900419139 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 59E88E4D2EBAACB900419139 /* FirebaseDatabase */; };
 		59E88E512EBAACB900419139 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 59E88E502EBAACB900419139 /* FirebaseFunctions */; };
 		59E88E532EBAACB900419139 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 59E88E522EBAACB900419139 /* FirebaseStorage */; };
@@ -30,56 +32,54 @@
 		63F8B699D6B846DDA4BFE703 /* AstroGlossary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1515A3A92841469ABDA4437C /* AstroGlossary.swift */; };
 		67A267233C3D270FAF54CC6C /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32ADC0D196DC4835745CE17 /* AuthService.swift */; };
 		68575162CA37B1BF0AEAC795 /* RemoteConfigService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1475F32409336714801E1C1 /* RemoteConfigService.swift */; };
+		6A1B2C3D4E5F60718293A4B5 /* BirthDataEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1C2A6D9E5B4C3A8D7E1F20 /* BirthDataEditorView.swift */; };
 		744EB922E0A58060B050F457 /* RootRouterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C48689CF08F88CDAC666943D /* RootRouterView.swift */; };
+		7C020F7270A5422ABAB5C5BC /* HoroscopeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B656ADF20D4B42BAA950219C /* HoroscopeService.swift */; };
+		7C350A43F33E40A4BDBAB9C6 /* SymbolSeasonalityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE5D781995B4B64A55C2638 /* SymbolSeasonalityDetailView.swift */; };
 		7D6E8F9A0B1C2D3E4F5A6B7C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D6E7F8A9B0C1D2E3F4A5B6 /* ContentView.swift */; };
 		7EFD863B0A1BD64765F88AC9 /* TodayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4088626376277D9767BB486B /* TodayViewModel.swift */; };
 		7F6DF3495A916712E3202551 /* HoroscopeDaily.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FA95901157E09C41131C675 /* HoroscopeDaily.swift */; };
-		F6C5D1BFBF4345DEAAA010EE /* HoroscopeStructured.swift in Sources */ = {isa = PBXBuildFile; fileRef = F24001C776294FDEA3E9F18C /* HoroscopeStructured.swift */; };
+		8192A3B4C5D6E7F8091A2B3C /* ProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D8E9F0A1B2C3D4E5F607182 /* ProfileService.swift */; };
 		867F4B148A814CB8CC2017AF /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = E005C838A6E21C391E9C7DD7 /* FirebaseAnalytics */; };
 		87B2A7A132C35BD6EC8AC881 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = B1A723C14C3A28AD9A7C5485 /* FirebaseAuth */; };
 		9613663DF8226ACB5021994B /* DreamDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB00E5FC10AF748766B3E08D /* DreamDetailView.swift */; };
-		A8B9C0D1E2F3A4B5C6D7E8F9 /* InterpretButtonGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1165398E7CDC47C0A84E0C2F /* InterpretButtonGate.swift */; };
-		B9C0D1E2F3A4B5C6D7E8F9A0 /* InterpretCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9934AADD3F194A7F9BE7D498 /* InterpretCoordinator.swift */; };
-		C5F1A2B3C4D5E6F708192A3B /* UsageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F6A7B8C9D0E1F203040506 /* UsageService.swift */; };
 		98898BF1CB85450DAFE7A46F /* AstroIconButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AC6D9ACE1E74875B39A642C /* AstroIconButton.swift */; };
 		9B19CF277A18B7E6C07E7DCA /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37481319B28DC7E1F017B47 /* NotificationService.swift */; };
 		9BD282320C85AF5D1C35A3B0 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C317807AF15F0F8C17F06F /* ProfileView.swift */; };
 		9C33E5ABEFF33AB3131490D0 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738C88E69026F7ECD6BAAAA1 /* Theme.swift */; };
-		1C2D3E4F5A6B7C8D9E0F1A2C /* ColorTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C2D3E4F5A6B7C8D9E0F1A2B /* ColorTokens.swift */; };
-		2A3B4C5D6E7F8091A2B3C4D6 /* ThemeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A3B4C5D6E7F8091A2B3C4D5 /* ThemeService.swift */; };
-		3BF331AE8B9C4BCB8656FAF5 /* OracleShimmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF6A3824F2164F6FB264D1A8 /* OracleShimmer.swift */; };
-		D22FA482FC054E709A328C1C /* TodayStructuredView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC556767D898403DBE7033EF /* TodayStructuredView.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E1 /* OracleGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F6A7B8C9D0E1F2 /* OracleGate.swift */; };
 		A1B2C3D4E5F6A7B8C9D0E1F2 /* TodayPlanetStrip.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F6A7B8C9D0E1F2A3 /* TodayPlanetStrip.swift */; };
+		A1D2C3B4E5F6071890ABCDE2 /* RecordDreamIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D2C3B4E5F6071890ABCDE1 /* RecordDreamIntent.swift */; };
 		A4A5C4DF0140CC9F30F80CEE /* OnboardingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6708ADB7D0E1E21AA637735 /* OnboardingFlow.swift */; };
 		A7C2CB8E0C0F6F87B989947B /* PushService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529E8FF6611032F53F615B44 /* PushService.swift */; };
+		A8B9C0D1E2F3A4B5C6D7E8F9 /* InterpretButtonGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1165398E7CDC47C0A84E0C2F /* InterpretButtonGate.swift */; };
+		B1C2D3E4F5061728394A5B6E /* QuickCaptureBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5061728394A5B6D /* QuickCaptureBridge.swift */; };
 		B32232A9AE9899A04406063A /* OracleService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E07790A9FE0B47C5A4AA6466 /* OracleService.swift */; };
 		B5C6D7E8F9A0B1C2D3E4F5A6 /* OracleChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D8E9F0A1B2C3D4E5F6A7 /* OracleChatService.swift */; };
 		B9546E7F8E9BC63A4D23D07E /* DreamlineApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E3AE5D7CD6A912C26DB35 /* DreamlineApp.swift */; };
+		B9C0D1E2F3A4B5C6D7E8F9A0 /* InterpretCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9934AADD3F194A7F9BE7D498 /* InterpretCoordinator.swift */; };
 		C34E429FAC9F6EAB6D60ED32 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A824CEB8FB20614385EAADE7 /* PaywallView.swift */; };
 		C3D4E5F6A7B8C9D0E1F2A3 /* TodayRangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E5F6A7B8C9D0E1F2A3B4 /* TodayRangeView.swift */; };
 		C3D4E5F6A7B8C9D0E1F2A3B4 /* AstroAssetsExistTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E5F6A7B8C9D0E1F2A3B4C5 /* AstroAssetsExistTests.swift */; };
+		C5F1A2B3C4D5E6F708192A3B /* UsageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F6A7B8C9D0E1F203040506 /* UsageService.swift */; };
 		C7502F15DA5B50EA5B2EF99F /* EntitlementsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B078092D64F5C5D7AC7B6C1 /* EntitlementsService.swift */; };
 		CFB5A5DB5C2A07D05E16FF9A /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 8C558025F22C54B074C96872 /* FirebaseRemoteConfig */; };
 		D145E9E89BAA769CC8043270 /* TranscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB56FE877C53F1EF21E3E0E1 /* TranscriptionService.swift */; };
 		D1C283A61F7B4511AE9A0B8B /* HoroscopeRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AB2AB61C6DC42D59A28AD4F /* HoroscopeRange.swift */; };
+		D22FA482FC054E709A328C1C /* TodayStructuredView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC556767D898403DBE7033EF /* TodayStructuredView.swift */; };
 		DB33F80575DB1EBAFD287189 /* StoreKitLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DB66BC88E5AB7C6AB8D3CC /* StoreKitLayer.swift */; };
-		FA3C2E1D0B5A4987C6D5E4F4 /* VoiceRecorderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3C2E1D0B5A4987C6D5E4F3 /* VoiceRecorderService.swift */; };
-		FE8A4D12C3B74E6B9123A4F1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8A4D11C3B74E6B9123A4F1 /* AppDelegate.swift */; };
-		A1D2C3B4E5F6071890ABCDE2 /* RecordDreamIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D2C3B4E5F6071890ABCDE1 /* RecordDreamIntent.swift */; };
-		B1C2D3E4F5061728394A5B6E /* QuickCaptureBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5061728394A5B6D /* QuickCaptureBridge.swift */; };
-		/* E1FFA4F9DF4596EE8FF7689F removed RemoteConfigTests.swift in Sources */
 		E8F9A0B1C2D3E4F5A6B7C8 /* TodayRangeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9A0B1C2D3E4F5A6B7C8D9 /* TodayRangeViewModel.swift */; };
 		EE532EF1CD26802316CF2437 /* DeepReadGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F364B5B852252478A372AFBD /* DeepReadGenerator.swift */; };
 		F0D7E430B94E4AB0881BBACB /* OracleChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2636DA5396634B318F6D4070 /* OracleChatView.swift */; };
 		F2E925FEDEB07CA9DCF0B298 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 2A27E80C677EC938346E464A /* FirebaseMessaging */; };
 		F31A57DEC339F24A7B09166B /* OracleSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D006DB938F0A71062F6DFB24 /* OracleSchemaTests.swift */; };
 		F38DC86033BA4FCD86BB36ED /* AstroCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EEB1162D6324A64AF70A76A /* AstroCatalog.swift */; };
+		F6C5D1BFBF4345DEAAA010EE /* HoroscopeStructured.swift in Sources */ = {isa = PBXBuildFile; fileRef = F24001C776294FDEA3E9F18C /* HoroscopeStructured.swift */; };
 		F8E9A0B1C2D3E4F5A6B7C8 /* HistoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E0A1B2C3D4E5F6A7B8C9 /* HistoryService.swift */; };
-		7C020F7270A5422ABAB5C5BC /* HoroscopeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B656ADF20D4B42BAA950219C /* HoroscopeService.swift */; };
+		FA3C2E1D0B5A4987C6D5E4F4 /* VoiceRecorderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3C2E1D0B5A4987C6D5E4F3 /* VoiceRecorderService.swift */; };
 		FC4B07B8F8849A5064DDA29A /* AstroService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFA543F810B15B3F844BCE2 /* AstroService.swift */; };
-		6A1B2C3D4E5F60718293A4B5 /* BirthDataEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1C2A6D9E5B4C3A8D7E1F20 /* BirthDataEditorView.swift */; };
-		8192A3B4C5D6E7F8091A2B3C /* ProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D8E9F0A1B2C3D4E5F607182 /* ProfileService.swift */; };
+		FE2C2A1B9D4E8F7C0A1B2C3D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = FE2C2A1B9D4E8F7C0A1B2C3E /* GoogleService-Info.plist */; };
+		FE8A4D12C3B74E6B9123A4F1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8A4D11C3B74E6B9123A4F1 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,14 +97,14 @@
 		06EA441B1A159BD5FE16FD39 /* DreamStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamStore.swift; sourceTree = "<group>"; };
 		09F7BB2925C947BB81DBB13E /* SymbolHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolHeatmapView.swift; sourceTree = "<group>"; };
 		0FA95901157E09C41131C675 /* HoroscopeDaily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeDaily.swift; sourceTree = "<group>"; };
-		F24001C776294FDEA3E9F18C /* HoroscopeStructured.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeStructured.swift; sourceTree = "<group>"; };
-		FE8A4D11C3B74E6B9123A4F1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		1165398E7CDC47C0A84E0C2F /* InterpretButtonGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterpretButtonGate.swift; sourceTree = "<group>"; };
 		1515A3A92841469ABDA4437C /* AstroGlossary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AstroGlossary.swift; sourceTree = "<group>"; };
-		A1D2C3B4E5F6071890ABCDE1 /* RecordDreamIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordDreamIntent.swift; sourceTree = "<group>"; };
-		B1C2D3E4F5061728394A5B6D /* QuickCaptureBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCaptureBridge.swift; sourceTree = "<group>"; };
+		1C2D3E4F5A6B7C8D9E0F1A2B /* ColorTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorTokens.swift; sourceTree = "<group>"; };
+		1FE5D781995B4B64A55C2638 /* SymbolSeasonalityDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolSeasonalityDetailView.swift; sourceTree = "<group>"; };
 		21E60B9072239A340ADB490A /* AppLockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockService.swift; sourceTree = "<group>"; };
 		2636DA5396634B318F6D4070 /* OracleChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleChatView.swift; sourceTree = "<group>"; };
 		29AE82C180EEBF259A9DD9C2 /* FirebaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseService.swift; sourceTree = "<group>"; };
+		2A3B4C5D6E7F8091A2B3C4D5 /* ThemeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeService.swift; sourceTree = "<group>"; };
 		2AC6D9ACE1E74875B39A642C /* AstroIconButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AstroIconButton.swift; sourceTree = "<group>"; };
 		37032F96872F6A7224C4582E /* Dreamline.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dreamline.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3EEB1162D6324A64AF70A76A /* AstroCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AstroCatalog.swift; sourceTree = "<group>"; };
@@ -113,35 +113,26 @@
 		529E8FF6611032F53F615B44 /* PushService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushService.swift; sourceTree = "<group>"; };
 		54C317807AF15F0F8C17F06F /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		557A8B5B088EEAA529DE7C8E /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
+		59A59A8D2EC06D1100B6D122 /* QuickReadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickReadView.swift; sourceTree = "<group>"; };
+		5F1C2A6D9E5B4C3A8D7E1F20 /* BirthDataEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirthDataEditorView.swift; sourceTree = "<group>"; };
 		62EABE4BE781CC2C4E82A18E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		FE2C2A1B9D4E8F7C0A1B2C3E /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = GoogleService-Info.plist; sourceTree = "<group>"; };
-		FE2C2A1B9D4E8F7C0A1B2C40 /* Config */ = {
-			isa = PBXGroup;
-			children = (
-				FE2C2A1B9D4E8F7C0A1B2C3E /* GoogleService-Info.plist */,
-			);
-			path = Config;
-			sourceTree = "<group>";
-		};
 		66027D041FEEE34D4E8467B0 /* InsightsGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsGate.swift; sourceTree = "<group>"; };
 		738C88E69026F7ECD6BAAAA1 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
-		1C2D3E4F5A6B7C8D9E0F1A2B /* ColorTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorTokens.swift; sourceTree = "<group>"; };
-		2A3B4C5D6E7F8091A2B3C4D5 /* ThemeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeService.swift; sourceTree = "<group>"; };
-		EF6A3824F2164F6FB264D1A8 /* OracleShimmer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleShimmer.swift; sourceTree = "<group>"; };
-		EC556767D898403DBE7033EF /* TodayStructuredView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayStructuredView.swift; sourceTree = "<group>"; };
 		7AB2AB61C6DC42D59A28AD4F /* HoroscopeRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeRange.swift; sourceTree = "<group>"; };
 		7B078092D64F5C5D7AC7B6C1 /* EntitlementsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementsService.swift; sourceTree = "<group>"; };
+		7D8E9F0A1B2C3D4E5F607182 /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileService.swift; sourceTree = "<group>"; };
 		887E0F168FD8290C58FFDA87 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
-		/* 89FC095E215D4EABD2332256 removed RemoteConfigTests.swift */
 		8A9B0C1D2E3F4A5B6C7D8E9F /* InsightsHeatmapSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsHeatmapSection.swift; sourceTree = "<group>"; };
-		1FE5D781995B4B64A55C2638 /* SymbolSeasonalityDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolSeasonalityDetailView.swift; sourceTree = "<group>"; };
 		8CB7A4A2D534E142CE71FDA9 /* AppEnv.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnv.swift; sourceTree = "<group>"; };
+		9934AADD3F194A7F9BE7D498 /* InterpretCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterpretCoordinator.swift; sourceTree = "<group>"; };
 		9A47D006D8A8BCC84656501B /* SymbolExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolExtractor.swift; sourceTree = "<group>"; };
 		9BFA543F810B15B3F844BCE2 /* AstroService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AstroService.swift; sourceTree = "<group>"; };
 		9F6438CFC912BED768EC0C9B /* DreamlineTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DreamlineTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1D2C3B4E5F6071890ABCDE1 /* RecordDreamIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordDreamIntent.swift; sourceTree = "<group>"; };
 		A32ADC0D196DC4835745CE17 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		A824CEB8FB20614385EAADE7 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		B1475F32409336714801E1C1 /* RemoteConfigService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfigService.swift; sourceTree = "<group>"; };
+		B1C2D3E4F5061728394A5B6D /* QuickCaptureBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCaptureBridge.swift; sourceTree = "<group>"; };
 		B2C3D4E5F6A7B8C9D0E1F2 /* OracleGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleGate.swift; sourceTree = "<group>"; };
 		B2C3D4E5F6A7B8C9D0E1F2A3 /* TodayPlanetStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPlanetStrip.swift; sourceTree = "<group>"; };
 		B656ADF20D4B42BAA950219C /* HoroscopeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeService.swift; sourceTree = "<group>"; };
@@ -155,20 +146,21 @@
 		D4E5F6A7B8C9D0E1F2A3B4C5 /* AstroAssetsExistTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AstroAssetsExistTests.swift; sourceTree = "<group>"; };
 		D9E0A1B2C3D4E5F6A7B8C9 /* HistoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryService.swift; sourceTree = "<group>"; };
 		DB00E5FC10AF748766B3E08D /* DreamDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamDetailView.swift; sourceTree = "<group>"; };
-		1165398E7CDC47C0A84E0C2F /* InterpretButtonGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterpretButtonGate.swift; sourceTree = "<group>"; };
-		9934AADD3F194A7F9BE7D498 /* InterpretCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterpretCoordinator.swift; sourceTree = "<group>"; };
 		E07790A9FE0B47C5A4AA6466 /* OracleService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleService.swift; sourceTree = "<group>"; };
+		E5F6A7B8C9D0E1F203040506 /* UsageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageService.swift; sourceTree = "<group>"; };
 		EA63262E7068CBD5081F58F5 /* DreamEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamEntry.swift; sourceTree = "<group>"; };
+		EC556767D898403DBE7033EF /* TodayStructuredView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayStructuredView.swift; sourceTree = "<group>"; };
+		EF6A3824F2164F6FB264D1A8 /* OracleShimmer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleShimmer.swift; sourceTree = "<group>"; };
+		F24001C776294FDEA3E9F18C /* HoroscopeStructured.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeStructured.swift; sourceTree = "<group>"; };
 		F364B5B852252478A372AFBD /* DeepReadGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepReadGenerator.swift; sourceTree = "<group>"; };
 		F6708ADB7D0E1E21AA637735 /* OnboardingFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFlow.swift; sourceTree = "<group>"; };
 		F9A0B1C2D3E4F5A6B7C8D9 /* TodayRangeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayRangeViewModel.swift; sourceTree = "<group>"; };
-		E5F6A7B8C9D0E1F203040506 /* UsageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageService.swift; sourceTree = "<group>"; };
-		FB56FE877C53F1EF21E3E0E1 /* TranscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionService.swift; sourceTree = "<group>"; };
 		FA3C2E1D0B5A4987C6D5E4F3 /* VoiceRecorderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceRecorderService.swift; sourceTree = "<group>"; };
+		FB56FE877C53F1EF21E3E0E1 /* TranscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionService.swift; sourceTree = "<group>"; };
 		FB853D90E0102838F0F5AF1E /* IAPIDs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPIDs.swift; sourceTree = "<group>"; };
+		FE2C2A1B9D4E8F7C0A1B2C3E /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		FE8A4D11C3B74E6B9123A4F1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FEA8C576AF8E38D2CBE3A1C6 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
-		5F1C2A6D9E5B4C3A8D7E1F20 /* BirthDataEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirthDataEditorView.swift; sourceTree = "<group>"; };
-		7D8E9F0A1B2C3D4E5F607182 /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -353,6 +345,14 @@
 			path = Billing;
 			sourceTree = "<group>";
 		};
+		A1D2C3B4E5F6071890ABCDE0 /* AppIntents */ = {
+			isa = PBXGroup;
+			children = (
+				A1D2C3B4E5F6071890ABCDE1 /* RecordDreamIntent.swift */,
+			);
+			path = AppIntents;
+			sourceTree = "<group>";
+		};
 		A6B74643CBB0CF1B78E6D6EA /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
@@ -365,7 +365,6 @@
 			isa = PBXGroup;
 			children = (
 				D006DB938F0A71062F6DFB24 /* OracleSchemaTests.swift */,
-				/* RemoteConfigTests.swift removed */
 				D4E5F6A7B8C9D0E1F2A3B4C5 /* AstroAssetsExistTests.swift */,
 			);
 			path = DreamlineTests;
@@ -415,14 +414,6 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		FA3C2E1D0B5A4987C6D5E4F2 /* Audio */ = {
-			isa = PBXGroup;
-			children = (
-				FA3C2E1D0B5A4987C6D5E4F3 /* VoiceRecorderService.swift */,
-			);
-			path = Audio;
-			sourceTree = "<group>";
-		};
 		C303490D1D7A6FB836D4605E /* App */ = {
 			isa = PBXGroup;
 			children = (
@@ -430,14 +421,6 @@
 				D41E3AE5D7CD6A912C26DB35 /* DreamlineApp.swift */,
 			);
 			path = App;
-			sourceTree = "<group>";
-		};
-		A1D2C3B4E5F6071890ABCDE0 /* AppIntents */ = {
-			isa = PBXGroup;
-			children = (
-				A1D2C3B4E5F6071890ABCDE1 /* RecordDreamIntent.swift */,
-			);
-			path = AppIntents;
 			sourceTree = "<group>";
 		};
 		DE2CD0D7C57C8DF24A8EFE06 /* Reports */ = {
@@ -451,6 +434,7 @@
 		E960A1607EF8715A6768FDD4 /* Dreams */ = {
 			isa = PBXGroup;
 			children = (
+				59A59A8D2EC06D1100B6D122 /* QuickReadView.swift */,
 				DB00E5FC10AF748766B3E08D /* DreamDetailView.swift */,
 				1165398E7CDC47C0A84E0C2F /* InterpretButtonGate.swift */,
 				9934AADD3F194A7F9BE7D498 /* InterpretCoordinator.swift */,
@@ -470,6 +454,22 @@
 				8FC56233D6AEBC1A6948AF4D /* Today */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		FA3C2E1D0B5A4987C6D5E4F2 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				FA3C2E1D0B5A4987C6D5E4F3 /* VoiceRecorderService.swift */,
+			);
+			path = Audio;
+			sourceTree = "<group>";
+		};
+		FE2C2A1B9D4E8F7C0A1B2C40 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				FE2C2A1B9D4E8F7C0A1B2C3E /* GoogleService-Info.plist */,
+			);
+			path = Config;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -571,7 +571,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F31A57DEC339F24A7B09166B /* OracleSchemaTests.swift in Sources */,
-				/* RemoteConfigTests.swift in Sources removed */
 				C3D4E5F6A7B8C9D0E1F2A3B4 /* AstroAssetsExistTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -610,6 +609,7 @@
 				B5C6D7E8F9A0B1C2D3E4F5A6 /* OracleChatService.swift in Sources */,
 				F8E9A0B1C2D3E4F5A6B7C8 /* HistoryService.swift in Sources */,
 				C5F1A2B3C4D5E6F708192A3B /* UsageService.swift in Sources */,
+				59A59A8E2EC06D1100B6D122 /* QuickReadView.swift in Sources */,
 				A1B2C3D4E5F6A7B8C9D0E1 /* OracleGate.swift in Sources */,
 				7C020F7270A5422ABAB5C5BC /* HoroscopeService.swift in Sources */,
 				9B19CF277A18B7E6C07E7DCA /* NotificationService.swift in Sources */,
@@ -639,6 +639,7 @@
 				D145E9E89BAA769CC8043270 /* TranscriptionService.swift in Sources */,
 				FA3C2E1D0B5A4987C6D5E4F4 /* VoiceRecorderService.swift in Sources */,
 				8192A3B4C5D6E7F8091A2B3C /* ProfileService.swift in Sources */,
+				FE8A4D12C3B74E6B9123A4F1 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

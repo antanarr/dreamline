@@ -35,6 +35,8 @@
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Dreamline uses the microphone to attach dream voice notes.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Dreamline uses speech recognition to transcribe your voice notes into text.</string>
 	<key>OracleModel</key>
 	<string>gpt-4.1-mini</string>
 	<key>UIApplicationSceneManifest</key>

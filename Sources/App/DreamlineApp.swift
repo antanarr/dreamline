@@ -3,10 +3,12 @@ import FirebaseCore
 
 @main
 struct DreamlineApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @State private var firebaseState: FirebaseBootstrapState = .notAvailable
     @State private var dreamStore = DreamStore()
     @State private var entitlementsService = EntitlementsService()
     @State private var themeService = ThemeService()
+    @Environment(\.scenePhase) private var scenePhase
     
     init() {
         firebaseState = FirebaseService.configureIfPossible()
@@ -21,6 +23,9 @@ struct DreamlineApp: App {
                         .environment(dreamStore)
                         .environment(entitlementsService)
                         .environment(themeService)
+                        .onOpenURL { url in
+                            handleDeepLink(url)
+                        }
                 case .missingPlist:
                     Text("Firebase configuration missing")
                 case .notAvailable:
@@ -28,5 +33,48 @@ struct DreamlineApp: App {
                 }
             }
         }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                checkForQuickAction()
+            }
+        }
+    }
+    
+    private func handleDeepLink(_ url: URL) {
+        guard url.scheme == "dreamline" else { return }
+        
+        if url.host == "record-dream" || url.path == "/record-dream" {
+            // Trigger voice capture
+            QuickCapture.triggerVoiceCapture()
+        }
+    }
+    
+    private func checkForQuickAction() {
+        #if canImport(UIKit)
+        guard let shortcutItem = UIApplication.shared.shortcutItem else { return }
+        
+        if shortcutItem.type == "com.dreamline.recordDream" {
+            QuickCapture.triggerVoiceCapture()
+            UIApplication.shared.shortcutItem = nil
+        }
+        #endif
     }
 }
+
+#if canImport(UIKit)
+import UIKit
+import ObjectiveC
+
+extension UIApplication {
+    var shortcutItem: UIApplicationShortcutItem? {
+        get {
+            return objc_getAssociatedObject(self, &shortcutItemKey) as? UIApplicationShortcutItem
+        }
+        set {
+            objc_setAssociatedObject(self, &shortcutItemKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+}
+
+private var shortcutItemKey: UInt8 = 0
+#endif

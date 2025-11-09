@@ -7,9 +7,12 @@ struct ProfileView: View {
     @Environment(EntitlementsService.self) private var entitlements
     @Environment(DreamStore.self) private var store
     @Environment(ThemeService.self) private var theme: ThemeService
+    @StateObject private var usage = UsageService.shared
+    @ObservedObject private var rc = RemoteConfigService.shared
     @State private var showPaywall = false
     @State private var showBirthEditor = false
     @State private var selectedThemeMode: ThemeService.Mode = .system
+    @State private var weeklyInterpretCount: Int = 0
     @AppStorage("app.lock.enabled") private var lockEnabled = false
     @AppStorage(BirthDataKeys.timestamp) private var birthTimestamp: Double = 0
     @AppStorage(BirthDataKeys.timeKnown) private var birthTimeKnown: Bool = true
@@ -146,6 +149,11 @@ struct ProfileView: View {
             ScrollView {
                 VStack(spacing: 28) {
                     heroCard
+                    
+                    if entitlements.tier == .free {
+                        quotaCard
+                    }
+                    
                     activityCard
                     birthCard
                     membershipCard
@@ -174,7 +182,87 @@ struct ProfileView: View {
             .onAppear {
                 selectedThemeMode = theme.mode
             }
+            .task {
+                weeklyInterpretCount = await usage.weeklyInterpretCount(weekStart: Date())
+            }
         }
+    }
+    
+    private var quotaCard: some View {
+        let maxInterprets = rc.config.freeInterpretationsPerWeek
+        let remaining = max(0, maxInterprets - weeklyInterpretCount)
+        let progress = maxInterprets > 0 ? Double(weeklyInterpretCount) / Double(maxInterprets) : 0.0
+        
+        return VStack(alignment: .leading, spacing: 16) {
+            HStack(spacing: 12) {
+                Image(systemName: "chart.bar.fill")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(remaining > 0 ? Color.dlMint : Color.dlAmber)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Weekly quota")
+                        .font(DLFont.title(20))
+                        .foregroundStyle(.primary)
+                    
+                    if remaining > 0 {
+                        Text("\(remaining) of \(maxInterprets) interpretations left this week")
+                            .font(DLFont.body(12))
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text("Quota exhausted — upgrade for unlimited")
+                            .font(DLFont.body(12))
+                            .foregroundStyle(Color.dlAmber)
+                    }
+                }
+            }
+            
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(theme.palette.capsuleFill)
+                        .frame(height: 8)
+                    
+                    Capsule()
+                        .fill(
+                            LinearGradient(
+                                colors: remaining > 0 ? [Color.dlMint, Color.dlLilac] : [Color.dlAmber, Color.dlAmber.opacity(0.7)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: geometry.size.width * min(1.0, progress), height: 8)
+                }
+            }
+            .frame(height: 8)
+            
+            if remaining == 0 {
+                Button {
+                    triggerUpgradeImpact()
+                    showPaywall = true
+                } label: {
+                    Text("Unlock unlimited interpretations")
+                        .font(DLFont.body(14))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(
+                            LinearGradient(
+                                colors: [Color.dlIndigo, Color.dlViolet],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ),
+                            in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        )
+                        .foregroundStyle(Color.white)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(22)
+        .background(standardCardBackground(cornerRadius: 26))
+        .overlay(
+            RoundedRectangle(cornerRadius: 26, style: .continuous)
+                .stroke(theme.palette.cardStroke)
+        )
     }
     
     private var heroCard: some View {
