@@ -164,20 +164,20 @@ struct JournalView: View {
             }()
             
             let coordinator = InterpretCoordinator(oracle: client)
-            if let interpretation = await coordinator.runInterpret(dreamText: store.entries[index].rawText) {
+            if let result = await coordinator.runInterpret(dreamText: store.entries[index].rawText) {
                 await MainActor.run {
-                    store.entries[index].oracleSummary = interpretation.shortSummary
-                    store.entries[index].extractedSymbols = interpretation.symbolCards.map { $0.name }
-                    store.entries[index].themes = [] // future: derive themes from interpretation
+                    store.entries[index].interpretation = result.interpretation
+                    store.entries[index].oracleSummary = result.interpretation.summary
+                    store.entries[index].extractedSymbols = result.extraction.symbols.map { $0.name }
+                    store.entries[index].themes = result.extraction.archetypes
                     interpretingEntryID = nil
                     Feedback.success()
                 }
             } else {
                 let fallback = oracle.interpret(text: store.entries[index].rawText)
                 await MainActor.run {
+                    store.entries[index].interpretation = fallback
                     store.entries[index].oracleSummary = fallback.summary
-                    store.entries[index].extractedSymbols = fallback.symbols
-                    store.entries[index].themes = fallback.themes
                     interpretingEntryID = nil
                     Feedback.success()
                 }
@@ -766,13 +766,16 @@ struct ComposeDreamView: View {
         
         // Create and save entry with interpretation when available
         var entry = DreamEntry(rawText: trimmed, transcriptURL: storedURL)
-        if let interpreted {
-            entry.oracleSummary = interpreted.shortSummary
-            entry.extractedSymbols = interpreted.symbolCards.map { $0.name }
-            entry.themes = [] // future: use interpreted.archetypes if exposed
+        if let result = interpreted {
+            entry.extractedSymbols = result.extraction.symbols.map { $0.name }
+            entry.themes = result.extraction.archetypes
+            entry.interpretation = result.interpretation
+            entry.oracleSummary = result.interpretation.summary
         } else {
-            // Fallback quick extraction for empty interpretations
             entry.extractedSymbols = extractQuickMotifs(from: trimmed)
+            let fallbackInterpretation = OracleService().interpret(text: trimmed)
+            entry.interpretation = fallbackInterpretation
+            entry.oracleSummary = fallbackInterpretation.summary
         }
         
         store.entries.insert(entry, at: 0)

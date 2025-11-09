@@ -182,20 +182,87 @@ struct DreamDetailView: View {
                     .frame(maxWidth: 180, alignment: .leading)
             }
             .shimmer()
-        } else if let summary = entry.oracleSummary {
-            VStack(alignment: .leading, spacing: 14) {
-                Text(summary)
-                    .font(DLFont.body(15))
+        } else if let interpretation = entry.interpretation {
+            VStack(alignment: .leading, spacing: 18) {
+                Text(interpretation.headline)
+                    .font(DLFont.title(24))
                     .foregroundStyle(.primary)
                     .onAppear(perform: scheduleUpsellIfNeeded)
                 
-                if !entry.extractedSymbols.isEmpty {
-                    TagList(title: "Symbols", items: entry.extractedSymbols)
+                Text(interpretation.summary)
+                    .font(DLFont.body(15))
+                    .foregroundStyle(.primary)
+                
+                Divider().overlay(Color.white.opacity(0.1))
+                
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Psychology")
+                        .font(DLFont.body(13))
+                        .foregroundStyle(.secondary)
+                    Text(interpretation.psychology)
+                        .font(DLFont.body(15))
+                        .foregroundStyle(.primary)
                 }
                 
-                if !entry.themes.isEmpty {
-                    TagList(title: "Themes", items: entry.themes)
+                if let astrology = interpretation.astrology {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Astrology")
+                            .font(DLFont.body(13))
+                            .foregroundStyle(.secondary)
+                        Text(astrology)
+                            .font(DLFont.body(15))
+                            .foregroundStyle(.primary)
+                    }
                 }
+                
+                if !interpretation.symbols.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Symbols")
+                            .font(DLFont.body(13))
+                            .foregroundStyle(.secondary)
+                        ForEach(interpretation.symbols, id: \.name) { symbol in
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack(spacing: 8) {
+                                    Text(symbol.name.capitalized)
+                                        .font(DLFont.body(15).weight(.semibold))
+                                        .foregroundStyle(.primary)
+                                    Spacer()
+                                    Text("\(Int(symbol.confidence * 100))%")
+                                        .font(DLFont.body(11))
+                                        .foregroundStyle(.secondary)
+                                }
+                                Text(symbol.meaning)
+                                    .font(DLFont.body(14))
+                                    .foregroundStyle(.primary.opacity(0.9))
+                            }
+                            .padding(14)
+                            .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        }
+                    }
+                }
+                
+                if !interpretation.actions.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Suggested actions")
+                            .font(DLFont.body(13))
+                            .foregroundStyle(.secondary)
+                        ForEach(Array(interpretation.actions.enumerated()), id: \.offset) { index, action in
+                            HStack(alignment: .top, spacing: 10) {
+                                Text("\(index + 1).")
+                                    .font(DLFont.body(13).weight(.semibold))
+                                    .foregroundStyle(.secondary)
+                                Text(action)
+                                    .font(DLFont.body(14))
+                                    .foregroundStyle(.primary)
+                            }
+                        }
+                    }
+                }
+                
+                Text(interpretation.disclaimer)
+                    .font(DLFont.body(11))
+                    .foregroundStyle(.secondary.opacity(0.9))
+                    .padding(.top, 6)
             }
         } else {
             VStack(alignment: .leading, spacing: 10) {
@@ -315,20 +382,20 @@ struct DreamDetailView: View {
         }()
         
         let coordinator = InterpretCoordinator(oracle: client)
-        if let interpretation = await coordinator.runInterpret(dreamText: entry.rawText) {
+        if let result = await coordinator.runInterpret(dreamText: entry.rawText) {
             await MainActor.run {
-                entry.oracleSummary = interpretation.shortSummary
-                entry.extractedSymbols = interpretation.symbolCards.map { $0.name }
-                entry.themes = [] // TODO: derive from interpretation
+                entry.interpretation = result.interpretation
+                entry.oracleSummary = result.interpretation.summary
+                entry.extractedSymbols = result.extraction.symbols.map { $0.name }
+                entry.themes = result.extraction.archetypes
                 isInterpreting = false
                 hasShownInterpretation = false
             }
         } else {
             let fallback = oracle.interpret(text: entry.rawText)
             await MainActor.run {
+                entry.interpretation = fallback
                 entry.oracleSummary = fallback.summary
-                entry.extractedSymbols = fallback.symbols
-                entry.themes = fallback.themes
                 isInterpreting = false
                 hasShownInterpretation = false
             }

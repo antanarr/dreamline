@@ -6,6 +6,9 @@ import corsLib from "cors";
 import fetch from "node-fetch";
 import { z } from "zod";
 import { defineSecret } from "firebase-functions/params";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { clinicalVoiceIssues, voiceGuardConstants } from "./style/voiceGuards.js";
 import { buildTransitRange } from "./astro/transitEngine.js";
 import { anchorKeyFor } from "./anchors.js";
@@ -23,7 +26,13 @@ const cors = corsLib({ origin: true });
 
 const OPENAI_KEY = defineSecret("OPENAI_API_KEY");
 const OPENAI_BASE = process.env.OPENAI_BASE || "https://api.openai.com";
-const ENABLE_SELF_CHECK = true;
+const ENABLE_SELF_CHECK = false;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const PROMPT_DIR = join(__dirname, "../prompts");
+const DREAM_INTERPRET_SYSTEM_PROMPT = readFileSync(join(PROMPT_DIR, "dream_interpret_system.md"), "utf-8").trim();
+const DREAM_INTERPRET_USER_TEMPLATE = readFileSync(join(PROMPT_DIR, "dream_interpret_user.md"), "utf-8").trim();
 
 // Schemas
 const ExtractSchema = z.object({
@@ -33,14 +42,17 @@ const ExtractSchema = z.object({
 });
 
 const InterpretSchema = z.object({
-  shortSummary: z.string(),
-  longForm: z.string(),
-  actionPrompt: z.string(),
-  symbolCards: z.array(z.object({
+  headline: z.string(),
+  summary: z.string(),
+  psychology: z.string(),
+  astrology: z.string().nullable(),
+  symbols: z.array(z.object({
     name: z.string(),
     meaning: z.string(),
-    personalNote: z.string().optional()
-  }))
+    confidence: z.number().min(0).max(1)
+  })),
+  actions: z.array(z.string()).min(2).max(4),
+  disclaimer: z.string()
 });
 
 const ChatSchema = z.object({
@@ -281,75 +293,128 @@ async function enforceClinicalText(text: string, context: string, model: string,
   return draft;
 }
 
+function summarizeHistoryForPrompt(history: any): string {
+  if (!history || typeof history !== "object") return "None provided.";
+  const parts: string[] = [];
+  if (Array.isArray(history.userPhrases) && history.userPhrases.length) {
+    parts.push(`User phrases: ${history.userPhrases.join(", ")}`);
+  }
+  if (Array.isArray(history.topSymbols) && history.topSymbols.length) {
+    parts.push(`Top symbols: ${history.topSymbols.join(", ")}`);
+  }
+  if (Array.isArray(history.archetypeTrends) && history.archetypeTrends.length) {
+    parts.push(`Archetype trends: ${history.archetypeTrends.join(", ")}`);
+  }
+  return parts.length ? parts.join(" | ") : "None provided.";
+}
+
+function summarizeTransitForPrompt(transit: any): string {
+  if (!transit || typeof transit !== "object") return "No transit context provided.";
+  const headline = typeof transit.headline === "string" && transit.headline.length ? transit.headline : "Unknown transit";
+  const notes = Array.isArray(transit.notes) && transit.notes.length ? transit.notes.join(" • ") : "";
+  const symbolLexicon = Object.entries(SYMBOL_NOTES).map(([k, v]) => `${k}: ${v}`).join(" | ");
+  return [headline, notes, `Symbol lexicon: ${symbolLexicon}`].filter(Boolean).join(" | ");
+}
+
+function formatBirthForPrompt(birth: any) {
+  if (!birth || typeof birth !== "object") {
+    return { date: "Unknown", time: "Unknown", place: "Unknown" };
+  }
+  return {
+    date: birth.date ?? birth.birthDate ?? "Unknown",
+    time: birth.time ?? birth.birthTime ?? "Unknown",
+    place: birth.place ?? birth.placeText ?? "Unknown"
+  };
+}
+
+function applyTemplate(template: string, replacements: Record<string, string>): string {
+  let output = template;
+  for (const [key, value] of Object.entries(replacements)) {
+    const pattern = new RegExp(`{{${key}}}`, "g");
+    output = output.replace(pattern, () => value);
+  }
+  return output;
+}
+
 // Oracle: interpret (history + transits + symbol notes + self-check)
 export const oracleInterpret = onRequest({ secrets: [OPENAI_KEY], cors: true, invoker: "public" }, async (req, res) => {
   return cors(req, res, async () => {
     const OPENAI = OPENAI_KEY.value();
     if (!OPENAI) return res.status(503).json({ error: "LLM unavailable" });
 
-    const { dream, extraction, transit, history, model = "gpt-4.1-mini" } = req.body || {};
-
-    const system =
-`You are the Dreamline Oracle. Write brief, reflective readings that connect the user's dream symbols with their ongoing motifs and today's transits. Stay grounded in the given dream text, extracted symbols, history, and transit summary.
-
-VOICE: Second person; calm, lyrical but clear. Avoid clichés; one vivid image max. Short summary 1–2 sentences. Long form 3–6 sentences (≈120–180 words). End with one concrete micro‑action.
-
-RESONANCE: Mirror one phrase from dream/history; name one universal tension bound to THIS imagery; tie one symbol to the transit headline as an influence (no predictions).
-
-GUARDRAILS: No deterministic forecasts; no medical/legal/financial advice; no diagnosis; no real‑world names not in the dream. If user went off-topic, gently reframe toward symbol work.
-
-OUTPUT: Follow schema exactly (shortSummary, longForm, actionPrompt, symbolCards[] with concise meanings). Use symbol notes when helpful.`;
+    const { dream, extraction, transit, history, birth, model = "gpt-4.1-mini" } = req.body || {};
 
     const schema = {
       type: "object",
       properties: {
-        shortSummary: { type: "string" },
-        longForm: { type: "string" },
-        actionPrompt: { type: "string" },
-        symbolCards: {
+        headline: { type: "string" },
+        summary: { type: "string" },
+        psychology: { type: "string" },
+        astrology: { anyOf: [{ type: "string" }, { type: "null" }] },
+        symbols: {
           type: "array",
           items: {
             type: "object",
             properties: {
               name: { type: "string" },
               meaning: { type: "string" },
-              personalNote: { type: "string" }
+              confidence: { type: "number", minimum: 0, maximum: 1 }
             },
-            required: ["name", "meaning"],
+            required: ["name", "meaning", "confidence"],
             additionalProperties: false
           }
-        }
+        },
+        actions: {
+          type: "array",
+          minItems: 2,
+          maxItems: 4,
+          items: { type: "string" }
+        },
+        disclaimer: { type: "string" }
       },
-      required: ["shortSummary", "longForm", "actionPrompt", "symbolCards"],
+      required: ["headline", "summary", "psychology", "astrology", "symbols", "actions", "disclaimer"],
       additionalProperties: false
     };
 
-    const grounding = "Symbol notes: " + Object.entries(SYMBOL_NOTES).map(([k, v]) => `${k}: ${v}`).join(" | ");
+    const dreamText = typeof dream === "string" && dream.trim().length ? dream.trim() : "No dream supplied.";
+    const lifeNotes = summarizeHistoryForPrompt(history);
+    const astroContext = summarizeTransitForPrompt(transit);
+    const birthSummary = formatBirthForPrompt(birth);
+
+    const userPrompt = applyTemplate(DREAM_INTERPRET_USER_TEMPLATE, {
+      dream_text: dreamText,
+      life_notes: lifeNotes,
+      birth_date: birthSummary.date,
+      birth_time: birthSummary.time,
+      birth_place: birthSummary.place,
+      astro_context: astroContext
+    });
 
     const prompt = [
-      { role: "system", content: system + "\n" + grounding },
-      { role: "user", content: "Dream: " + String(dream ?? "") },
-      { role: "user", content: "Extraction: " + JSON.stringify(extraction ?? {}) },
-      { role: "user", content: "Transit: " + JSON.stringify(transit ?? {}) },
-      { role: "user", content: "History: " + JSON.stringify(history ?? {}) }
+      { role: "system", content: DREAM_INTERPRET_SYSTEM_PROMPT },
+      { role: "user", content: userPrompt },
+      { role: "user", content: "Dream extraction JSON: " + JSON.stringify(extraction ?? {}) },
+      { role: "user", content: "Transit JSON: " + JSON.stringify(transit ?? {}) },
+      { role: "user", content: "History JSON: " + JSON.stringify(history ?? {}) }
     ];
 
     const r = await callResponses(model, {
       input: prompt,
       response_format: {
         type: "json_schema",
-        json_schema: { name: "OracleInterpretation", schema, strict: true }
-      }
+        json_schema: { name: "DreamInterpretation", schema, strict: true }
+      },
+      temperature: 0.6
     }, OPENAI);
 
     const text = r.output_text ?? (r.output?.[0]?.content?.[0]?.text ?? "");
-    const parsed = InterpretSchema.safeParse(JSON.parse(text));
 
-    if (!parsed.success) return res.status(422).json({ error: parsed.error.flatten() });
-
-    const final = await selfCheckRevise(parsed.data, extraction, transit, history, OPENAI, model);
-
-    res.json(final);
+    try {
+      const parsed = InterpretSchema.parse(JSON.parse(text));
+      res.json(parsed);
+    } catch (error) {
+      return res.status(422).json({ error: "Schema violation", detail: (error as Error).message, raw: text });
+    }
   });
 });
 

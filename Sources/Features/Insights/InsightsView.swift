@@ -70,7 +70,7 @@ struct InsightsView: View {
     }
     
     private var interpretedCount: Int {
-        entries.filter { $0.oracleSummary != nil }.count
+        entries.filter { $0.interpretation != nil }.count
     }
     
     private var streakValue: String {

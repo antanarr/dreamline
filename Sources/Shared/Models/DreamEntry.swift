@@ -13,4 +13,5 @@ struct DreamEntry: Identifiable, Codable, Hashable {
     var oracleSummary: String? = nil
     var extractedSymbols: [String] = []
     var themes: [String] = []
+    var interpretation: DreamInterpretation? = nil
 }

@@ -40,7 +40,7 @@ struct ProfileView: View {
     private var dreamEntries: [DreamEntry] { store.entries }
     private var dreamCount: Int { dreamEntries.count }
     private var interpretedEntries: [DreamEntry] {
-        dreamEntries.filter { $0.oracleSummary != nil }
+        dreamEntries.filter { $0.interpretation != nil }
     }
     
     private var metrics: [ProfileMetric] {
