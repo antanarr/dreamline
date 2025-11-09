@@ -478,7 +478,7 @@ export const horoscopeCompose = onRequest({ secrets: [OPENAI_KEY], cors: true, i
 
     // Check cache unless force refresh
     if (!force) {
-      const cacheRef = db.doc(`users/${uid}/cache/horoscope/${range}_${anchorKey}`);
+      const cacheRef = db.doc(`users/${uid}/horoscope-cache/${range}_${anchorKey}`);
       const cacheSnap = await cacheRef.get();
       if (cacheSnap.exists) {
         const d = cacheSnap.data() as any;
@@ -600,7 +600,7 @@ export const horoscopeRead = onRequest({ secrets: [OPENAI_KEY], cors: true, invo
     
     const tz = (tzInput || 'UTC') as string;
     const anchorKey = anchorKeyFor(range as 'day'|'week'|'month'|'year', new Date(), tz);
-    const snap = await db.doc(`users/${uid}/cache/horoscope/${range}_${anchorKey}`).get();
+    const snap = await db.doc(`users/${uid}/horoscope-cache/${range}_${anchorKey}`).get();
     
     return res.json(snap.exists ? { item: snap.data()?.item, cached: true } : { item: null, cached: false });
   });
