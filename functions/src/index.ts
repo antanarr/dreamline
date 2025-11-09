@@ -85,7 +85,7 @@ const SYMBOL_NOTES: Record<string, string> = {
 };
 
 // Scope gate
-export const scopeGate = onRequest({ secrets: [OPENAI_KEY] }, async (req, res) => {
+export const scopeGate = onRequest({ secrets: [OPENAI_KEY], cors: true, invoker: "public" }, async (req, res) => {
   return cors(req, res, async () => {
     const OPENAI = OPENAI_KEY.value();
     if (!OPENAI) return res.status(503).json({ error: "LLM unavailable" });
@@ -127,7 +127,7 @@ export const scopeGate = onRequest({ secrets: [OPENAI_KEY] }, async (req, res) =
 });
 
 // Oracle: extract
-export const oracleExtract = onRequest({ secrets: [OPENAI_KEY] }, async (req, res) => {
+export const oracleExtract = onRequest({ secrets: [OPENAI_KEY], cors: true, invoker: "public" }, async (req, res) => {
   return cors(req, res, async () => {
     const OPENAI = OPENAI_KEY.value();
     if (!OPENAI) return res.status(503).json({ error: "LLM unavailable" });
@@ -247,7 +247,7 @@ async function enforceClinicalText(text: string, context: string, model: string,
 }
 
 // Oracle: interpret (history + transits + symbol notes + self-check)
-export const oracleInterpret = onRequest({ secrets: [OPENAI_KEY] }, async (req, res) => {
+export const oracleInterpret = onRequest({ secrets: [OPENAI_KEY], cors: true, invoker: "public" }, async (req, res) => {
   return cors(req, res, async () => {
     const OPENAI = OPENAI_KEY.value();
     if (!OPENAI) return res.status(503).json({ error: "LLM unavailable" });
@@ -319,7 +319,7 @@ OUTPUT: Follow schema exactly (shortSummary, longForm, actionPrompt, symbolCards
 });
 
 // Oracle: chat (Pro) with scope gate
-export const oracleChat = onRequest({ secrets: [OPENAI_KEY] }, async (req, res) => {
+export const oracleChat = onRequest({ secrets: [OPENAI_KEY], cors: true, invoker: "public" }, async (req, res) => {
   return cors(req, res, async () => {
     const OPENAI = OPENAI_KEY.value();
     if (!OPENAI) return res.status(503).json({ error: "LLM unavailable" });
@@ -442,7 +442,7 @@ const HoroscopeComposeSchema = z.object({
   tz: z.string().optional()
 });
 
-export const astroTransitsRange = onRequest(async (req, res) => {
+export const astroTransitsRange = onRequest({ cors: true, invoker: "public" }, async (req, res) => {
   return cors(req, res, async () => {
     const parsed = RangeSchema.safeParse(req.body ?? {});
     if (!parsed.success) {
@@ -461,7 +461,7 @@ export const astroTransitsRange = onRequest(async (req, res) => {
 });
 
 // Horoscope compose (text from transits)
-export const horoscopeCompose = onRequest({ secrets: [OPENAI_KEY] }, async (req, res) => {
+export const horoscopeCompose = onRequest({ secrets: [OPENAI_KEY], cors: true, invoker: "public" }, async (req, res) => {
   return cors(req, res, async () => {
     const OPENAI = OPENAI_KEY.value();
     if (!OPENAI) return res.status(503).json({ error: "LLM unavailable" });
@@ -590,7 +590,7 @@ export const horoscopeCompose = onRequest({ secrets: [OPENAI_KEY] }, async (req,
 });
 
 // Horoscope read (cache-only, no generation)
-export const horoscopeRead = onRequest({ secrets: [OPENAI_KEY] }, async (req, res) => {
+export const horoscopeRead = onRequest({ secrets: [OPENAI_KEY], cors: true, invoker: "public" }, async (req, res) => {
   return cors(req, res, async () => {
     const { uid, range = 'day', tz: tzInput } = req.body || {};
     
@@ -607,7 +607,7 @@ export const horoscopeRead = onRequest({ secrets: [OPENAI_KEY] }, async (req, re
 });
 
 // Usage counter (atomic)
-export const incrementUsage = onRequest(async (req, res) => {
+export const incrementUsage = onRequest({ cors: true, invoker: "public" }, async (req, res) => {
   return cors(req, res, async () => {
     const { uid, key } = req.body || {};
 
