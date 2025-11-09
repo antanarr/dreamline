@@ -521,31 +521,65 @@ export const horoscopeCompose = onRequest({ secrets: [OPENAI_KEY], cors: true, i
     const anchorKey = anchorKeyFor(rangeValue as any, new Date(), tz);
     const force = forceValue;
     
-    // If no items provided, fetch recent dreams from Firestore
-    let dreamItems = items;
-    if (!dreamItems || dreamItems.length === 0) {
-      try {
-        const dreamsSnap = await db.collection(`users/${uid}/dreams`)
-          .orderBy('createdAt', 'desc')
-          .limit(7)
-          .get();
-        dreamItems = dreamsSnap.docs.map(doc => {
-          const data = doc.data();
-          return {
-            dateISO: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-            headline: data.title || data.headline || "Dream",
-            bullets: data.symbols || data.themes || data.motifs || []
-          };
-        });
-      } catch (err) {
-        // If no dreams found, use empty array (will generate generic horoscope)
-        dreamItems = [];
+    // Get user profile first (needed for tier-based logic)
+    const prof = await getOrInitUserProfile(uid);
+    
+    // Always fetch recent dreams to weave into horoscope
+    // Fetch more dreams for pattern analysis (up to 30 days of history)
+    let recentDreams: any[] = [];
+    let dreamPatterns: any[] = [];
+    try {
+      const dreamsSnap = await db.collection(`users/${uid}/dreams`)
+        .orderBy('createdAt', 'desc')
+        .limit(30) // Fetch last 30 dreams for pattern analysis
+        .get();
+      
+      const allDreams = dreamsSnap.docs.map(doc => {
+        const data = doc.data();
+        return {
+          dateISO: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+          headline: data.title || data.headline || "Dream",
+          bullets: data.symbols || data.themes || data.motifs || [],
+          symbols: data.symbols || [],
+          archetypes: data.archetypes || [],
+          createdAt: data.createdAt?.toDate?.() || new Date()
+        };
+      });
+      
+      // Recent dreams (last 7 days) for current context
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      recentDreams = allDreams.filter(d => d.createdAt >= sevenDaysAgo);
+      
+      // Look for recurring symbols in older dreams (8-30 days ago)
+      const olderDreams = allDreams.filter(d => d.createdAt < sevenDaysAgo);
+      const recentSymbols = new Set(recentDreams.flatMap(d => d.symbols));
+      
+      // Find patterns: same symbols appearing in different time periods
+      for (const symbol of recentSymbols) {
+        const pastOccurrences = olderDreams.filter(d => d.symbols.includes(symbol));
+        if (pastOccurrences.length > 0) {
+          dreamPatterns.push({
+            symbol,
+            recentCount: recentDreams.filter(d => d.symbols.includes(symbol)).length,
+            pastOccurrence: pastOccurrences[0], // Most recent past occurrence
+            daysAgo: Math.floor((Date.now() - pastOccurrences[0].createdAt.getTime()) / (24 * 60 * 60 * 1000))
+          });
+        }
       }
+    } catch (err) {
+      // No dreams or error fetching - continue with empty arrays
+      recentDreams = [];
+      dreamPatterns = [];
     }
-
+    
+    // Create a hash of recent dreams for cache key (so new dreams = new cache entry)
+    const dreamHash = recentDreams.length > 0 
+      ? recentDreams.map(d => `${d.headline.slice(0, 20)}${d.symbols.join(',')}`).join('|').slice(0, 50)
+      : 'nodreams';
+    
     // Check cache unless force refresh
     if (!force) {
-      const cacheRef = db.doc(`users/${uid}/horoscope-cache/${rangeValue}_${anchorKey}`);
+      const cacheRef = db.doc(`users/${uid}/horoscope-cache/${rangeValue}_${anchorKey}_${dreamHash}`);
       const cacheSnap = await cacheRef.get();
       if (cacheSnap.exists) {
         const d = cacheSnap.data() as any;
@@ -554,9 +588,6 @@ export const horoscopeCompose = onRequest({ secrets: [OPENAI_KEY], cors: true, i
         }
       }
     }
-
-    // Get user profile and config for model selection
-    const prof = await getOrInitUserProfile(uid);
     const cfg = await loadConfig();
     const model = requestedModel || 
                   (prof.tier === 'pro' ? cfg.model.pro :
@@ -566,9 +597,11 @@ export const horoscopeCompose = onRequest({ secrets: [OPENAI_KEY], cors: true, i
                      : cfg.model.free.fallback);
 
     // Convert transit items to Transit format for structured output
-    // Extract aspects from items (assuming items come from astroTransitsRange which includes aspects)
+    // Note: This section is for parsing transit data, not dreams
+    // If items were provided (from astroTransitsRange), parse them for transit aspects
     const transits: any[] = [];
-    for (const item of (dreamItems || [])) {
+    if (items && items.length > 0) {
+    for (const item of items) {
       // If items have aspects array (from DailyTransitSummary), use them
       const itemWithAspects = item as any;
       if (itemWithAspects.aspects && Array.isArray(itemWithAspects.aspects)) {
@@ -602,20 +635,47 @@ export const horoscopeCompose = onRequest({ secrets: [OPENAI_KEY], cors: true, i
         }
       }
     }
+    }
 
     // Build prompt for structured output with model-written areas
     const ctx = {
       motifs: history?.topSymbols || [],
-      transits: transits.map((t: any) => ({ label: t.label, tone: t.tone }))
+      transits: transits.map((t: any) => ({ label: t.label, tone: t.tone })),
+      recentDreams: recentDreams.map(d => ({
+        date: d.dateISO.split('T')[0],
+        symbols: d.symbols,
+        archetypes: d.archetypes
+      })),
+      dreamPatterns: dreamPatterns.map(p => ({
+        symbol: p.symbol,
+        daysAgo: p.daysAgo,
+        recurring: p.recentCount > 1
+      }))
     };
     
-    const sys = `Write precise, second‑person, clinical‑poetic horoscopes. Avoid clichés. Sound human, not mystical fluff. Use the user's dream motifs and current transits. Keep language personal: "You may feel…", "Are you noticing…".`;
+    // Tier-aware system prompt
+    const isPaid = prof.tier === 'pro' || prof.tier === 'plus';
+    const dreamIntegrationInstructions = isPaid
+      ? `Deeply integrate the user's recent dreams and recurring patterns. When you spot a recurring symbol (e.g., water appearing again after X days), explain the astrological significance and timing. Connect dream symbols to current transits. Be specific about dates and planetary positions.`
+      : `If dream patterns exist, give a brief teaser (1 sentence max) hinting at recurring symbols or timing, but keep it vague. Frame it as "There's something interesting about [symbol] appearing now..." to encourage upgrade. Do NOT give away the full analysis.`;
+    
+    const sys = `Write precise, second‑person, clinical‑poetic horoscopes. Avoid clichés. Sound human, not mystical fluff. Use the user's dream motifs and current transits. Keep language personal: "You may feel…", "Are you noticing…".
+    
+${dreamIntegrationInstructions}
+
+The horoscope structure:
+- headline: Short, evocative (5-8 words)
+- summary: One guiding sentence
+- areas: 6 life areas (relationships, work_money, home_body, creativity_learning, spirituality, routine_habits) with 2-4 bullets each and do/don't recommendations`;
     
     const usr = {
-      instruction: `Produce JSON that matches the provided schema. Include 6 areas with short bullets and practical do/don't.`,
+      instruction: `Produce JSON that matches the provided schema.`,
       range: rangeValue, anchorKey, tz,
+      userTier: prof.tier,
       motifs: ctx.motifs,
-      transits: ctx.transits
+      transits: ctx.transits,
+      recentDreams: ctx.recentDreams.length > 0 ? ctx.recentDreams : undefined,
+      dreamPatterns: ctx.dreamPatterns.length > 0 ? ctx.dreamPatterns : undefined
     };
 
     const resp = await callResponses(model, {
@@ -642,8 +702,8 @@ export const horoscopeCompose = onRequest({ secrets: [OPENAI_KEY], cors: true, i
       generatedAt: new Date().toISOString()
     };
 
-    // Cache the result
-    const cacheRef = db.doc(`users/${uid}/horoscope-cache/${rangeValue}_${anchorKey}`);
+    // Cache the result (include dream hash so new dreams = new horoscope)
+    const cacheRef = db.doc(`users/${uid}/horoscope-cache/${rangeValue}_${anchorKey}_${dreamHash}`);
     await cacheRef.set({ 
       item, 
       _ts: FieldValue.serverTimestamp(), 
