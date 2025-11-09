@@ -1,9 +1,8 @@
 import { getFirestore } from 'firebase-admin/firestore';
 import { UserProfile } from './userProfile';
 
-const db = getFirestore();
-
 export async function loadConfig() {
+  const db = getFirestore();
   const snap = await db.doc('config/current').get();
   const data = snap.data();
   

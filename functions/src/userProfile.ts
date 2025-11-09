@@ -1,13 +1,12 @@
 import { getFirestore } from 'firebase-admin/firestore';
 
-const db = getFirestore();
-
 export interface UserProfile {
   tier?: 'free' | 'plus' | 'pro';
   createdAt?: string;
 }
 
 export async function getOrInitUserProfile(uid: string): Promise<UserProfile> {
+  const db = getFirestore();
   const ref = db.collection('users').doc(uid);
   const snap = await ref.get();
   
