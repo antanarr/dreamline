@@ -5,13 +5,13 @@ struct TodayView: View {
     @Environment(EntitlementsService.self) private var entitlements
     @Environment(ThemeService.self) private var theme: ThemeService
     @StateObject private var vm = TodayViewModel()
-    @StateObject private var horoscopeVM = HoroscopeViewModel()
-    @StateObject private var paywall = PaywallService.shared
-    @StateObject private var patternService = DreamPatternService.shared
+    @StateObject private var horoscopeVM = TodayRangeViewModel()
     @State private var showRecorder = false
     @State private var startRecordingOnCompose = false
     @State private var selectedLifeArea: HoroscopeArea?
     @State private var bestDays: [BestDayInfo] = []
+    @State private var showPaywall = false
+    @State private var paywallContext: PaywallService.PaywallContext?
 
     var body: some View {
         NavigationStack {
@@ -19,7 +19,7 @@ struct TodayView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     // Hero: Your Day + Log Dream
                     YourDayHeroCard(
-                        headline: horoscopeVM.structuredItem?.headline ?? "Loading your day...",
+                        headline: horoscopeVM.item?.headline ?? "Loading your day...",
                         dreamEnhancement: dreamEnhancement,
                         onLogDream: {
                             startRecordingOnCompose = true
@@ -28,22 +28,23 @@ struct TodayView: View {
                     )
                     
                     // Areas of Life
-                    if let item = horoscopeVM.structuredItem {
+                    if let item = horoscopeVM.item {
                         areasOfLifeSection(item: item)
                     }
                     
                     // Behind This Forecast
-                    if let item = horoscopeVM.structuredItem, !item.transits.isEmpty {
+                    if let item = horoscopeVM.item, !item.transits.isEmpty {
                         BehindThisForecastView(transits: item.transits)
                     }
                     
                     // Seasonal Content
                     SeasonalContentView(
                         currentZodiacSeason: ZodiacSign.current(),
-                        dreamPatterns: patternService.analyzePatterns(from: store, days: 30),
+                        dreamPatterns: DreamPatternService.shared.analyzePatterns(from: store, days: 30),
                         isPro: isPro,
                         onUnlock: {
-                            paywall.trigger(.dreamPatterns)
+                            paywallContext = .dreamPatterns
+                            showPaywall = true
                         }
                     )
                     
@@ -55,7 +56,8 @@ struct TodayView: View {
                             // Navigate to full calendar (future)
                         },
                         onUnlock: {
-                            paywall.trigger(.bestDays)
+                            paywallContext = .bestDays
+                            showPaywall = true
                         }
                     )
                 }
@@ -68,7 +70,7 @@ struct TodayView: View {
             .navigationTitle("Today")
             .task {
                 await vm.load(dreamStore: store)
-                await horoscopeVM.fetchStructured(range: .day)
+                await horoscopeVM.fetch(selection: .day, tzIdentifier: TimeZone.current.identifier)
                 // TODO: Fetch best days from backend
                 bestDays = [] // Placeholder
             }
@@ -81,15 +83,16 @@ struct TodayView: View {
                 NavigationStack {
                     LifeAreaDetailView(
                         area: area,
-                        transits: horoscopeVM.structuredItem?.transits ?? [],
+                        transits: horoscopeVM.item?.transits ?? [],
                         isPro: isPro
                     )
                 }
             }
-            .sheet(isPresented: $paywall.showPaywall) {
-                if let context = paywall.paywallContext {
+            .sheet(isPresented: $showPaywall) {
+                if let context = paywallContext {
                     PaywallView(context: context, onDismiss: {
-                        paywall.dismiss()
+                        showPaywall = false
+                        paywallContext = nil
                     })
                 }
             }
@@ -138,7 +141,8 @@ struct TodayView: View {
                         isLocked: isLocked,
                         onTap: {
                             if isLocked {
-                                paywall.trigger(.lockedLifeArea(areaId: area.id))
+                                paywallContext = .lockedLifeArea(areaId: area.id)
+                                showPaywall = true
                             } else {
                                 selectedLifeArea = area
                             }
