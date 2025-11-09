@@ -80,6 +80,7 @@
 		FC4B07B8F8849A5064DDA29A /* AstroService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFA543F810B15B3F844BCE2 /* AstroService.swift */; };
 		FE2C2A1B9D4E8F7C0A1B2C3D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = FE2C2A1B9D4E8F7C0A1B2C3E /* GoogleService-Info.plist */; };
 		FE8A4D12C3B74E6B9123A4F1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8A4D11C3B74E6B9123A4F1 /* AppDelegate.swift */; };
+		AA11BB22CC33DD44EE55FF67 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF66 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -161,6 +162,7 @@
 		FE2C2A1B9D4E8F7C0A1B2C3E /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		FE8A4D11C3B74E6B9123A4F1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FEA8C576AF8E38D2CBE3A1C6 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF66 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -386,9 +388,18 @@
 				AE85689E934517EE1E19725B /* DreamlineTests */,
 				FE2C2A1B9D4E8F7C0A1B2C40 /* Config */,
 				DE2CD0D7C57C8DF24A8EFE06 /* Reports */,
+				AA11BB22CC33DD44EE55FF77 /* Resources */,
 				50FBA4079D82A1D279C13E77 /* Sources */,
 				50A196FF7667C42F51A3D07F /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		AA11BB22CC33DD44EE55FF77 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AA11BB22CC33DD44EE55FF66 /* Assets.xcassets */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		B9E9E896B80C9CCE4595418F /* Services */ = {
@@ -560,6 +571,7 @@
 			files = (
 				12DE67D82F51E7B68B722C32 /* README.md in Resources */,
 				FE2C2A1B9D4E8F7C0A1B2C3D /* GoogleService-Info.plist in Resources */,
+				AA11BB22CC33DD44EE55FF67 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
