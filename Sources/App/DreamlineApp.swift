@@ -4,14 +4,21 @@ import FirebaseCore
 @main
 struct DreamlineApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @State private var firebaseState: FirebaseBootstrapState = .notAvailable
     @State private var dreamStore = DreamStore()
     @State private var entitlementsService = EntitlementsService()
     @State private var themeService = ThemeService()
     @Environment(\.scenePhase) private var scenePhase
     
-    init() {
-        firebaseState = FirebaseService.configureIfPossible()
+    var firebaseState: FirebaseBootstrapState {
+        // Check if Firebase is configured (done by AppDelegate)
+        #if canImport(FirebaseCore)
+        if FirebaseApp.app() != nil {
+            return .configured
+        } else if Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") == nil {
+            return .missingPlist
+        }
+        #endif
+        return .notAvailable
     }
     
     var body: some Scene {
