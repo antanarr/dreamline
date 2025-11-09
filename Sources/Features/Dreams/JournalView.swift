@@ -16,7 +16,6 @@ struct JournalView: View {
             ZStack(alignment: .bottomTrailing) {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
-                        recordBanner
                         header
                         
                         if store.entries.isEmpty {
@@ -368,7 +367,8 @@ struct ComposeDreamView: View {
                     VStack(alignment: .leading, spacing: 28) {
                         composeHeader
                         editorCard
-                        audioCard
+                        // Audio capture is intentionally hidden to unify entry UX;
+                        // users can use the keyboard microphone to dictate.
                     }
                     .padding(.horizontal, 22)
                     .padding(.top, 32)
@@ -401,10 +401,8 @@ struct ComposeDreamView: View {
                         editorFocused = true
                     }
                 }
-                if shouldAutoStartRecording && recorder.state == .idle {
-                    Task { await recorder.startRecording(autoActivate: true) }
-                    shouldAutoStartRecording = false
-                }
+                // Do not auto-start recording; keyboard mic is sufficient for speech input.
+                shouldAutoStartRecording = false
             }
             .onDisappear {
                 if case .recording = recorder.state {
@@ -678,9 +676,9 @@ struct ComposeDreamView: View {
             }
             
             Button {
-                saveDream()
+                Task { await saveDreamWithInterpretation() }
             } label: {
-                Text("Save Dream")
+                Text("Get Interpretation")
                     .font(DLFont.body(16))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
@@ -745,7 +743,7 @@ struct ComposeDreamView: View {
         theme.mode == .dawn ? Color(hex: 0x6E7198, alpha: 0.7) : Color.white.opacity(0.38)
     }
     
-    private func saveDream() {
+    private func saveDreamWithInterpretation() async {
         let trimmed = draft.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
             Feedback.error()
@@ -755,23 +753,36 @@ struct ComposeDreamView: View {
             return
         }
         
+        // Optional audio handling (kept for future) — not surfaced in UI now
         let storedURL = audioURL.flatMap(persistRecording)
         
-        // Create and save the entry
-        let entry = DreamEntry(rawText: trimmed, transcriptURL: storedURL)
-        store.add(rawText: trimmed, transcriptURL: storedURL)
+        // Interpret using cloud client when configured, otherwise stub
+        let client: OracleClient = {
+            let baseURL = (Bundle.main.object(forInfoDictionaryKey: "FunctionsBaseURL") as? String) ?? ""
+            return baseURL.isEmpty ? StubOracleClient() : CloudOracleClient()
+        }()
+        let coordinator = InterpretCoordinator(oracle: client)
+        let interpreted = await coordinator.runInterpret(dreamText: trimmed)
         
-        // Extract quick motifs for the Quick Read
-        var quickEntry = entry
-        quickEntry.extractedSymbols = extractQuickMotifs(from: trimmed)
+        // Create and save entry with interpretation when available
+        var entry = DreamEntry(rawText: trimmed, transcriptURL: storedURL)
+        if let interpreted {
+            entry.oracleSummary = interpreted.shortSummary
+            entry.extractedSymbols = interpreted.symbolCards.map { $0.name }
+            entry.themes = [] // future: use interpreted.archetypes if exposed
+        } else {
+            // Fallback quick extraction for empty interpretations
+            entry.extractedSymbols = extractQuickMotifs(from: trimmed)
+        }
         
+        store.entries.insert(entry, at: 0)
         Feedback.success()
         
-        // Show Quick Read before dismissing
-        savedEntry = quickEntry
+        // Present Quick Read (uses summary/symbols if present)
+        savedEntry = entry
         showQuickRead = true
         
-        // Dismiss the compose view (Quick Read will be shown as a sheet)
+        // Dismiss compose view (Quick Read appears modally)
         dismiss()
     }
     
