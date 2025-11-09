@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="g1" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#3b2a6e"/>
+      <stop offset="60%" stop-color="#1b1436"/>
+      <stop offset="100%" stop-color="#0b0f1a"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#g1)"/>
+  <g fill="#cfc9ff" font-family="SF Pro Display, -apple-system, Helvetica, Arial, sans-serif" text-anchor="middle">
+    <text x="256" y="260" font-size="28" opacity="0.92">OB SAMPLE</text>
+  </g>
+</svg>

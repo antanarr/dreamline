@@ -1,0 +1,22 @@
+{
+  "name": "dreamline",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "classify:art": "node bin/classify_artwork.mjs",
+    "ingest:art": "node bin/ingest_artwork.mjs",
+    "art:all": "npm run classify:art && npm run ingest:art"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "fast-glob": "^3.3.3",
+    "fs-extra": "^11.3.2",
+    "openai": "^6.8.1",
+    "sharp": "^0.34.5"
+  }
+}

@@ -87,7 +87,7 @@ extension View {
 }
 
 private struct DreamlineScreenBackground: ViewModifier {
-    @Environment(ThemeService.self) private var theme
+    @Environment(ThemeService.self) private var theme: ThemeService
     var patternScale: CGFloat
     
     func body(content: Content) -> some View {

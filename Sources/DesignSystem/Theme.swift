@@ -4,7 +4,23 @@ import Observation
 
 @Observable
 final class ThemeService {
-    enum Mode: String, CaseIterable { case system, light, dark }
+    enum Mode: String, CaseIterable, Identifiable {
+        case system, light, dark, dawn, midnight
+        
+        var id: String { rawValue }
+        
+        static var auto: Mode { .system }
+        
+        var displayName: String {
+            switch self {
+            case .system: return "Auto"
+            case .light: return "Light"
+            case .dark: return "Dark"
+            case .dawn: return "Dawn"
+            case .midnight: return "Midnight"
+            }
+        }
+    }
 
     var mode: Mode = .system
 
@@ -15,6 +31,13 @@ final class ThemeService {
         var tabBackground: UIColor
         var tabSelected: UIColor
         var tabUnselected: UIColor
+        
+        // Additional properties for cards and UI elements
+        let cardFillPrimary: Color
+        let cardFillSecondary: Color
+        let cardStroke: Color
+        let capsuleFill: Color
+        let separator: Color
     }
 
     var accent: Color = .dlIndigo
@@ -30,7 +53,12 @@ final class ThemeService {
                 textPrimary: UIColor(.dlMoon),
                 tabBackground: UIColor(.dlSpace),
                 tabSelected: UIColor(accent),
-                tabUnselected: UIColor(accent.opacity(0.6))
+                tabUnselected: UIColor(accent.opacity(0.6)),
+                cardFillPrimary: Color.white.opacity(0.08),
+                cardFillSecondary: Color.white.opacity(0.05),
+                cardStroke: Color.white.opacity(0.1),
+                capsuleFill: Color.white.opacity(0.1),
+                separator: Color.white.opacity(0.15)
             )
         case .light:
             return Palette(
@@ -39,7 +67,12 @@ final class ThemeService {
                 textPrimary: UIColor(Color.black.opacity(0.9)),
                 tabBackground: UIColor(.white),
                 tabSelected: UIColor(accent),
-                tabUnselected: UIColor(accent.opacity(0.6))
+                tabUnselected: UIColor(accent.opacity(0.6)),
+                cardFillPrimary: Color.white.opacity(0.9),
+                cardFillSecondary: Color.white.opacity(0.7),
+                cardStroke: Color.black.opacity(0.1),
+                capsuleFill: Color.gray.opacity(0.2),
+                separator: Color.gray.opacity(0.3)
             )
         @unknown default:
             return Palette(
@@ -48,16 +81,29 @@ final class ThemeService {
                 textPrimary: UIColor(.dlMoon),
                 tabBackground: UIColor(.dlSpace),
                 tabSelected: UIColor(accent),
-                tabUnselected: UIColor(accent.opacity(0.6))
+                tabUnselected: UIColor(accent.opacity(0.6)),
+                cardFillPrimary: Color.white.opacity(0.08),
+                cardFillSecondary: Color.white.opacity(0.05),
+                cardStroke: Color.white.opacity(0.1),
+                capsuleFill: Color.white.opacity(0.1),
+                separator: Color.white.opacity(0.15)
             )
         }
     }
 
     var colorScheme: ColorScheme? {
-        switch mode { case .system: return nil; case .light: return .light; case .dark: return .dark }
+        switch mode {
+        case .system: return nil
+        case .light, .dawn: return .light
+        case .dark, .midnight: return .dark
+        }
     }
 
     private var effectiveColorScheme: ColorScheme {
-        switch mode { case .system: return .dark; case .light: return .light; case .dark: return .dark }
+        switch mode {
+        case .system: return .dark
+        case .light, .dawn: return .light
+        case .dark, .midnight: return .dark
+        }
     }
 }

@@ -1,0 +1,212 @@
+[
+  {
+    "name": "zodiac_aries",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroZodiac/zodiac_aries.imageset",
+    "exists": true
+  },
+  {
+    "name": "zodiac_taurus",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroZodiac/zodiac_taurus.imageset",
+    "exists": true
+  },
+  {
+    "name": "zodiac_gemini",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroZodiac/zodiac_gemini.imageset",
+    "exists": true
+  },
+  {
+    "name": "zodiac_cancer",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroZodiac/zodiac_cancer.imageset",
+    "exists": true
+  },
+  {
+    "name": "zodiac_leo",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroZodiac/zodiac_leo.imageset",
+    "exists": true
+  },
+  {
+    "name": "zodiac_virgo",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroZodiac/zodiac_virgo.imageset",
+    "exists": true
+  },
+  {
+    "name": "zodiac_libra",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroZodiac/zodiac_libra.imageset",
+    "exists": true
+  },
+  {
+    "name": "zodiac_scorpio",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroZodiac/zodiac_scorpio.imageset",
+    "exists": true
+  },
+  {
+    "name": "zodiac_sagittarius",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroZodiac/zodiac_sagittarius.imageset",
+    "exists": true
+  },
+  {
+    "name": "zodiac_capricorn",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroZodiac/zodiac_capricorn.imageset",
+    "exists": true
+  },
+  {
+    "name": "zodiac_aquarius",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroZodiac/zodiac_aquarius.imageset",
+    "exists": true
+  },
+  {
+    "name": "zodiac_pisces",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroZodiac/zodiac_pisces.imageset",
+    "exists": true
+  },
+  {
+    "name": "planet_sun_fill",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroPlanets/planet_sun_fill.imageset",
+    "exists": true
+  },
+  {
+    "name": "planet_moon_fill",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroPlanets/planet_moon_fill.imageset",
+    "exists": true
+  },
+  {
+    "name": "planet_mercury_fill",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroPlanets/planet_mercury_fill.imageset",
+    "exists": true
+  },
+  {
+    "name": "planet_venus_fill",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroPlanets/planet_venus_fill.imageset",
+    "exists": true
+  },
+  {
+    "name": "planet_mars_fill",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroPlanets/planet_mars_fill.imageset",
+    "exists": true
+  },
+  {
+    "name": "planet_jupiter_fill",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroPlanets/planet_jupiter_fill.imageset",
+    "exists": true
+  },
+  {
+    "name": "planet_saturn_fill",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroPlanets/planet_saturn_fill.imageset",
+    "exists": true
+  },
+  {
+    "name": "planet_uranus_fill",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroPlanets/planet_uranus_fill.imageset",
+    "exists": true
+  },
+  {
+    "name": "planet_neptune_fill",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroPlanets/planet_neptune_fill.imageset",
+    "exists": true
+  },
+  {
+    "name": "planet_pluto_fill",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/AstroPlanets/planet_pluto_fill.imageset",
+    "exists": true
+  },
+  {
+    "name": "bg_horoscope_card",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Backgrounds/bg_horoscope_card.imageset",
+    "exists": true
+  },
+  {
+    "name": "ob_welcome",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Onboarding/ob_welcome.imageset",
+    "exists": true
+  },
+  {
+    "name": "ob_privacy",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Onboarding/ob_privacy.imageset",
+    "exists": true
+  },
+  {
+    "name": "ob_birth",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Onboarding/ob_birth.imageset",
+    "exists": true
+  },
+  {
+    "name": "ob_notifications",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Onboarding/ob_notifications.imageset",
+    "exists": true
+  },
+  {
+    "name": "ob_sample",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Onboarding/ob_sample.imageset",
+    "exists": true
+  },
+  {
+    "name": "ob_completion",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Onboarding/ob_completion.imageset",
+    "exists": true
+  },
+  {
+    "name": "symbol_water",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Symbols/symbol_water.imageset",
+    "exists": true
+  },
+  {
+    "name": "symbol_door",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Symbols/symbol_door.imageset",
+    "exists": true
+  },
+  {
+    "name": "symbol_room",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Symbols/symbol_room.imageset",
+    "exists": true
+  },
+  {
+    "name": "symbol_house",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Symbols/symbol_house.imageset",
+    "exists": true
+  },
+  {
+    "name": "symbol_bird",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Symbols/symbol_bird.imageset",
+    "exists": true
+  },
+  {
+    "name": "symbol_teeth",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Symbols/symbol_teeth.imageset",
+    "exists": true
+  },
+  {
+    "name": "symbol_flight",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Symbols/symbol_flight.imageset",
+    "exists": true
+  },
+  {
+    "name": "symbol_ocean",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Symbols/symbol_ocean.imageset",
+    "exists": true
+  },
+  {
+    "name": "symbol_wall",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Symbols/symbol_wall.imageset",
+    "exists": true
+  },
+  {
+    "name": "symbol_truck",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Symbols/symbol_truck.imageset",
+    "exists": true
+  },
+  {
+    "name": "symbol_car",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Symbols/symbol_car.imageset",
+    "exists": true
+  },
+  {
+    "name": "symbol_road",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Symbols/symbol_road.imageset",
+    "exists": true
+  },
+  {
+    "name": "symbol_building",
+    "path": "/Users/vidau/Desktop/Dreamline/Resources/Assets.xcassets/Symbols/symbol_building.imageset",
+    "exists": true
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "images": [
+    {
+      "filename": "icon_oracle.png",
+      "idiom": "universal",
+      "scale": "1x"
+    }
+  ],
+  "properties": {
+    "template-rendering-intent": "original",
+    "preserves-vector-representation": false
+  },
+  "info": {
+    "version": 1,
+    "author": "xcode"
+  }
+}

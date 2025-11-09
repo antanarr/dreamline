@@ -1,0 +1,17 @@
+{
+  "images": [
+    {
+      "filename": "oracle_hero_header.png",
+      "idiom": "universal",
+      "scale": "1x"
+    }
+  ],
+  "properties": {
+    "template-rendering-intent": "original",
+    "preserves-vector-representation": false
+  },
+  "info": {
+    "version": 1,
+    "author": "xcode"
+  }
+}

@@ -31,6 +31,7 @@
 		67A267233C3D270FAF54CC6C /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32ADC0D196DC4835745CE17 /* AuthService.swift */; };
 		68575162CA37B1BF0AEAC795 /* RemoteConfigService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1475F32409336714801E1C1 /* RemoteConfigService.swift */; };
 		744EB922E0A58060B050F457 /* RootRouterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C48689CF08F88CDAC666943D /* RootRouterView.swift */; };
+		7D6E8F9A0B1C2D3E4F5A6B7C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D6E7F8A9B0C1D2E3F4A5B6 /* ContentView.swift */; };
 		7EFD863B0A1BD64765F88AC9 /* TodayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4088626376277D9767BB486B /* TodayViewModel.swift */; };
 		7F6DF3495A916712E3202551 /* HoroscopeDaily.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FA95901157E09C41131C675 /* HoroscopeDaily.swift */; };
 		F6C5D1BFBF4345DEAAA010EE /* HoroscopeStructured.swift in Sources */ = {isa = PBXBuildFile; fileRef = F24001C776294FDEA3E9F18C /* HoroscopeStructured.swift */; };
@@ -145,6 +146,7 @@
 		B2C3D4E5F6A7B8C9D0E1F2A3 /* TodayPlanetStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPlanetStrip.swift; sourceTree = "<group>"; };
 		B656ADF20D4B42BAA950219C /* HoroscopeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeService.swift; sourceTree = "<group>"; };
 		C48689CF08F88CDAC666943D /* RootRouterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootRouterView.swift; sourceTree = "<group>"; };
+		C5D6E7F8A9B0C1D2E3F4A5B6 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C7D8E9F0A1B2C3D4E5F6A7 /* OracleChatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleChatService.swift; sourceTree = "<group>"; };
 		D006DB938F0A71062F6DFB24 /* OracleSchemaTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleSchemaTests.swift; sourceTree = "<group>"; };
 		D37481319B28DC7E1F017B47 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -221,6 +223,7 @@
 			isa = PBXGroup;
 			children = (
 				C48689CF08F88CDAC666943D /* RootRouterView.swift */,
+				C5D6E7F8A9B0C1D2E3F4A5B6 /* ContentView.swift */,
 				AEE10FA9425E0CBBE2781D53 /* Env */,
 				6F5372C9FFEB221E504FB4C1 /* Models */,
 			);
@@ -618,6 +621,7 @@
 				A7C2CB8E0C0F6F87B989947B /* PushService.swift in Sources */,
 				68575162CA37B1BF0AEAC795 /* RemoteConfigService.swift in Sources */,
 				744EB922E0A58060B050F457 /* RootRouterView.swift in Sources */,
+				7D6E8F9A0B1C2D3E4F5A6B7C /* ContentView.swift in Sources */,
 				DB33F80575DB1EBAFD287189 /* StoreKitLayer.swift in Sources */,
 				2E4892FD18196F1649CF8FBD /* SymbolExtractor.swift in Sources */,
 				1C2D3E4F5A6B7C8D9E0F1A2C /* ColorTokens.swift in Sources */,
