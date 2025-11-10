@@ -16,7 +16,7 @@ struct TodayView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 26) {
                     // Horoscope hero FIRST
                     if let item = horoscopeVM.item {
                         YourDayHeroCard(
@@ -29,6 +29,10 @@ struct TodayView: View {
                         loadingShimmer
                     } else {
                         emptyState
+                    }
+                    
+                    if let item = horoscopeVM.item, !item.dreamLinks.isEmpty {
+                        dreamThreadsSection(item: item)
                     }
                     
                     // Areas of Life
@@ -142,15 +146,20 @@ struct TodayView: View {
     
     @ViewBuilder
     private func areasOfLifeSection(item: HoroscopeStructured) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("AREAS OF YOUR LIFE")
-                .font(DLFont.body(12))
-                .foregroundStyle(.secondary)
-                .kerning(1.2)
-                .textCase(.uppercase)
-                .padding(.horizontal, 20)
-                .padding(.top, 24)
-                .padding(.bottom, 16)
+        VStack(alignment: .leading, spacing: 20) {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                Text("AREAS OF YOUR LIFE")
+                    .font(DLFont.body(12))
+                    .foregroundStyle(.secondary)
+                    .kerning(1.2)
+                    .textCase(.uppercase)
+                
+                if !isPro {
+                    Text("Dive deeper to unlock all six focus areas.")
+                        .font(DLFont.body(12))
+                        .foregroundStyle(.secondary.opacity(0.8))
+                }
+            }
             
             VStack(spacing: 0) {
                 ForEach(Array(item.areas.enumerated()), id: \.element.id) { index, area in
@@ -171,12 +180,67 @@ struct TodayView: View {
                 }
             }
         }
-        .background(theme.palette.cardFillSecondary)
+        .padding(24)
+        .background(lifeAreaBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
         .overlay(
-            Rectangle()
-                .fill(theme.palette.separator)
-                .frame(height: 1),
-            alignment: .bottom
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                .stroke(theme.palette.cardStroke)
+        )
+    }
+    
+    private var lifeAreaBackground: some View {
+        let shape = RoundedRectangle(cornerRadius: 30, style: .continuous)
+        return shape
+            .fill(theme.palette.cardFillSecondary)
+            .overlay(
+                LinearGradient(
+                    colors: [
+                        Color.dlIndigo.opacity(theme.isLight ? 0.10 : 0.16),
+                        Color.clear
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .clipShape(shape)
+            )
+    }
+    
+    @ViewBuilder
+    private func dreamThreadsSection(item: HoroscopeStructured) -> some View {
+        VStack(alignment: .leading, spacing: 18) {
+            HStack(spacing: 10) {
+                Text("Dream threads we’re weaving")
+                    .font(DLFont.body(14).weight(.semibold))
+                    .foregroundStyle(.primary)
+                
+                if let transit = item.primaryTransit {
+                    Text(transit)
+                        .font(DLFont.body(12))
+                        .foregroundStyle(Color.dlMint)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color.dlMint.opacity(0.12), in: Capsule())
+                }
+            }
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 14) {
+                    ForEach(item.dreamLinks) { link in
+                        DreamLinkChip(link: link)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        }
+        .padding(24)
+        .background(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(theme.palette.cardFillPrimary)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .stroke(theme.palette.cardStroke)
         )
     }
     
@@ -247,5 +311,51 @@ struct TodayView: View {
         .frame(maxWidth: .infinity)
         .padding(40)
         .background(theme.palette.cardFillSecondary)
+    }
+}
+
+private struct DreamLinkChip: View {
+    let link: DreamLink
+    
+    @Environment(ThemeService.self) private var theme: ThemeService
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(link.motif)
+                .font(DLFont.body(13).weight(.semibold))
+                .foregroundStyle(.primary)
+            
+            Text(link.line)
+                .font(DLFont.body(13))
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            if let transit = link.transitRef, !transit.isEmpty {
+                Divider()
+                    .overlay(theme.palette.separator.opacity(0.6))
+                Text(transit)
+                    .font(DLFont.body(11))
+                    .foregroundStyle(Color.dlMint)
+            }
+        }
+        .padding(18)
+        .frame(width: 220, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            theme.palette.cardFillSecondary,
+                            theme.palette.cardFillPrimary.opacity(0.7)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .stroke(theme.palette.cardStroke)
+        )
     }
 }
