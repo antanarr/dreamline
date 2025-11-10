@@ -5,8 +5,26 @@ struct YourDayHeroCard: View {
     let headline: String
     let summary: String?
     let dreamEnhancement: String?
-    var showLogButton: Bool = false
-    var onLogDream: (() -> Void)? = nil
+    let doItems: [String]
+    let dontItems: [String]
+    var showLogButton: Bool
+    var onLogDream: (() -> Void)?
+    
+    init(headline: String,
+         summary: String?,
+         dreamEnhancement: String?,
+         doItems: [String] = [],
+         dontItems: [String] = [],
+         showLogButton: Bool = false,
+         onLogDream: (() -> Void)? = nil) {
+        self.headline = headline
+        self.summary = summary
+        self.dreamEnhancement = dreamEnhancement
+        self.doItems = doItems
+        self.dontItems = dontItems
+        self.showLogButton = showLogButton
+        self.onLogDream = onLogDream
+    }
     
     @Environment(ThemeService.self) private var theme: ThemeService
     @State private var isPressed = false
@@ -15,20 +33,26 @@ struct YourDayHeroCard: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             backgroundCard
+                .parallax(12)
                 .overlay(heroHalo)
             
             VStack(alignment: .leading, spacing: 18) {
-                Label("Day at a Glance", systemImage: "sparkles")
-                    .font(DLFont.body(13))
-                    .foregroundStyle(Color.white.opacity(0.9))
-                    .labelStyle(.titleAndIcon)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(Color.white.opacity(0.15), in: Capsule())
+                HStack(spacing: 8) {
+                    DLAssetImage.oracleIcon
+                        .renderingMode(.template)
+                        .foregroundStyle(Color.white.opacity(0.9))
+                        .frame(width: 18, height: 18)
+                    Text("Day at a Glance")
+                }
+                .font(DLFont.body(13))
+                .foregroundStyle(Color.white.opacity(0.9))
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(Color.white.opacity(0.15), in: Capsule())
                 
                 VStack(alignment: .leading, spacing: 14) {
                     Text(headline)
-                        .font(DLFont.title(36))
+                        .dlType(.titleXL)
                         .fontWeight(.bold)
                         .fixedSize(horizontal: false, vertical: true)
                         .lineSpacing(4)
@@ -36,9 +60,14 @@ struct YourDayHeroCard: View {
                     
                     if let summary, !summary.isEmpty {
                         Text(summary)
-                            .font(DLFont.body(18))
+                            .dlType(.body)
                             .foregroundStyle(Color.white.opacity(0.92))
                             .fixedSize(horizontal: false, vertical: true)
+                    }
+                    
+                    if !doItems.isEmpty || !dontItems.isEmpty {
+                        ActionChips(doItems: Array(doItems.prefix(2)),
+                                    dontItems: Array(dontItems.prefix(2)))
                     }
                     
                     if let enhancement = dreamEnhancement, !enhancement.isEmpty {
@@ -55,10 +84,12 @@ struct YourDayHeroCard: View {
                         }
                     }) {
                         HStack(spacing: 10) {
-                            Image(systemName: "plus")
-                                .font(.system(size: 16, weight: .semibold))
+                            DLAssetImage.oracleIcon
+                                .renderingMode(.template)
+                                .foregroundStyle(Color.white.opacity(0.92))
+                                .frame(width: 16, height: 16)
                             Text("Log a dream")
-                                .font(DLFont.body(16))
+                                .dlType(.body)
                                 .fontWeight(.medium)
                         }
                         .padding(.horizontal, 18)
@@ -100,32 +131,33 @@ struct YourDayHeroCard: View {
         return shape
             .fill(
                 LinearGradient(
-                    colors: theme.isLight
-                        ? [Color.dlIndigo.opacity(0.9), Color.dlViolet.opacity(0.85)]
-                        : [Color.dlIndigo.opacity(0.95), Color.black.opacity(0.6)],
+                    colors: theme.palette.horoscopeCardBackground,
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
             )
             .overlay(
-                Image("bg_nebula_full")
+                DLAssetImage.nebula
                     .resizable()
                     .scaledToFill()
-                    .opacity(theme.isLight ? 0.45 : 0.55)
+                    .opacity(theme.isLight ? 0.38 : 0.5)
                     .blendMode(.screen)
                     .clipShape(shape)
             )
             .overlay(
-                Image("pattern_stargrid_tile")
+                DLAssetImage.starGrid
                     .resizable(resizingMode: .tile)
                     .scaleEffect(0.6)
-                    .opacity(theme.isLight ? 0.16 : 0.22)
+                    .opacity(theme.isLight ? 0.12 : 0.2)
                     .blendMode(.screen)
                     .clipShape(shape)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 32, style: .continuous)
-                    .stroke(Color.white.opacity(theme.isLight ? 0.18 : 0.12))
+                DLAssetImage.grain
+                    .resizable(resizingMode: .tile)
+                    .opacity(theme.isLight ? 0.05 : 0.08)
+                    .blendMode(.plusLighter)
+                    .clipShape(shape)
             )
     }
     
@@ -149,18 +181,20 @@ struct YourDayHeroCard: View {
     
     private func dreamEnhancementPill(_ enhancement: String) -> some View {
         HStack(alignment: .top, spacing: 10) {
-            Image(systemName: "moon.stars.fill")
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(Color.white.opacity(0.9))
+            DLAssetImage.symbol("ocean")
+                .renderingMode(.original)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 24, height: 24)
                 .padding(10)
                 .background(Color.white.opacity(0.16), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
             
             VStack(alignment: .leading, spacing: 6) {
                 Text("Dream weaving")
-                    .font(DLFont.body(13).weight(.semibold))
+                    .dlType(.caption)
                     .foregroundStyle(Color.white.opacity(0.85))
                 Text(enhancement)
-                    .font(DLFont.body(15))
+                    .dlType(.body)
                     .foregroundStyle(Color.white.opacity(0.92))
                     .fixedSize(horizontal: false, vertical: true)
             }

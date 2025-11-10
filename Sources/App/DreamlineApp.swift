@@ -39,6 +39,7 @@ struct DreamlineApp: App {
                     Text("Firebase not available")
                 }
             }
+            .preferredColorScheme(themeService.mode.preferredColorScheme)
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {

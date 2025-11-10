@@ -89,9 +89,19 @@ final class HoroscopeService: ObservableObject {
 
     // MARK: - Public API
 
-    func cached(period: HoroscopeRange, tz: String, uid: String = "me") -> HoroscopeStructured? {
-        let anchorKey = Self.makeAnchorKey(uid: uid, period: period, tzIdentifier: tz)
-        return cached(anchorKey: anchorKey)
+    func cached(period: HoroscopeRange,
+                tz: String,
+                uid: String = "me",
+                reference: Date = Date()) -> HoroscopeStructured? {
+        let anchorKey = Self.makeAnchorKey(uid: uid, period: period, tzIdentifier: tz, reference: reference)
+        return cached(anchorKey: anchorKey, asOf: reference)
+    }
+    
+    func cached(period: HoroscopeRange,
+                tz: String,
+                uid: String = "me",
+                referenceDate: Date) -> HoroscopeStructured? {
+        cached(period: period, tz: tz, uid: uid, reference: referenceDate)
     }
     
     func fetchBestDays(uid: String = "me") async throws -> [BestDayInfo] {
@@ -143,13 +153,17 @@ final class HoroscopeService: ObservableObject {
         }
     }
 
-    func readOrCompose(period: HoroscopeRange, tz: String, uid: String = "me", force: Bool = false) async throws -> HoroscopeStructured {
+    func readOrCompose(period: HoroscopeRange,
+                       tz: String,
+                       uid: String = "me",
+                       force: Bool = false,
+                       reference: Date = Date()) async throws -> HoroscopeStructured {
         guard baseURL != nil else { throw URLError(.badURL) }
 
-        let anchorKey = Self.makeAnchorKey(uid: uid, period: period, tzIdentifier: tz)
+        let anchorKey = Self.makeAnchorKey(uid: uid, period: period, tzIdentifier: tz, reference: reference)
 
         var fallback: HoroscopeStructured?
-        if !force, let cached = cached(anchorKey: anchorKey), !cached.isExpired() {
+        if !force, let cached = cached(anchorKey: anchorKey, asOf: reference), !cached.isExpired(asOf: reference) {
             fallback = cached
         }
 
@@ -161,14 +175,30 @@ final class HoroscopeService: ObservableObject {
             uid: uid,
             force: force,
             fallback: fallback,
-            birth: birthSnapshot
+            birth: birthSnapshot,
+            reference: reference
         )
         store(fresh)
         return fresh
     }
+    
+    func readOrCompose(period: HoroscopeRange,
+                       tz: String,
+                       uid: String = "me",
+                       force: Bool = false,
+                       referenceDate: Date) async throws -> HoroscopeStructured {
+        try await readOrCompose(period: period,
+                                tz: tz,
+                                uid: uid,
+                                force: force,
+                                reference: referenceDate)
+    }
 
-    func anchorKey(for period: HoroscopeRange, tz: String, uid: String = "me") -> String {
-        Self.makeAnchorKey(uid: uid, period: period, tzIdentifier: tz)
+    func anchorKey(for period: HoroscopeRange,
+                   tz: String,
+                   uid: String = "me",
+                   reference: Date = Date()) -> String {
+        Self.makeAnchorKey(uid: uid, period: period, tzIdentifier: tz, reference: reference)
     }
 
     // MARK: - Cache
@@ -186,10 +216,10 @@ final class HoroscopeService: ObservableObject {
         }
     }
 
-    private func cached(anchorKey: String) -> HoroscopeStructured? {
+    private func cached(anchorKey: String, asOf reference: Date = Date()) -> HoroscopeStructured? {
         var store = cacheStore
         if let value = store[anchorKey] {
-            if value.isExpired() {
+            if value.isExpired(asOf: reference) {
                 store.removeValue(forKey: anchorKey)
                 cacheStore = store
                 return nil
@@ -233,7 +263,13 @@ final class HoroscopeService: ObservableObject {
 
     // MARK: - Networking
 
-    private func fetchRemote(period: HoroscopeRange, tz: String, uid: String, force: Bool, fallback: HoroscopeStructured?, birth: BirthSnapshot) async throws -> HoroscopeStructured {
+    private func fetchRemote(period: HoroscopeRange,
+                             tz: String,
+                             uid: String,
+                             force: Bool,
+                             fallback: HoroscopeStructured?,
+                             birth: BirthSnapshot,
+                             reference: Date) async throws -> HoroscopeStructured {
         if !force, let readHit = await attemptRead(period: period, tz: tz, uid: uid, birth: birth) {
             return readHit
         }

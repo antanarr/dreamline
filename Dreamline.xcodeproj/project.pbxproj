@@ -10,9 +10,13 @@
 		0356C22E838247689A8C6792 /* InsightsHeatmapSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A9B0C1D2E3F4A5B6C7D8E9F /* InsightsHeatmapSection.swift */; };
 		05358BFB70209254EA33A1D2 /* DreamEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA63262E7068CBD5081F58F5 /* DreamEntry.swift */; };
 		12DE67D82F51E7B68B722C32 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 62EABE4BE781CC2C4E82A18E /* README.md */; };
+		AF7C1234567890ABCDEF0124 /* ActionChips.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF7C1234567890ABCDEF0123 /* ActionChips.swift */; };
+		1584AB12CDEF4567890ABCDF /* AssetImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1584AB12CDEF4567890ABCDE /* AssetImage.swift */; };
 		179FD4B77773418D962583E4 /* SymbolHeatmapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09F7BB2925C947BB81DBB13E /* SymbolHeatmapView.swift */; };
 		1B8B297B979698E24E895008 /* AppEnv.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB7A4A2D534E142CE71FDA9 /* AppEnv.swift */; };
 		1C2D3E4F5A6B7C8D9E0F1A2C /* ColorTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C2D3E4F5A6B7C8D9E0F1A2B /* ColorTokens.swift */; };
+		1D9EFABC01234567890ABCDE /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D9EFABC01234567890ABCDD /* Typography.swift */; };
+		1DA23BCDEF4567890ABCDE12 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA23BCDEF4567890ABCDE11 /* Animations.swift */; };
 		1E650A1D4E257F57FAA59640 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 51153838FCC526CD33479F93 /* FirebaseFirestore */; };
 		2A3B4C5D6E7F8091A2B3C4D6 /* ThemeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A3B4C5D6E7F8091A2B3C4D5 /* ThemeService.swift */; };
 		2E4892FD18196F1649CF8FBD /* SymbolExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A47D006D8A8BCC84656501B /* SymbolExtractor.swift */; };
@@ -56,6 +60,7 @@
 		B1C2D3E4F5061728394A5B6E /* QuickCaptureBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5061728394A5B6D /* QuickCaptureBridge.swift */; };
 		B32232A9AE9899A04406063A /* OracleService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E07790A9FE0B47C5A4AA6466 /* OracleService.swift */; };
 		B5C6D7E8F9A0B1C2D3E4F5A6 /* OracleChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D8E9F0A1B2C3D4E5F6A7 /* OracleChatService.swift */; };
+		B7A1C2D3E4F567890ABCDE12 /* HoroscopeCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A1C2D3E4F567890ABCDE11 /* HoroscopeCalendarView.swift */; };
 		B9546E7F8E9BC63A4D23D07E /* DreamlineApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E3AE5D7CD6A912C26DB35 /* DreamlineApp.swift */; };
 		B9C0D1E2F3A4B5C6D7E8F9A0 /* InterpretCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9934AADD3F194A7F9BE7D498 /* InterpretCoordinator.swift */; };
 		C34E429FAC9F6EAB6D60ED32 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A824CEB8FB20614385EAADE7 /* PaywallView.swift */; };
@@ -114,8 +119,12 @@
 		0FA95901157E09C41131C675 /* HoroscopeDaily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeDaily.swift; sourceTree = "<group>"; };
 		1165398E7CDC47C0A84E0C2F /* InterpretButtonGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterpretButtonGate.swift; sourceTree = "<group>"; };
 		1515A3A92841469ABDA4437C /* AstroGlossary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AstroGlossary.swift; sourceTree = "<group>"; };
+		1584AB12CDEF4567890ABCDE /* AssetImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetImage.swift; sourceTree = "<group>"; };
 		1C2D3E4F5A6B7C8D9E0F1A2B /* ColorTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorTokens.swift; sourceTree = "<group>"; };
 		1FE5D781995B4B64A55C2638 /* SymbolSeasonalityDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolSeasonalityDetailView.swift; sourceTree = "<group>"; };
+		AF7C1234567890ABCDEF0123 /* ActionChips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionChips.swift; sourceTree = "<group>"; };
+		1D9EFABC01234567890ABCDD /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		1DA23BCDEF4567890ABCDE11 /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
 		21E60B9072239A340ADB490A /* AppLockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockService.swift; sourceTree = "<group>"; };
 		2636DA5396634B318F6D4070 /* OracleChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleChatView.swift; sourceTree = "<group>"; };
 		29AE82C180EEBF259A9DD9C2 /* FirebaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseService.swift; sourceTree = "<group>"; };
@@ -154,6 +163,7 @@
 		C48689CF08F88CDAC666943D /* RootRouterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootRouterView.swift; sourceTree = "<group>"; };
 		C5D6E7F8A9B0C1D2E3F4A5B6 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C7D8E9F0A1B2C3D4E5F6A7 /* OracleChatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleChatService.swift; sourceTree = "<group>"; };
+		B7A1C2D3E4F567890ABCDE11 /* HoroscopeCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeCalendarView.swift; sourceTree = "<group>"; };
 		D006DB938F0A71062F6DFB24 /* OracleSchemaTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleSchemaTests.swift; sourceTree = "<group>"; };
 		D37481319B28DC7E1F017B47 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		D41E3AE5D7CD6A912C26DB35 /* DreamlineApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamlineApp.swift; sourceTree = "<group>"; };
@@ -219,6 +229,9 @@
 				738C88E69026F7ECD6BAAAA1 /* Theme.swift */,
 				2A3B4C5D6E7F8091A2B3C4D5 /* ThemeService.swift */,
 				EF6A3824F2164F6FB264D1A8 /* OracleShimmer.swift */,
+				1584AB12CDEF4567890ABCDE /* AssetImage.swift */,
+				1D9EFABC01234567890ABCDD /* Typography.swift */,
+				1DA23BCDEF4567890ABCDE11 /* Animations.swift */,
 			);
 			path = DesignSystem;
 			sourceTree = "<group>";
@@ -315,6 +328,14 @@
 			path = Firestore;
 			sourceTree = "<group>";
 		};
+		AF12B34C56D78E90F1234567 /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				B7A1C2D3E4F567890ABCDE11 /* HoroscopeCalendarView.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
 		6968DFFB46F180BBCB652E2A /* Astro */ = {
 			isa = PBXGroup;
 			children = (
@@ -351,6 +372,7 @@
 				F9A0B1C2D3E4F5A6B7C8D9 /* TodayRangeViewModel.swift */,
 				EC556767D898403DBE7033EF /* TodayStructuredView.swift */,
 				8F7E23320710CB8055B0D2BC /* YourDayHeroCard.swift */,
+				AF7C1234567890ABCDEF0123 /* ActionChips.swift */,
 				87A30E282B561BB8F3978B5E /* LifeAreaRow.swift */,
 				E7EF5EFF8F56843C90D5B30F /* LifeAreaDetailView.swift */,
 				23A65F19103A322D2C71A7A7 /* AccuracyFeedbackView.swift */,
@@ -505,6 +527,7 @@
 				446D930BA0C084218F3CFF70 /* Me */,
 				2636DA5396634B318F6D4071 /* OracleChat */,
 				8FC56233D6AEBC1A6948AF4D /* Today */,
+				AF12B34C56D78E90F1234567 /* Calendar */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -679,6 +702,9 @@
 				DB33F80575DB1EBAFD287189 /* StoreKitLayer.swift in Sources */,
 				2E4892FD18196F1649CF8FBD /* SymbolExtractor.swift in Sources */,
 				1C2D3E4F5A6B7C8D9E0F1A2C /* ColorTokens.swift in Sources */,
+				1584AB12CDEF4567890ABCDF /* AssetImage.swift in Sources */,
+				1D9EFABC01234567890ABCDE /* Typography.swift in Sources */,
+				1DA23BCDEF4567890ABCDE12 /* Animations.swift in Sources */,
 				2A3B4C5D6E7F8091A2B3C4D6 /* ThemeService.swift in Sources */,
 				9C33E5ABEFF33AB3131490D0 /* Theme.swift in Sources */,
 				3BF331AE8B9C4BCB8656FAF5 /* OracleShimmer.swift in Sources */,
@@ -696,7 +722,9 @@
 				FC27ACFC690E7D099C256E60 /* AccuracyFeedbackView.swift in Sources */,
 				D0D4EAFB01D01538ED944F62 /* BehindThisForecastView.swift in Sources */,
 				04219AF072BF998396652256 /* SeasonalContentView.swift in Sources */,
+				AF7C1234567890ABCDEF0124 /* ActionChips.swift in Sources */,
 				25F228F1F6F0D665BF538DFD /* BestDaysView.swift in Sources */,
+				B7A1C2D3E4F567890ABCDE12 /* HoroscopeCalendarView.swift in Sources */,
 				52071A0428BD20ACC91AED22 /* TransitDiagramView.swift in Sources */,
 				198027435449AF2A573DE445 /* ZodiacSign.swift in Sources */,
 				5F752D50988D6120C44EC791 /* DreamPattern.swift in Sources */,

@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 struct LifeAreaRow: View {
     let area: HoroscopeArea
@@ -44,18 +43,18 @@ struct LifeAreaRow: View {
                 
                 Spacer()
                 
-                Image(isLocked ? "icon_oracle" : "icon_oracle")
+                DLAssetImage.oracleIcon
                     .renderingMode(.template)
                     .foregroundStyle(.secondary)
                     .frame(width: 16, height: 16)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
-            .background(theme.palette.cardFillSecondary)
+            .background(Color.clear)
             .overlay(
                 Rectangle()
-                    .fill(theme.palette.separator)
-                    .frame(height: 1),
+                    .fill(theme.palette.separator.opacity(theme.isLight ? 0.25 : 0.18))
+                    .frame(height: 0.6),
                 alignment: .bottom
             )
             .opacity(isLocked ? 0.7 : 1.0)
@@ -83,16 +82,11 @@ struct LifeAreaRow: View {
     
     @ViewBuilder
     private var leadingArtwork: some View {
-        if let image = UIImage(named: lifeArea.artworkAssetName) {
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFit()
-                .shadow(color: Color.black.opacity(0.1), radius: 6, x: 0, y: 4)
-        } else {
-            Image(systemName: lifeArea.iconSystemName)
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(isLocked ? .secondary : Color.dlIndigo)
-        }
+        DLAssetImage.planet(lifeArea.planetKey, style: .line)
+            .renderingMode(.original)
+            .resizable()
+            .scaledToFit()
+            .shadow(color: Color.black.opacity(0.12), radius: 6, x: 0, y: 4)
     }
 }
 

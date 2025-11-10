@@ -306,31 +306,26 @@ private struct JournalEmptyState: View {
     
     var body: some View {
         VStack(spacing: 18) {
-            Image(systemName: "moon.stars.fill")
-                .font(.system(size: 48, weight: .semibold))
-                .foregroundStyle(Color.dlLilac)
+            DLAssetImage.emptyJournal
+                .resizable()
+                .scaledToFit()
+                .frame(width: 140, height: 140)
+                .opacity(0.95)
             
-            Text("No dreams logged yet")
-                .font(DLFont.title(24))
+            Text("Your dream archive awaits")
+                .dlType(.titleM)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.primary)
             
-            Text("Tap “New Dream” to start your journal. Dreamline will begin surfacing motifs and insights the moment you interpret your first entry.")
-                .font(DLFont.body(14))
+            Text("Add last night’s memory and we’ll weave your first interpretation—free.")
+                .dlType(.bodyS)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 12)
         }
         .padding(32)
         .frame(maxWidth: .infinity)
-        .background(
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
-                .fill(theme.palette.cardFillSecondary)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
+        .background(Color.clear)
     }
 }
 

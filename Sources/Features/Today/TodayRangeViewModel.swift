@@ -8,11 +8,15 @@ final class TodayRangeViewModel: ObservableObject {
 
     private var activeAnchorKey: String?
 
-    func load(period: HoroscopeRange, tz: String, uid: String = "me", force: Bool = false) async {
-        let anchorKey = HoroscopeService.makeAnchorKey(uid: uid, period: period, tzIdentifier: tz)
+    func load(period: HoroscopeRange,
+              tz: String,
+              uid: String = "me",
+              force: Bool = false,
+              reference: Date = Date()) async {
+        let anchorKey = HoroscopeService.makeAnchorKey(uid: uid, period: period, tzIdentifier: tz, reference: reference)
         activeAnchorKey = anchorKey
-
-        let cached = HoroscopeService.shared.cached(period: period, tz: tz, uid: uid)
+        
+        let cached = HoroscopeService.shared.cached(period: period, tz: tz, uid: uid, reference: reference)
 
         if !force, let cached {
             item = cached
@@ -27,7 +31,11 @@ final class TodayRangeViewModel: ObservableObject {
         }
 
         do {
-            let fresh = try await HoroscopeService.shared.readOrCompose(period: period, tz: tz, uid: uid, force: force)
+            let fresh = try await HoroscopeService.shared.readOrCompose(period: period,
+                                                                        tz: tz,
+                                                                        uid: uid,
+                                                                        force: force,
+                                                                        reference: reference)
             guard activeAnchorKey == anchorKey else { return }
             item = fresh
             errorMessage = nil

@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 struct SeasonalContentView: View {
     let currentZodiacSeason: ZodiacSign
@@ -32,7 +31,10 @@ struct ZodiacSeasonCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 16) {
-                artwork
+                DLAssetImage.zodiac(sign.rawValue)
+                    .resizable()
+                    .scaledToFit()
+                    .shadow(color: Color.black.opacity(0.18), radius: 10, x: 0, y: 6)
                     .frame(width: 64, height: 64)
                 
                 VStack(alignment: .leading, spacing: 4) {
@@ -53,10 +55,6 @@ struct ZodiacSeasonCard: View {
         .padding(24)
         .background(cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
     
     private var cardBackground: some View {
@@ -72,19 +70,6 @@ struct ZodiacSeasonCard: View {
                 .clipShape(shape)
             )
     }
-    
-    @ViewBuilder
-    private var artwork: some View {
-        if let image = UIImage(named: sign.artworkAssetName) {
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFit()
-                .shadow(color: Color.black.opacity(0.18), radius: 10, x: 0, y: 6)
-        } else {
-            Text(sign.symbol)
-                .font(.system(size: 48))
-        }
-    }
 }
 
 struct DreamPatternsCard: View {
@@ -97,7 +82,7 @@ struct DreamPatternsCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 14) {
-                Image("icon_oracle")
+                DLAssetImage.oracleIcon
                     .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
@@ -131,7 +116,11 @@ struct DreamPatternsCard: View {
                 // Teaser for free users
                 VStack(alignment: .leading, spacing: 12) {
                     HStack(spacing: 12) {
-                        teaserArtwork
+                        DLAssetImage.symbol(patterns.first?.symbol ?? "ocean")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 32, height: 32)
+                            .shadow(color: Color.dlIndigo.opacity(0.2), radius: 8, x: 0, y: 6)
                         
                         VStack(alignment: .leading, spacing: 4) {
                             Text(patterns.first?.symbol.capitalized ?? "Symbols")
@@ -145,7 +134,7 @@ struct DreamPatternsCard: View {
                         
                         Spacer()
                         
-                        Image("icon_oracle")
+                        DLAssetImage.oracleIcon
                             .renderingMode(.template)
                             .foregroundStyle(.secondary)
                             .frame(width: 20, height: 20)
@@ -153,19 +142,16 @@ struct DreamPatternsCard: View {
                     .padding(16)
                     .background(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(theme.palette.cardFillSecondary.opacity(0.5))
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .stroke(style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
-                            .foregroundStyle(.secondary.opacity(0.3))
+                            .fill(theme.palette.cardFillSecondary.opacity(theme.isLight ? 0.55 : 0.4))
                     )
                 }
                 
                 Button(action: onUnlock) {
                     HStack {
-                        Image("icon_oracle")
+                        DLAssetImage.oracleIcon
                             .renderingMode(.template)
+                            .foregroundStyle(.white.opacity(0.88))
+                            .frame(width: 16, height: 16)
                         Text("Unlock Pattern Analysis")
                     }
                     .font(DLFont.body(14))
@@ -188,19 +174,6 @@ struct DreamPatternsCard: View {
         .padding(24)
         .background(cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
-    }
-    
-    private var teaserArtwork: some View {
-        Image("symbol_water")
-            .renderingMode(.original)
-            .resizable()
-            .scaledToFit()
-            .frame(width: 32, height: 32)
-            .shadow(color: Color.dlIndigo.opacity(0.15), radius: 6, x: 0, y: 6)
     }
     
     private var cardBackground: some View {
@@ -247,27 +220,10 @@ private struct PatternRow: View {
     
     @ViewBuilder
     private var leadingArtwork: some View {
-        if let assetName = artworkName(for: pattern.symbol),
-           let image = UIImage(named: assetName) {
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFit()
-                .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 4)
-        } else {
-            Image("icon_oracle")
-                .renderingMode(.template)
-                .foregroundStyle(Color.dlMint)
-                .padding(4)
-        }
-    }
-    
-    private func artworkName(for symbol: String) -> String? {
-        let slug = symbol
-            .lowercased()
-            .replacingOccurrences(of: " ", with: "_")
-            .replacingOccurrences(of: "-", with: "_")
-        let candidate = "symbol_\(slug)"
-        return UIImage(named: candidate) != nil ? candidate : nil
+        DLAssetImage.symbol(pattern.symbol)
+            .resizable()
+            .scaledToFit()
+            .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 4)
     }
 }
 

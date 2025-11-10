@@ -12,7 +12,7 @@ struct BestDaysView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("YOUR BEST DAYS")
-                    .font(DLFont.body(12))
+                    .dlType(.caption)
                     .foregroundStyle(.secondary)
                     .kerning(1.2)
                     .textCase(.uppercase)
@@ -22,7 +22,7 @@ struct BestDaysView: View {
                 if !isPro {
                     Button(action: onUnlock) {
                         Text("PRO")
-                            .font(DLFont.body(10))
+                            .font(.caption.weight(.semibold))
                             .fontWeight(.semibold)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
@@ -44,16 +44,12 @@ struct BestDaysView: View {
         }
         .padding(24)
         .background(cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
     
     private var emptyState: some View {
         Text("Best days calculation coming soon")
-            .font(DLFont.body(14))
+            .dlType(.bodyS)
             .foregroundStyle(.secondary)
             .italic()
             .frame(maxWidth: .infinity, alignment: .center)
@@ -69,14 +65,16 @@ struct BestDaysView: View {
             if days.count > 2 {
                 Button(action: onViewFull) {
                     HStack {
-                        Text("VIEW FULL WEEK")
-                            .font(DLFont.body(14))
+                        Text("View full calendar")
+                            .dlType(.body)
                             .fontWeight(.semibold)
                         
                         Spacer()
                         
-                        Image(systemName: "arrow.right")
-                            .font(.caption)
+                        DLAssetImage.oracleIcon
+                            .renderingMode(.template)
+                            .foregroundStyle(.primary.opacity(0.6))
+                            .frame(width: 16, height: 16)
                     }
                     .padding(.vertical, 12)
                     .padding(.horizontal, 16)
@@ -84,6 +82,7 @@ struct BestDaysView: View {
                     .foregroundStyle(.primary)
                 }
                 .buttonStyle(.plain)
+                .contentTransition(.opacity)
             }
         }
     }
@@ -96,10 +95,13 @@ struct BestDaysView: View {
             
             Button(action: onUnlock) {
                 HStack {
-                    Image(systemName: "lock.open.fill")
+                    DLAssetImage.oracleIcon
+                        .renderingMode(.template)
+                        .foregroundStyle(Color.white.opacity(0.85))
+                        .frame(width: 16, height: 16)
                     Text("Unlock Best Days")
                 }
-                .font(DLFont.body(14))
+                .dlType(.body)
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
@@ -118,15 +120,22 @@ struct BestDaysView: View {
     }
     
     private var cardBackground: some View {
-        let shape = RoundedRectangle(cornerRadius: 28, style: .continuous)
-        return shape
-            .fill(theme.palette.cardFillSecondary)
+        RoundedRectangle(cornerRadius: 24, style: .continuous)
+            .fill(
+                LinearGradient(
+                    colors: [
+                        Color.white.opacity(theme.isLight ? 0.85 : 0.08),
+                        Color.dlViolet.opacity(theme.isLight ? 0.12 : 0.16)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
             .overlay(
-                Image("bg_horoscope_card")
+                DLAssetImage.heroBackground
                     .resizable()
                     .scaledToFill()
-                    .opacity(theme.isLight ? 0.35 : 0.18)
-                    .clipShape(shape)
+                    .opacity(theme.isLight ? 0.22 : 0.14)
             )
     }
 }
@@ -145,22 +154,22 @@ private struct BestDayRow: View {
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(day.title)
-                    .font(DLFont.body(15))
+                    .dlType(.body)
                     .fontWeight(.semibold)
                 
                 if showContext && !isLocked {
                     Text(day.reason)
-                        .font(DLFont.body(13))
+                        .dlType(.bodyS)
                         .foregroundStyle(.secondary)
                     
                     if let context = day.dreamContext {
                         HStack(spacing: 6) {
-                            Image("symbol_ocean")
+                            DLAssetImage.symbol("ocean")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 14, height: 14)
                             Text(context)
-                                .font(DLFont.body(12))
+                                .dlType(.caption)
                         }
                         .foregroundStyle(Color.dlMint)
                         .padding(.horizontal, 10)
@@ -169,7 +178,7 @@ private struct BestDayRow: View {
                     }
                 } else if isLocked {
                     Text("Unlock to see why")
-                        .font(DLFont.body(13))
+                        .dlType(.bodyS)
                         .foregroundStyle(.secondary)
                         .italic()
                 }
@@ -178,7 +187,7 @@ private struct BestDayRow: View {
             Spacer()
             
             if isLocked {
-                Image("icon_oracle")
+                DLAssetImage.oracleIcon
                     .renderingMode(.template)
                     .foregroundStyle(.secondary)
                     .frame(width: 18, height: 18)
@@ -205,12 +214,12 @@ private struct BestDayRow: View {
     private var leadingBadge: some View {
         VStack(spacing: 6) {
             Text(dayName)
-                .font(DLFont.body(11))
+                .dlType(.caption)
                 .foregroundStyle(.secondary)
                 .textCase(.uppercase)
             
             Text("\(dayNumber)")
-                .font(DLFont.title(20))
+                .dlType(.titleM)
                 .fontWeight(.bold)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

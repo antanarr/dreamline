@@ -18,6 +18,14 @@ final class ThemeService {
             case .dark: return "Dark"
             }
         }
+        
+        var preferredColorScheme: ColorScheme? {
+            switch self {
+            case .system: return nil
+            case .light: return .light
+            case .dark: return .dark
+            }
+        }
     }
 
     var mode: Mode = .system

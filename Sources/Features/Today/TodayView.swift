@@ -12,6 +12,8 @@ struct TodayView: View {
     @State private var bestDays: [BestDayInfo] = []
     @State private var showPaywall = false
     @State private var paywallContext: PaywallService.PaywallContext?
+    @State private var presentCalendar = false
+    @State private var selectedDate: Date = Date()
 
     var body: some View {
         NavigationStack {
@@ -23,8 +25,11 @@ struct TodayView: View {
                             headline: item.headline,
                             summary: item.summary,
                             dreamEnhancement: dreamEnhancement,
+                            doItems: heroActions.do,
+                            dontItems: heroActions.dont,
                             showLogButton: false
                         )
+                        .fadeIn(delay: 0.05)
                     } else if horoscopeVM.loading {
                         loadingShimmer
                     } else {
@@ -61,13 +66,23 @@ struct TodayView: View {
                         days: bestDays,
                         isPro: isPro,
                         onViewFull: {
-                            // Navigate to full calendar (future)
+                            presentCalendar = true
                         },
                         onUnlock: {
                             paywallContext = .bestDays
                             showPaywall = true
                         }
                     )
+                    
+                    Button {
+                        presentCalendar = true
+                    } label: {
+                        Text("Browse calendar")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(Color.dlViolet)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("browse-calendar-button")
                 }
                 .padding(.top, 8)
             }
@@ -91,8 +106,8 @@ struct TodayView: View {
                 await refreshContent()
             }
             .task {
-                await vm.load(dreamStore: store)
-                await horoscopeVM.load(period: .day, tz: TimeZone.current.identifier)
+                await vm.load(dreamStore: store, date: selectedDate)
+                await horoscopeVM.load(period: .day, tz: TimeZone.current.identifier, reference: selectedDate)
                 // TODO: Fetch best days from backend
                 bestDays = [] // Placeholder
             }
@@ -113,6 +128,18 @@ struct TodayView: View {
             .sheet(isPresented: $showPaywall) {
                 PaywallView()
             }
+            .sheet(isPresented: $presentCalendar) {
+                HoroscopeCalendarView(initialDate: selectedDate) { date in
+                    selectedDate = date
+                    Task {
+                        await horoscopeVM.load(period: .day,
+                                               tz: TimeZone.current.identifier,
+                                               force: true,
+                                               reference: date)
+                    }
+                }
+                .environment(theme)
+            }
             .onReceive(NotificationCenter.default.publisher(for: .dlStartVoiceCapture)) { _ in
                 startRecordingOnCompose = true
                 showRecorder = true
@@ -129,8 +156,8 @@ struct TodayView: View {
     }
     
     private var dreamEnhancement: String? {
-        // Get most recent dream from today
         let today = Calendar.current.startOfDay(for: Date())
+        guard Calendar.current.isDate(selectedDate, inSameDayAs: today) else { return nil }
         let todayDreams = store.entries.filter {
             Calendar.current.isDate($0.createdAt, inSameDayAs: today)
         }
@@ -183,10 +210,6 @@ struct TodayView: View {
         .padding(24)
         .background(lifeAreaBackground)
         .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 30, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
     
     private var lifeAreaBackground: some View {
@@ -211,12 +234,13 @@ struct TodayView: View {
         VStack(alignment: .leading, spacing: 18) {
             HStack(spacing: 10) {
                 Text("Dream threads we’re weaving")
-                    .font(DLFont.body(14).weight(.semibold))
+                    .dlType(.bodyS)
+                    .fontWeight(.semibold)
                     .foregroundStyle(.primary)
                 
                 if let transit = item.primaryTransit {
                     Text(transit)
-                        .font(DLFont.body(12))
+                        .dlType(.caption)
                         .foregroundStyle(Color.dlMint)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
@@ -233,14 +257,13 @@ struct TodayView: View {
                 .padding(.vertical, 4)
             }
         }
-        .padding(24)
-        .background(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .fill(theme.palette.cardFillPrimary)
-        )
+        .padding(.vertical, 12)
+        .padding(.bottom, 4)
         .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(theme.palette.cardStroke)
+            Rectangle()
+                .fill(theme.palette.separator.opacity(theme.isLight ? 0.22 : 0.16))
+                .frame(height: 0.6),
+            alignment: .bottom
         )
     }
     
@@ -248,8 +271,12 @@ struct TodayView: View {
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
         
-        await vm.load(dreamStore: store)
-        await horoscopeVM.load(period: .day, tz: TimeZone.current.identifier, force: true)
+        await vm.load(dreamStore: store, date: selectedDate)
+        await horoscopeVM.load(period: .day,
+                               tz: TimeZone.current.identifier,
+                               uid: "me",
+                               force: true,
+                               reference: selectedDate)
         bestDays = []
         
         let successGenerator = UINotificationFeedbackGenerator()
@@ -257,60 +284,54 @@ struct TodayView: View {
     }
     
     private var loadingShimmer: some View {
-        VStack(spacing: 0) {
-            ForEach(0..<4, id: \.self) { _ in
-                HStack(spacing: 12) {
-                    Circle()
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(width: 32, height: 32)
-                    
-                    VStack(alignment: .leading, spacing: 6) {
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(width: 120, height: 16)
-                        
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.gray.opacity(0.2))
-                            .frame(width: 200, height: 14)
-                    }
-                    
-                    Spacer()
+        RoundedRectangle(cornerRadius: 28, style: .continuous)
+            .fill(
+                LinearGradient(
+                    colors: [
+                        Color.dlViolet.opacity(theme.isLight ? 0.25 : 0.35),
+                        Color.dlIndigo.opacity(theme.isLight ? 0.2 : 0.3)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .overlay(
+                VStack(alignment: .leading, spacing: 16) {
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color.white.opacity(0.25))
+                        .frame(width: 200, height: 18)
+                        .shimmer()
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color.white.opacity(0.18))
+                        .frame(width: 260, height: 14)
+                        .shimmer()
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
-            }
-        }
-        .background(theme.palette.cardFillSecondary)
-        .shimmer()
+                .padding(28)
+            )
+            .padding(.horizontal, 20)
     }
     
     private var emptyState: some View {
         VStack(spacing: 20) {
-            Image(systemName: "sparkles")
-                .font(.system(size: 64))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Color.dlIndigo, Color.dlViolet],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+            DLAssetImage.emptyToday
+                .resizable()
+                .scaledToFit()
+                .frame(width: 140, height: 140)
+                .opacity(0.9)
             
             VStack(spacing: 8) {
-                Text("Your Cosmic Forecast")
-                    .font(DLFont.title(24))
-                    .fontWeight(.semibold)
+                Text("Your sky is waiting")
+                    .dlType(.titleM)
+                    .multilineTextAlignment(.center)
                 
-                Text("Pull down to refresh and see what the stars have aligned for you today.")
-                    .font(DLFont.body(16))
+                Text("Here’s a taste of your sky—add birth details to personalize it.")
+                    .dlType(.bodyS)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .frame(maxWidth: .infinity)
         .padding(40)
-        .background(theme.palette.cardFillSecondary)
     }
 }
 
@@ -322,11 +343,12 @@ private struct DreamLinkChip: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(link.motif)
-                .font(DLFont.body(13).weight(.semibold))
+                .dlType(.bodyS)
+                .fontWeight(.semibold)
                 .foregroundStyle(.primary)
             
             Text(link.line)
-                .font(DLFont.body(13))
+                .dlType(.bodyS)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             
@@ -353,9 +375,14 @@ private struct DreamLinkChip: View {
                     )
                 )
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
+    }
+}
+
+private extension TodayView {
+    var heroActions: (do: [String], dont: [String]) {
+        guard let item = horoscopeVM.item else { return ([], []) }
+        let actions = item.aggregatedActions
+        return (Array(actions.do.prefix(2)),
+                Array(actions.dont.prefix(2)))
     }
 }
