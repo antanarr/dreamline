@@ -201,6 +201,8 @@ struct YourDayHeroCard: View {
         }
         .padding(16)
         .background(Color.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Dream weaving. \(enhancement)")
     }
 }
 

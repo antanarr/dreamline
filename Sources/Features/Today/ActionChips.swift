@@ -39,5 +39,7 @@ struct ActionChips: View {
                 }
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title) \(items.count) \(items.count == 1 ? "item" : "items"): \(items.joined(separator: ", "))")
     }
 }

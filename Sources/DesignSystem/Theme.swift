@@ -28,7 +28,13 @@ final class ThemeService {
         }
     }
 
-    var mode: Mode = .system
+    private let modeKey = "dreamline.theme.mode"
+    
+    var mode: Mode = .system {
+        didSet {
+            UserDefaults.standard.set(mode.rawValue, forKey: modeKey)
+        }
+    }
 
     struct Palette {
         var accent: UIColor
@@ -154,6 +160,13 @@ final class ThemeService {
     // Expose convenience flags so views don't need to know about custom modes
     var isLight: Bool { effectiveColorScheme == .light }
     var isDark: Bool { effectiveColorScheme == .dark }
+    
+    init() {
+        if let stored = UserDefaults.standard.string(forKey: modeKey),
+           let savedMode = Mode(rawValue: stored) {
+            mode = savedMode
+        }
+    }
 }
 
 extension ThemeService.Palette {
