@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct SeasonalContentView: View {
     let currentZodiacSeason: ZodiacSign
@@ -30,9 +31,9 @@ struct ZodiacSeasonCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack(spacing: 8) {
-                Text(sign.symbol)
-                    .font(.system(size: 32))
+            HStack(spacing: 16) {
+                artwork
+                    .frame(width: 64, height: 64)
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("It's \(sign.rawValue.capitalized) season.")
@@ -71,6 +72,19 @@ struct ZodiacSeasonCard: View {
                 .clipShape(shape)
             )
     }
+    
+    @ViewBuilder
+    private var artwork: some View {
+        if let image = UIImage(named: sign.artworkAssetName) {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFit()
+                .shadow(color: Color.black.opacity(0.18), radius: 10, x: 0, y: 6)
+        } else {
+            Text(sign.symbol)
+                .font(.system(size: 48))
+        }
+    }
 }
 
 struct DreamPatternsCard: View {
@@ -82,9 +96,12 @@ struct DreamPatternsCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Image(systemName: "moon.stars.fill")
-                    .font(.title2)
+            HStack(spacing: 14) {
+                Image("icon_oracle")
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 28, height: 28)
                     .foregroundStyle(Color.dlIndigo)
                 
                 Text("Your Dream Patterns")
@@ -114,9 +131,7 @@ struct DreamPatternsCard: View {
                 // Teaser for free users
                 VStack(alignment: .leading, spacing: 12) {
                     HStack(spacing: 12) {
-                        Image(systemName: "drop.fill")
-                            .font(.title3)
-                            .foregroundStyle(Color.dlMint.opacity(0.6))
+                        teaserArtwork
                         
                         VStack(alignment: .leading, spacing: 4) {
                             Text(patterns.first?.symbol.capitalized ?? "Symbols")
@@ -130,9 +145,10 @@ struct DreamPatternsCard: View {
                         
                         Spacer()
                         
-                        Image(systemName: "lock.fill")
-                            .font(.caption)
+                        Image("icon_oracle")
+                            .renderingMode(.template)
                             .foregroundStyle(.secondary)
+                            .frame(width: 20, height: 20)
                     }
                     .padding(16)
                     .background(
@@ -148,7 +164,8 @@ struct DreamPatternsCard: View {
                 
                 Button(action: onUnlock) {
                     HStack {
-                        Image(systemName: "lock.open.fill")
+                        Image("icon_oracle")
+                            .renderingMode(.template)
                         Text("Unlock Pattern Analysis")
                     }
                     .font(DLFont.body(14))
@@ -177,6 +194,15 @@ struct DreamPatternsCard: View {
         )
     }
     
+    private var teaserArtwork: some View {
+        Image("symbol_water")
+            .renderingMode(.original)
+            .resizable()
+            .scaledToFit()
+            .frame(width: 32, height: 32)
+            .shadow(color: Color.dlIndigo.opacity(0.15), radius: 6, x: 0, y: 6)
+    }
+    
     private var cardBackground: some View {
         RoundedRectangle(cornerRadius: 28, style: .continuous)
             .fill(theme.palette.cardFillSecondary)
@@ -190,10 +216,8 @@ private struct PatternRow: View {
     
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            Image(systemName: symbolIcon)
-                .font(.title3)
-                .foregroundStyle(Color.dlMint)
-                .frame(width: 28)
+            leadingArtwork
+                .frame(width: 36, height: 36)
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(pattern.symbol.capitalized)
@@ -221,16 +245,29 @@ private struct PatternRow: View {
         )
     }
     
-    private var symbolIcon: String {
-        let lowercased = pattern.symbol.lowercased()
-        if lowercased.contains("water") { return "drop.fill" }
-        if lowercased.contains("fire") { return "flame.fill" }
-        if lowercased.contains("air") { return "wind" }
-        if lowercased.contains("earth") { return "mountain.2.fill" }
-        if lowercased.contains("animal") { return "pawprint.fill" }
-        if lowercased.contains("death") { return "leaf.fill" }
-        if lowercased.contains("birth") { return "sunrise.fill" }
-        return "sparkles"
+    @ViewBuilder
+    private var leadingArtwork: some View {
+        if let assetName = artworkName(for: pattern.symbol),
+           let image = UIImage(named: assetName) {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFit()
+                .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 4)
+        } else {
+            Image("icon_oracle")
+                .renderingMode(.template)
+                .foregroundStyle(Color.dlMint)
+                .padding(4)
+        }
+    }
+    
+    private func artworkName(for symbol: String) -> String? {
+        let slug = symbol
+            .lowercased()
+            .replacingOccurrences(of: " ", with: "_")
+            .replacingOccurrences(of: "-", with: "_")
+        let candidate = "symbol_\(slug)"
+        return UIImage(named: candidate) != nil ? candidate : nil
     }
 }
 

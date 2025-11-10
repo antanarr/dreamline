@@ -94,6 +94,18 @@ enum LifeArea: String, CaseIterable, Codable, Identifiable {
     case .mystery: return "questionmark.diamond.fill"
     }
   }
+  
+  var artworkAssetName: String {
+    switch self {
+    case .relationships: return "planet_venus_fill"
+    case .wellbeing: return "planet_moon_fill"
+    case .career: return "planet_saturn_fill"
+    case .creativity: return "planet_mercury_fill"
+    case .intuition: return "planet_neptune_fill"
+    case .rest: return "planet_moon_line"
+    case .mystery: return "planet_pluto_fill"
+    }
+  }
 }
 
 extension HoroscopeStructured {

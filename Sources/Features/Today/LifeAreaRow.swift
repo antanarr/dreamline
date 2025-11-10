@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct LifeAreaRow: View {
     let area: HoroscopeArea
@@ -19,10 +20,8 @@ struct LifeAreaRow: View {
             }
         }) {
             HStack(alignment: .top, spacing: 12) {
-                Image(systemName: lifeArea.iconSystemName)
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(isLocked ? .secondary : Color.dlIndigo)
-                    .frame(width: 32)
+                leadingArtwork
+                    .frame(width: 36, height: 36)
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(area.title)
@@ -45,9 +44,10 @@ struct LifeAreaRow: View {
                 
                 Spacer()
                 
-                Image(systemName: isLocked ? "lock.fill" : "chevron.right")
-                    .font(.caption)
+                Image(isLocked ? "icon_oracle" : "icon_oracle")
+                    .renderingMode(.template)
                     .foregroundStyle(.secondary)
+                    .frame(width: 16, height: 16)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -79,6 +79,20 @@ struct LifeAreaRow: View {
     
     private var lifeArea: LifeArea {
         LifeArea(rawID: area.id)
+    }
+    
+    @ViewBuilder
+    private var leadingArtwork: some View {
+        if let image = UIImage(named: lifeArea.artworkAssetName) {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFit()
+                .shadow(color: Color.black.opacity(0.1), radius: 6, x: 0, y: 4)
+        } else {
+            Image(systemName: lifeArea.iconSystemName)
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(isLocked ? .secondary : Color.dlIndigo)
+        }
     }
 }
 

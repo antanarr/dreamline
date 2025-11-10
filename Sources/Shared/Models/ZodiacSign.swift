@@ -91,5 +91,9 @@ enum ZodiacSign: String, CaseIterable {
         case .pisces: return "♓"
         }
     }
+    
+    var artworkAssetName: String {
+        "zodiac_\(rawValue)"
+    }
 }
 

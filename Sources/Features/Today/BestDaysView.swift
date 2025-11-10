@@ -118,8 +118,16 @@ struct BestDaysView: View {
     }
     
     private var cardBackground: some View {
-        RoundedRectangle(cornerRadius: 28, style: .continuous)
+        let shape = RoundedRectangle(cornerRadius: 28, style: .continuous)
+        return shape
             .fill(theme.palette.cardFillSecondary)
+            .overlay(
+                Image("bg_horoscope_card")
+                    .resizable()
+                    .scaledToFill()
+                    .opacity(theme.isLight ? 0.35 : 0.18)
+                    .clipShape(shape)
+            )
     }
 }
 
@@ -132,17 +140,8 @@ private struct BestDayRow: View {
     
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            VStack(spacing: 4) {
-                Text(dayName)
-                    .font(DLFont.body(11))
-                    .foregroundStyle(.secondary)
-                    .textCase(.uppercase)
-                
-                Text("\(dayNumber)")
-                    .font(DLFont.title(20))
-                    .fontWeight(.bold)
-            }
-            .frame(width: 40)
+            leadingBadge
+                .frame(width: 48, height: 48)
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(day.title)
@@ -155,15 +154,17 @@ private struct BestDayRow: View {
                         .foregroundStyle(.secondary)
                     
                     if let context = day.dreamContext {
-                        HStack(spacing: 4) {
-                            Image(systemName: "moon.stars.fill")
-                                .font(.caption2)
+                        HStack(spacing: 6) {
+                            Image("symbol_ocean")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 14, height: 14)
                             Text(context)
                                 .font(DLFont.body(12))
                         }
                         .foregroundStyle(Color.dlMint)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
                         .background(Color.dlMint.opacity(0.1), in: Capsule())
                     }
                 } else if isLocked {
@@ -177,9 +178,10 @@ private struct BestDayRow: View {
             Spacer()
             
             if isLocked {
-                Image(systemName: "lock.fill")
-                    .font(.caption)
+                Image("icon_oracle")
+                    .renderingMode(.template)
                     .foregroundStyle(.secondary)
+                    .frame(width: 18, height: 18)
             }
         }
         .padding(16)
@@ -198,6 +200,31 @@ private struct BestDayRow: View {
     
     private var dayNumber: Int {
         Calendar.current.component(.day, from: day.date)
+    }
+    
+    private var leadingBadge: some View {
+        VStack(spacing: 6) {
+            Text(dayName)
+                .font(DLFont.body(11))
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+            
+            Text("\(dayNumber)")
+                .font(DLFont.title(20))
+                .fontWeight(.bold)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(10)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [Color.dlIndigo.opacity(0.18), Color.dlViolet.opacity(0.12)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+        )
     }
 }
 
