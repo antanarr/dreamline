@@ -127,7 +127,7 @@ struct OnboardingFlow: View {
             VStack(spacing: 24) {
                 hero(imageName: "ob_notifications",
                      title: "A daily nudge when the sky shifts.",
-                     subtitle: "Pick the time you want Dreamline to surface the day’s horoscope.")
+                     subtitle: "Pick the time you want Dreamline to surface the day's horoscope.")
                 
                 OnboardingCard {
                     VStack(alignment: .leading, spacing: 18) {
@@ -149,11 +149,11 @@ struct OnboardingFlow: View {
             VStack(spacing: 24) {
                 hero(imageName: "ob_sample",
                      title: "Dream in to see the Oracle respond.",
-                     subtitle: "Here’s one of our house dreams. Generate a first interpretation to watch the flow.")
+                     subtitle: "Here's one of our house dreams. Generate a first interpretation to watch the flow.")
                 
                 OnboardingCard {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("\"Ocean, collapsing house, hidden room…\"")
+                        Text("\"Ocean, collapsing house, hidden room...\"")
                             .font(DLFont.body(16))
                             .foregroundStyle(.primary)
                         
@@ -167,7 +167,7 @@ struct OnboardingFlow: View {
         case .done:
             VStack(spacing: 32) {
                 hero(imageName: "ob_completion",
-                     title: "You’re all set.",
+                     title: "You're all set.",
                      subtitle: "Your journal, Oracle, and insights are ready whenever you are.")
                 
                 primaryButton(title: "Enter Dreamline") {

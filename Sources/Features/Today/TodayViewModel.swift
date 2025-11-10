@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 final class TodayViewModel: ObservableObject {
-    @Published var summary: String = "Loading…"
+    @Published var summary: String = "Loading..."
     @Published var isLoading: Bool = true
     
     func load(dreamStore: DreamStore? = nil, date: Date = Date()) async {

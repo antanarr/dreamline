@@ -373,7 +373,7 @@ private struct InsightsEmptyState: View {
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.primary)
                 
-                Text("Log a few dreams and we’ll start surfacing motifs and seasonality.")
+                Text("Log a few dreams and we'll start surfacing motifs and seasonality.")
                     .dlType(.body)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)

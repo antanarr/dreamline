@@ -119,7 +119,7 @@ struct DreamDetailView: View {
                     Text("Oracle insight")
                         .font(DLFont.title(20))
                         .foregroundStyle(.primary)
-                    Text("Fold this dream into your ongoing motifs and today’s sky.")
+                    Text("Fold this dream into your ongoing motifs and today's sky.")
                         .font(DLFont.body(12))
                         .foregroundStyle(.secondary)
                 }

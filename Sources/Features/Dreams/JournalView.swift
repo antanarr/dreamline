@@ -97,7 +97,7 @@ struct JournalView: View {
                     Text("Record a dream")
                         .font(DLFont.title(24))
                         .foregroundStyle(Color.white)
-                    Text("Start a voice note instantly; we’ll transcribe and merge it with your entry.")
+                    Text("Start a voice note instantly; we'll transcribe and merge it with your entry.")
                         .font(DLFont.body(12))
                         .foregroundStyle(Color.white.opacity(0.8))
                 }
@@ -502,7 +502,7 @@ struct ComposeDreamView: View {
         case .recording:
             VStack(alignment: .leading, spacing: 12) {
                 waveformView(level: recorder.normalizedPower)
-                Text("Recording… \(formattedElapsed(recorder.elapsed))")
+                Text("Recording... \(formattedElapsed(recorder.elapsed))")
                     .font(DLFont.body(12))
                     .foregroundStyle(.secondary)
             }
@@ -521,12 +521,12 @@ struct ComposeDreamView: View {
                     HStack(spacing: 8) {
                         ProgressView()
                             .progressViewStyle(.circular)
-                        Text("Transcribing…")
+                        Text("Transcribing...")
                             .font(DLFont.body(12))
                             .foregroundStyle(.secondary)
                     }
                 } else if let lastTranscription {
-                    Text("Transcript added: “\(lastTranscription)”")
+                    Text("Transcript added: "\(lastTranscription)"")
                         .font(DLFont.body(12))
                         .foregroundStyle(.secondary)
                 }

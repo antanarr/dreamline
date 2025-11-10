@@ -145,7 +145,7 @@ private struct FormContent: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
-                Text("Pinpoint your birth moment to align Dreamline’s transits with precision.")
+                Text("Pinpoint your birth moment to align Dreamline's transits with precision.")
                     .font(DLFont.body(14))
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 24)
@@ -174,7 +174,7 @@ private struct FormContent: View {
                                     .labelsHidden()
                                     .tint(Color.dlLilac)
                             } else {
-                                Text("We’ll use 12:00 PM as a midpoint when no exact time is provided.")
+                                Text("We'll use 12:00 PM as a midpoint when no exact time is provided.")
                                     .font(DLFont.body(12))
                                     .foregroundStyle(.secondary)
                             }

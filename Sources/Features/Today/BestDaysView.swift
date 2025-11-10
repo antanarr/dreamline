@@ -59,7 +59,7 @@ struct BestDaysView: View {
                 .frame(width: 140, height: 140)
                 .opacity(theme.isLight ? 0.95 : 0.9)
             
-            Text(isPro ? "We’re mapping your week." : "Unlock Best Days to see when the cosmos aligns for you.")
+            Text(isPro ? "We're mapping your week." : "Unlock Best Days to see when the cosmos aligns for you.")
                 .dlType(.body)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)

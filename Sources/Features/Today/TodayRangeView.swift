@@ -92,7 +92,7 @@ struct TodayRangeView: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "arrow.clockwise")
-                        Text(vm.loading ? "Refreshing…" : "Refresh")
+                        Text(vm.loading ? "Refreshing..." : "Refresh")
                     }
                     .font(DLFont.body(12))
                     .padding(.horizontal, 14)
@@ -152,7 +152,7 @@ private struct TodayRangeEmptyState: View {
             Text("Sky cache is quiet.")
                 .font(DLFont.title(20))
             
-            Text(message ?? "We couldn’t reach the horoscope service just now. Try again in a moment.")
+            Text(message ?? "We couldn't reach the horoscope service just now. Try again in a moment.")
                 .font(DLFont.body(14))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

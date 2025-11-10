@@ -35,14 +35,14 @@ struct OracleChatView: View {
                 }
                 
                 if loading {
-                    Text("…")
+                    Text("...")
                         .shimmer()
                 }
             }
             .padding()
             
             HStack {
-                TextField("Ask about a symbol, feeling, or pattern…", text: $input)
+                TextField("Ask about a symbol, feeling, or pattern...", text: $input)
                     .textFieldStyle(.roundedBorder)
                 
                 Button("Send") {

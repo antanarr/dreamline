@@ -26,7 +26,7 @@ struct HoroscopeCalendarView: View {
                     onSelect(selectedDate)
                     dismiss()
                 } label: {
-                    Text("Show that day’s horoscope")
+                    Text("Show that day's horoscope")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
