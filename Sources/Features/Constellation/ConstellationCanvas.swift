@@ -1,126 +1,130 @@
 import SwiftUI
 
 struct ConstellationCanvas: View {
-    struct Node: Identifiable {
-        let id: String
-        let point: CGPoint   // normalized [-1, 1]
-        let label: String
-        let recencyWeight: CGFloat
-    }
-
-    struct Edge: Identifiable {
-        let id: String
-        let a: String
-        let b: String
-        let weight: CGFloat
-    }
-
-    let nodes: [Node]
-    let edges: [Edge]
-
     @Environment(ThemeService.self) private var theme
-    @State private var zoom: CGFloat = 1.0
-    @State private var offset: CGSize = .zero
-    @GestureState private var drag: CGSize = .zero
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    let entries: [DreamEntry]
+    let neighbors: [String: [ConstellationStore.Neighbor]]
+    let coordinates: [String: CGPoint]
+
+    @State private var scale: CGFloat = 1.0
+    @State private var offset: CGSize = .zero
+    @State private var lastDrag: CGSize = .zero
+    @State private var lastScale: CGFloat = 1.0
     @State private var didAutoFit = false
 
     var body: some View {
         GeometryReader { proxy in
-            let dedupedEdges: [Edge] = {
-                var seen = Set<String>()
-                var result: [Edge] = []
-                for edge in edges {
-                    let key = edgeKey(edge.a, edge.b)
-                    if seen.insert(key).inserted {
-                        result.append(edge)
+            let size = proxy.size
+            Canvas { ctx, canvasSize in
+                let base = min(canvasSize.width, canvasSize.height) * 0.48
+                let center = CGPoint(x: canvasSize.width/2 + offset.width,
+                                     y: canvasSize.height/2 + offset.height)
+
+                // Edges (deduped undirected)
+                var drawn = Set<String>()
+                for (a, neighs) in neighbors {
+                    guard let p1n = coordinates[a] else { continue }
+                    let p1 = CGPoint(x: center.x + CGFloat(p1n.x) * base * scale,
+                                     y: center.y + CGFloat(p1n.y) * base * scale)
+                    for n in neighs {
+                        let key = a < n.id ? "\(a)|\(n.id)" : "\(n.id)|\(a)"
+                        if !drawn.insert(key).inserted { continue }
+                        guard let p2n = coordinates[n.id] else { continue }
+                        let p2 = CGPoint(x: center.x + CGFloat(p2n.x) * base * scale,
+                                         y: center.y + CGFloat(p2n.y) * base * scale)
+                        let alpha = max(0.08, min(0.35, Double(n.weight) * 0.35))
+                        var path = Path(); path.move(to: p1); path.addLine(to: p2)
+                        let stroke = theme.isLight
+                            ? Color.black.opacity(alpha * 0.35)
+                            : Color.white.opacity(alpha * 0.35)
+                        ctx.stroke(path, with: .color(stroke),
+                                   lineWidth: 0.5 + CGFloat(n.weight) * 1.5)
                     }
                 }
-                return result
-            }()
+
+                // Nodes (recency → size)
+                let dateByID = Dictionary(uniqueKeysWithValues: entries.map { ($0.id, $0.createdAt) })
+                for (id, p) in coordinates {
+                    guard dateByID[id] != nil else { continue }
+                    let pt = CGPoint(x: center.x + CGFloat(p.x) * base * scale,
+                                     y: center.y + CGFloat(p.y) * base * scale)
+                    let days = max(0, Date().timeIntervalSince(dateByID[id] ?? Date()) / 86_400)
+                    let r = CGFloat(4.0 + max(0.0, 10.0 - days)) // newer slightly larger
+                    let fill = theme.isLight ? Color.black.opacity(0.8) : Color.white.opacity(0.9)
+                    let nodeRect = CGRect(x: pt.x - r/2, y: pt.y - r/2, width: r, height: r)
+                    ctx.fill(Path(ellipseIn: nodeRect), with: .color(fill))
+                    if !theme.isLight {
+                        ctx.stroke(Path(ellipseIn: nodeRect.insetBy(dx: -1.0, dy: -1.0)),
+                                   with: .color(Color.white.opacity(0.15)))
+                    }
+                }
+            }
+            // Gestures
+            .gesture(
+                DragGesture()
+                    .onChanged { value in
+                        offset = CGSize(width: lastDrag.width + value.translation.width,
+                                        height: lastDrag.height + value.translation.height)
+                    }
+                    .onEnded { _ in lastDrag = offset }
+            )
+            .simultaneousGesture(
+                MagnificationGesture()
+                    .onChanged { value in scale = max(0.5, min(3.0, lastScale * value)) }
+                    .onEnded { _ in lastScale = scale }
+            )
+            // Auto-fit first open & when node set changes
+            .onAppear {
+                if !didAutoFit {
+                    scale = fitScale(for: size)
+                    didAutoFit = true
+                }
+            }
+            .onChange(of: coordinates.count) { _ in
+                scale = fitScale(for: size)
+            }
+        }
+        .background(
             ZStack {
-                ForEach(dedupedEdges) { e in
-                    if let pa = pos(e.a, in: proxy.size), let pb = pos(e.b, in: proxy.size) {
-                        Path { p in
-                            p.move(to: pa)
-                            p.addLine(to: pb)
-                        }
-                        .stroke(edgeStrokeColor(weight: e.weight),
-                                lineWidth: 0.5 + CGFloat(e.weight) * 1.5)
-                    }
-                }
-
-                ForEach(nodes) { n in
-                    if let p = pos(n.id, in: proxy.size) {
-                        Circle()
-                            .fill(Color.white.opacity(0.9))
-                            .frame(width: 8 + 10 * n.recencyWeight,
-                                   height: 8 + 10 * n.recencyWeight)
-                            .shadow(color: .white.opacity(0.25), radius: 6, x: 0, y: 0)
-                            .position(p)
-                        Text(n.label)
-                            .font(.system(size: 11, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.secondary)
-                            .position(CGPoint(x: p.x + 10, y: p.y - 14))
-                            .accessibilityHidden(true)
-                    }
-                }
-            }
-            .scaleEffect(zoom)
-            .offset(x: offset.width + drag.width, y: offset.height + drag.height)
-            .gesture(DragGesture().updating($drag) { value, state, _ in
-                state = value.translation
-            })
-            .simultaneousGesture(MagnificationGesture().onChanged { m in
-                zoom = min(max(m, 0.6), 2.0)
-            })
-            .animation(reduceMotion ? nil : .easeOut(duration: 0.6), value: zoom)
-        }
-        .background(Color.black.opacity(0.85))
-        .ignoresSafeArea()
-        .accessibilityElement(children: .contain)
-        .onAppear {
-            if !didAutoFit {
-                zoom = fitScale(for: proxy.size)
-                didAutoFit = true
-            }
-        }
-        .onChange(of: nodes.count) { _ in
-            zoom = fitScale(for: proxy.size)
-        }
-    }
-
-    private func pos(_ id: String, in size: CGSize) -> CGPoint? {
-        guard let n = nodes.first(where: { $0.id == id }) else { return nil }
-        let s = min(size.width, size.height)
-        return CGPoint(
-            x: size.width * 0.5  + n.point.x * s * 0.42,
-            y: size.height * 0.5 + n.point.y * s * 0.42
+                LinearGradient(colors: theme.palette.horoscopeCardBackground,
+                               startPoint: .topLeading, endPoint: .bottomTrailing)
+                DLAssetImage.heroBackground.resizable().scaledToFill()
+                    .opacity(theme.isLight ? 0.18 : 0.12)
+            }.ignoresSafeArea()
         )
-    }
-
-    private var coordinates: [String: CGPoint] {
-        Dictionary(uniqueKeysWithValues: nodes.map { ($0.id, $0.point) })
+        .overlay(alignment: .topTrailing) {
+            Button {
+                let reset = {
+                    scale = 1.0
+                    offset = .zero
+                    lastDrag = .zero
+                    lastScale = 1.0
+                }
+                if reduceMotion {
+                    reset()
+                } else {
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { reset() }
+                }
+            } label: {
+                Text("Reset")
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .padding(.horizontal, 12).padding(.vertical, 8)
+                    .background(theme.palette.capsuleFill, in: Capsule())
+            }
+            .padding(12)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Dream constellation. Use two fingers to zoom and one finger to pan.")
     }
 
     private func fitScale(for size: CGSize) -> CGFloat {
-        let pts = coordinates.values.map { hypot($0.x, $0.y) }
-        guard let rmax = pts.max(), rmax > 0 else { return 1.0 }
+        let rmax = coordinates.values.map { hypot($0.x, $0.y) }.max() ?? 0
+        guard rmax > 0 else { return 1.0 }
+        // base = 0.48 * min(size); target radius ≈ 0.44 * min(size)
         let s = 0.44 / (0.48 * max(0.25, rmax))
         return min(3.0, max(0.6, s))
-    }
-
-    private func edgeKey(_ a: String, _ b: String) -> String {
-        a < b ? "\(a)|\(b)" : "\(b)|\(a)"
-    }
-
-    private func edgeStrokeColor(weight: CGFloat) -> Color {
-        let alpha = max(0.08, min(0.35, Double(weight) * 0.35))
-        if theme.isLight {
-            return Color.black.opacity(alpha * 0.35)
-        } else {
-            return Color.white.opacity(alpha * 0.35)
-        }
     }
 }
 

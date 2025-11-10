@@ -4,6 +4,7 @@ struct TodayView: View {
     @Environment(DreamStore.self) private var store
     @Environment(EntitlementsService.self) private var entitlements
     @Environment(ThemeService.self) private var theme: ThemeService
+    @ObservedObject private var constellation = ConstellationStore.shared
     @StateObject private var vm = TodayViewModel()
     @StateObject private var horoscopeVM = TodayRangeViewModel()
     @State private var showRecorder = false
@@ -14,7 +15,7 @@ struct TodayView: View {
     @State private var paywallContext: PaywallService.PaywallContext?
     @State private var presentCalendar = false
     @State private var selectedDate: Date = Date()
-    @State private var showConstellation = false
+    @State private var presentConstellation = false
 
     var body: some View {
         NavigationStack {
@@ -44,11 +45,14 @@ struct TodayView: View {
                             .revealOnScroll()
                     }
 
-                    if ConstellationStore.shared.neighbors.values.contains(where: { !$0.isEmpty }) {
-                        ConstellationPreview(count: ConstellationStore.shared.neighbors.count) {
-                            showConstellation = true
-                        }
-                        .revealOnScroll()
+                    if constellation.hasGraph {
+                        ConstellationPreview(
+                            entries: store.entries,
+                            neighbors: constellation.neighbors,
+                            coordinates: constellation.coordinates,
+                            onOpen: { presentConstellation = true }
+                        )
+                        .padding(.horizontal, 20)
                     }
                     
                     // Areas of Life
@@ -151,32 +155,13 @@ struct TodayView: View {
             .sheet(isPresented: $showPaywall) {
                 PaywallView()
             }
-            .sheet(isPresented: $showConstellation) {
-                let store = ConstellationStore.shared
-                let edgesDict = store.neighbors
-
-                var seen = Set<String>()
-                let edges: [ConstellationCanvas.Edge] = edgesDict.flatMap { (a, neigh) in
-                    neigh.compactMap { nb in
-                        let key = a < nb.id ? "\(a)|\(nb.id)" : "\(nb.id)|\(a)"
-                        if seen.contains(key) { return nil }
-                        seen.insert(key)
-                        return ConstellationCanvas.Edge(id: key, a: a, b: nb.id, weight: CGFloat(nb.weight))
-                    }
-                }
-
-                let storeEntries = store.entries
-                let map = Dictionary(uniqueKeysWithValues: storeEntries.map { ($0.id, $0) })
-                let nodes: [ConstellationCanvas.Node] = store.coordinates.compactMap { (id, point) in
-                    guard let dream = map[id] else { return nil }
-                    let days = max(0, Date().timeIntervalSince(dream.createdAt) / 86_400)
-                    let recency = max(0.15, CGFloat(exp(-days / 21.0)))
-                    let label = dream.symbols?.first?.capitalized ?? "Dream"
-                    return ConstellationCanvas.Node(id: id, point: point, label: label, recencyWeight: recency)
-                }
-
-                ConstellationCanvas(nodes: nodes, edges: edges)
-                    .environment(ThemeService.self, theme)
+            .sheet(isPresented: $presentConstellation) {
+                ConstellationCanvas(
+                    entries: store.entries,
+                    neighbors: constellation.neighbors,
+                    coordinates: constellation.coordinates
+                )
+                .environment(ThemeService.self, theme)
             }
             .sheet(isPresented: $presentCalendar) {
                 HoroscopeCalendarView(initialDate: selectedDate) { date in
@@ -200,6 +185,12 @@ struct TodayView: View {
             .onReceive(NotificationCenter.default.publisher(for: .dlStartVoiceCapture)) { _ in
                 startRecordingOnCompose = true
                 showRecorder = true
+            }
+            .task {
+                await ConstellationStore.shared.rebuild(from: store.entries)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .dreamsDidChange)) { _ in
+                Task { await ConstellationStore.shared.rebuild(from: store.entries) }
             }
         }
     }

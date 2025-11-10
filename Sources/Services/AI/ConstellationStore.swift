@@ -1,149 +1,144 @@
 import Foundation
+import SwiftUI
 import CoreGraphics
-import CryptoKit
-
-struct Neighbor: Codable, Hashable {
-    let id: String
-    let weight: Float
-    let lastTouched: Date
-}
 
 @MainActor
-final class ConstellationStore {
+final class ConstellationStore: ObservableObject {
     static let shared = ConstellationStore()
-    private init() {
-        load()
-        loadCoords()
+
+    struct Neighbor: Codable, Hashable {
+        let id: String
+        let weight: Float
+        let lastTouched: Date
     }
 
-    private(set) var neighbors: [String: [Neighbor]] = [:]
-    // Normalized node coordinates: [-1, 1] in both axes
-    private(set) var coordinates: [String: CGPoint] = [:]
-    private let coordsKey = "dreamline.constellation.coords.v1"
-    private let k = 5
-    private let threshold: Float = 0.65
+    // Graph: node id → neighbors (top‑k with weights)
+    @Published private(set) var neighbors: [String: [Neighbor]] = [:]
+    // 2D coordinates normalized to [-1, 1]
+    @Published private(set) var coordinates: [String: CGPoint] = [:]
 
+    // Persistence keys
+    private let neighborsKey = "dreamline.constellation.neighbors.v1"
+    private let coordsKey    = "dreamline.constellation.coords.v1"
+
+    private init() { load() }
+
+    // Public surface
+    var hasGraph: Bool { neighbors.values.contains { !$0.isEmpty } && coordinates.count >= 2 }
+    var nodeCount: Int { neighbors.keys.count }
+    var edgeCount: Int { neighbors.values.reduce(0) { $0 + $1.count } / 2 }
+
+    func reset() {
+        neighbors = [:]
+        coordinates = [:]
+        save()
+    }
+
+    // Build/refresh graph from dreams (last 90 days, up to 200 entries)
+    func rebuild(from dreams: [DreamEntry], topK: Int = 5, threshold: Float = 0.65, tauDays: Float = 21) async {
+        let now = Date()
+        let cutoff = Calendar.current.date(byAdding: .day, value: -90, to: now) ?? .distantPast
+
+        let nodes = dreams
+            .filter { $0.createdAt >= cutoff && ($0.embedding?.isEmpty == false) }
+            .prefix(200)
+
+        guard !nodes.isEmpty else {
+            neighbors = [:]
+            coordinates = [:]
+            save()
+            return
+        }
+
+        // Indexable arrays
+        let ids   = nodes.map { $0.id }
+        let vecs  = nodes.map { $0.embedding! }   // safe due to filter above
+        let dates = nodes.map { $0.createdAt }
+
+        // Pairwise scores with time‑decay
+        var adj: [String: [Neighbor]] = [:]
+        for i in 0..<ids.count {
+            var heap: [(String, Float, Date)] = []
+            for j in 0..<ids.count where j != i {
+                let sim = cosine(vecs[i], vecs[j])
+                if sim <= 0 { continue }
+                let recent = max(dates[i], dates[j])
+                let w = sim * timeDecayWeight(since: recent, tauDays: tauDays)
+                if w >= threshold { heap.append((ids[j], w, recent)) }
+            }
+            heap.sort { $0.1 > $1.1 }
+            let top = heap.prefix(topK).map { Neighbor(id: $0.0, weight: $0.1, lastTouched: $0.2) }
+            if !top.isEmpty { adj[ids[i]] = top }
+        }
+
+        neighbors = adj
+        // Seed coordinates for any NEW nodes; preserve existing for stability
+        assignInitialLayout(nodeIDs: Set(ids), dates: Dictionary(uniqueKeysWithValues: zip(ids, dates)))
+        save()
+    }
+
+    // MARK: - Layout (radial by recency, stable angle + jitter by id hash)
+    private func assignInitialLayout(nodeIDs: Set<String>, dates: [String: Date]) {
+        var coords = coordinates // keep existing
+        let sorted = nodeIDs.sorted { (dates[$0] ?? .distantPast) > (dates[$1] ?? .distantPast) }
+        let n = max(sorted.count, 1)
+        for (idx, id) in sorted.enumerated() {
+            if coords[id] != nil { continue } // keep existing
+            // recency in [0,1]: 0 newest, 1 oldest → newer closer to center
+            let rec = n > 1 ? Float(idx) / Float(n - 1) : 0
+            let r = 0.15 + (0.90 - 0.15) * Double(1 - rec) // 0.15..0.90
+            let base = stableAngle(for: id)
+            let jitter = stableJitter(for: id) * 0.08
+            let theta = base + jitter
+            coords[id] = CGPoint(x: r * cos(theta), y: r * sin(theta))
+        }
+        coordinates = coords
+    }
+
+    // MARK: - Persistence
+    private func load() {
+        let ud = UserDefaults.standard
+        if let data = ud.data(forKey: neighborsKey),
+           let decoded = try? JSONDecoder().decode([String: [Neighbor]].self, from: data) {
+            neighbors = decoded
+        }
+        if let data = ud.data(forKey: coordsKey),
+           let decoded = try? JSONDecoder().decode([String: [Double]].self, from: data) {
+            var map: [String: CGPoint] = [:]
+            decoded.forEach { id, xy in if xy.count == 2 { map[id] = CGPoint(x: xy[0], y: xy[1]) } }
+            coordinates = map
+        }
+    }
+
+    private func save() {
+        let ud = UserDefaults.standard
+        if let data = try? JSONEncoder().encode(neighbors) { ud.set(data, forKey: neighborsKey) }
+        let compact: [String: [Double]] = coordinates.mapValues { [Double($0.x), Double($0.y)] }
+        if let data = try? JSONEncoder().encode(compact) { ud.set(data, forKey: coordsKey) }
+    }
+
+    // MARK: - Math helpers
     private func cosine(_ a: [Float], _ b: [Float]) -> Float {
         guard a.count == b.count, !a.isEmpty else { return 0 }
-        var dot: Float = 0
-        var na: Float = 0
-        var nb: Float = 0
-        for i in 0..<a.count {
-            dot += a[i] * b[i]
-            na += a[i] * a[i]
-            nb += b[i] * b[i]
-        }
+        var dot: Float = 0, na: Float = 0, nb: Float = 0
+        for i in 0..<a.count { dot += a[i]*b[i]; na += a[i]*a[i]; nb += b[i]*b[i] }
         let denom = (na.squareRoot() * nb.squareRoot())
-        return denom > 0 ? (dot / denom) : 0
+        return denom > 0 ? (dot/denom) : 0
     }
-
     private func timeDecayWeight(since date: Date, tauDays: Float = 21) -> Float {
         let days = Float(max(0, Date().timeIntervalSince(date) / 86_400))
         return exp(-days / tauDays)
     }
-
-    func rebuild(from dreams: [DreamEntry]) async {
-        let cutoff = Calendar.current.date(byAdding: .day, value: -90, to: Date()) ?? Date.distantPast
-        let nodes = dreams.filter { $0.createdAt >= cutoff && ($0.embedding?.isEmpty == false) }
-        var map: [String: [Neighbor]] = [:]
-        for i in 0..<nodes.count {
-            let a = nodes[i]
-            guard let va = a.embedding else { continue }
-            var nbs: [Neighbor] = []
-            for j in 0..<nodes.count where j != i {
-                let b = nodes[j]
-                guard let vb = b.embedding else { continue }
-                let sim = cosine(va, vb) * max(timeDecayWeight(since: a.createdAt), timeDecayWeight(since: b.createdAt))
-                if sim >= threshold {
-                    nbs.append(Neighbor(id: b.id, weight: sim, lastTouched: Date()))
-                }
-            }
-            nbs.sort { $0.weight > $1.weight }
-            map[a.id] = Array(nbs.prefix(k))
-        }
-        neighbors = map
-        save()
-
-        let nodeMeta: [(id: String, createdAt: Date)] = dreams.map { ($0.id, $0.createdAt) }
-        let current = Set(coordinates.keys)
-        let target  = Set(nodeMeta.map { $0.id })
-        if coordinates.isEmpty || current != target {
-            coordinates = radialLayout(nodes: nodeMeta)
-        }
-        saveCoords()
+    private func stableAngle(for id: String) -> Double {
+        var h: UInt64 = 1469598103934665603 // FNV offset
+        for u in id.utf8 { h = (h ^ UInt64(u)) &* 1099511628211 }
+        return Double(h % 6_283) / 1000.0 // ~[0, 2π)
     }
-
-    func topNeighbors(of id: String) -> [Neighbor] {
-        neighbors[id] ?? []
-    }
-
-    private func jitterForID(_ id: String, amplitude: CGFloat) -> CGPoint {
-        let digest = SHA256.hash(data: Data(id.utf8))
-        let bytes = Array(digest)
-        func unit(_ b: UInt8) -> CGFloat { CGFloat(b) / 255.0 }
-        let jx = (unit(bytes[0]) * 2 - 1) * amplitude
-        let jy = (unit(bytes[1]) * 2 - 1) * amplitude
-        return CGPoint(x: jx, y: jy)
-    }
-
-    private func radialLayout(nodes: [(id: String, createdAt: Date)],
-                              jitter amplitude: CGFloat = 0.05) -> [String: CGPoint] {
-        guard !nodes.isEmpty else { return [:] }
-        let sorted = nodes.sorted { $0.createdAt > $1.createdAt }
-        let n = sorted.count
-        var result: [String: CGPoint] = [:]
-        for (i, node) in sorted.enumerated() {
-            let t = CGFloat(i) / max(1, CGFloat(n - 1))
-            let r = 0.15 + 0.85 * t
-            let angle = CGFloat(i) * (2 * .pi / max(1, CGFloat(n)))
-            var x = cos(angle) * r
-            var y = sin(angle) * r
-            let jit = jitterForID(node.id, amplitude: amplitude)
-            x += jit.x
-            y += jit.y
-            result[node.id] = CGPoint(x: x, y: y)
-        }
-        return result
-    }
-
-    private func url() -> URL {
-        let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        return dir.appendingPathComponent("ConstellationStore.json")
-    }
-
-    private func save() {
-        do {
-            let data = try JSONEncoder().encode(neighbors)
-            try data.write(to: url())
-        } catch {
-            print("Constellation save error: \(error)")
-        }
-    }
-
-    private func load() {
-        do {
-            let data = try Data(contentsOf: url())
-            neighbors = try JSONDecoder().decode([String: [Neighbor]].self, from: data)
-        } catch {
-            neighbors = [:]
-        }
-    }
-
-    private func loadCoords() {
-        guard let data = UserDefaults.standard.data(forKey: coordsKey),
-              let decoded = try? JSONDecoder().decode([String: [Double]].self, from: data) else { return }
-        var map: [String: CGPoint] = [:]
-        for (id, xy) in decoded where xy.count == 2 {
-            map[id] = CGPoint(x: xy[0], y: xy[1])
-        }
-        coordinates = map
-    }
-
-    private func saveCoords() {
-        let enc = coordinates.mapValues { [Double($0.x), Double($0.y)] }
-        if let data = try? JSONEncoder().encode(enc) {
-            UserDefaults.standard.set(data, forKey: coordsKey)
-        }
+    private func stableJitter(for id: String) -> Double {
+        var h: UInt64 = 7809847782465536322
+        for u in id.utf8 { h = (h &+ UInt64(u)) &* 6364136223846793005 &+ 1 }
+        return Double(h % 1_000) / 1_000.0 // [0,1)
     }
 }
+
 
