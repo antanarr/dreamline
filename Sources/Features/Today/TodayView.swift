@@ -17,7 +17,7 @@ struct TodayView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
+                ScrollView {
                 VStack(alignment: .leading, spacing: 26) {
                     // Horoscope hero FIRST
                     if let item = horoscopeVM.item {
@@ -29,7 +29,8 @@ struct TodayView: View {
                             dontItems: heroActions.dont,
                             showLogButton: false
                         )
-                        .fadeIn(delay: 0.05)
+                            .fadeIn(delay: 0.05)
+                            .revealOnScroll()
                     } else if horoscopeVM.loading {
                         loadingShimmer
                     } else {
@@ -37,17 +38,20 @@ struct TodayView: View {
                     }
                     
                     if let item = horoscopeVM.item, !item.dreamLinks.isEmpty {
-                        dreamThreadsSection(item: item)
+                            dreamThreadsSection(item: item)
+                                .revealOnScroll()
                     }
                     
                     // Areas of Life
                     if let item = horoscopeVM.item {
                         areasOfLifeSection(item: item)
+                                .revealOnScroll()
                     }
                     
                     // Behind This Forecast
                     if let item = horoscopeVM.item, !item.transits.isEmpty {
                         BehindThisForecastView(transits: item.transits)
+                                .revealOnScroll()
                     }
                     
                     // Seasonal Content
@@ -60,6 +64,7 @@ struct TodayView: View {
                             showPaywall = true
                         }
                     )
+                        .revealOnScroll()
                     
                     // Best Days
                     BestDaysView(
@@ -73,6 +78,7 @@ struct TodayView: View {
                             showPaywall = true
                         }
                     )
+                        .revealOnScroll()
                     
                     Button {
                         presentCalendar = true
@@ -105,6 +111,7 @@ struct TodayView: View {
             .refreshable {
                 await refreshContent()
             }
+                .coordinateSpace(name: "scroll")
             .task {
                 await vm.load(dreamStore: store, date: selectedDate)
                 await horoscopeVM.load(period: .day, tz: TimeZone.current.identifier, reference: selectedDate)
@@ -312,26 +319,32 @@ struct TodayView: View {
     }
     
     private var emptyState: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 18) {
             DLAssetImage.emptyToday
                 .resizable()
                 .scaledToFit()
-                .frame(width: 140, height: 140)
-                .opacity(0.9)
+                .frame(width: 160, height: 160)
+                .opacity(theme.isLight ? 0.95 : 0.9)
             
             VStack(spacing: 8) {
-                Text("Your sky is waiting")
+                Text("Your cosmic forecast")
                     .dlType(.titleM)
-                    .multilineTextAlignment(.center)
+                    .fontWeight(.semibold)
                 
-                Text("Here’s a taste of your sky—add birth details to personalize it.")
-                    .dlType(.bodyS)
-                    .foregroundStyle(.secondary)
+                Text("We’re tuning to your sky. Add your birth details for a reading that feels like it knows you.")
+                    .dlType(.body)
                     .multilineTextAlignment(.center)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
+            
+            Text("Tip: log last night’s dream to weave it into today’s reading.")
+                .dlType(.caption)
+                .foregroundStyle(.secondary.opacity(0.8))
         }
         .frame(maxWidth: .infinity)
-        .padding(40)
+        .padding(.horizontal, 28)
+        .padding(.vertical, 36)
     }
 }
 

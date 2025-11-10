@@ -123,10 +123,7 @@ struct BestDaysView: View {
         RoundedRectangle(cornerRadius: 24, style: .continuous)
             .fill(
                 LinearGradient(
-                    colors: [
-                        Color.white.opacity(theme.isLight ? 0.85 : 0.08),
-                        Color.dlViolet.opacity(theme.isLight ? 0.12 : 0.16)
-                    ],
+                    colors: theme.palette.horoscopeCardBackground,
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )

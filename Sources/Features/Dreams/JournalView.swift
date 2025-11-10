@@ -305,23 +305,23 @@ private struct JournalEmptyState: View {
             DLAssetImage.emptyJournal
                 .resizable()
                 .scaledToFit()
-                .frame(width: 140, height: 140)
+                .frame(width: 160, height: 160)
                 .opacity(0.95)
             
-            Text("Your dream archive awaits")
+            Text("Begin your dream archive")
                 .dlType(.titleM)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.primary)
+                .fontWeight(.semibold)
             
-            Text("Add last night’s memory and we’ll weave your first interpretation—free.")
-                .dlType(.bodyS)
+            Text("Capture a few lines when you wake. Dreamline will learn your symbols and surface patterns over time.")
+                .dlType(.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 12)
+                .padding(.horizontal, 8)
         }
-        .padding(32)
+        .padding(.horizontal, 28)
+        .padding(.vertical, 36)
         .frame(maxWidth: .infinity)
-        .background(Color.clear)
     }
 }
 
