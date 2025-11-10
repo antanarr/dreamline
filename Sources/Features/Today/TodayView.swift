@@ -16,11 +16,12 @@ struct TodayView: View {
     @State private var presentCalendar = false
     @State private var selectedDate: Date = Date()
     @State private var presentConstellation = false
+    @State private var refreshToken = UUID()
 
     var body: some View {
         NavigationStack {
                 ScrollView {
-                VStack(alignment: .leading, spacing: 26) {
+                LazyVStack(alignment: .leading, spacing: 16) {
                     // Horoscope hero FIRST
                     if let item = horoscopeVM.item {
                         YourDayHeroCard(
@@ -103,6 +104,7 @@ struct TodayView: View {
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("browse-calendar-button")
                 }
+                .padding(.horizontal, 16)
                 .padding(.top, 8)
             }
             .background(
@@ -121,11 +123,11 @@ struct TodayView: View {
                     .accessibilityLabel("Log a dream")
                 }
             }
-            .refreshable {
-                await refreshContent()
+            .safeRefresh {
+                await MainActor.run { refreshToken = UUID() }
             }
                 .coordinateSpace(name: "scroll")
-            .task {
+            .task(id: refreshToken) {
                 await vm.load(dreamStore: store, date: selectedDate)
                 await horoscopeVM.load(period: .day,
                                        tz: TimeZone.current.identifier,

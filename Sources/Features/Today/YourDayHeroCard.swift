@@ -33,7 +33,7 @@ struct YourDayHeroCard: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isPressed = false
     @State private var animateHalo = false
-    @State private var pulse: Bool = false
+    @State private var pulse = false
     
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -159,6 +159,7 @@ struct YourDayHeroCard: View {
         }
         .padding(.horizontal, 20)
         .padding(.top, 8)
+        .readableScrim(0.40)
         .task {
             withAnimation(.easeInOut(duration: 2.4).repeatForever(autoreverses: true)) {
                 animateHalo = true
