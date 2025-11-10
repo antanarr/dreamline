@@ -47,10 +47,6 @@ struct TodayRangeView: View {
         }
         .padding(22)
         .background(cardBackground)
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
         .task { await vm.load(period: selection, tz: tzIdentifier, force: false) }
         .onChange(of: selection) { _, newValue in refresh(with: newValue, force: false) }
         .refreshable { await vm.load(period: selection, tz: tzIdentifier, force: true) }
@@ -184,10 +180,6 @@ private struct TodayRangeEmptyState: View {
         .background(
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .fill(theme.palette.cardFillSecondary)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(theme.palette.cardStroke)
         )
     }
 }

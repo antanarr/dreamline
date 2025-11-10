@@ -32,10 +32,6 @@ struct QuickReadView: View {
             }
             .padding(22)
             .background(cardBackground(level: .secondary))
-            .overlay(
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .stroke(theme.palette.cardStroke)
-            )
         }
     }
     
@@ -47,10 +43,6 @@ struct QuickReadView: View {
                 .foregroundStyle(.secondary)
                 .padding(22)
                 .background(cardBackground(level: .secondary))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .stroke(theme.palette.cardStroke)
-                )
         }
     }
     
@@ -68,10 +60,6 @@ struct QuickReadView: View {
             }
             .padding(22)
             .background(cardBackground(level: .secondary))
-            .overlay(
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .stroke(theme.palette.cardStroke)
-            )
         }
     }
     
@@ -102,10 +90,6 @@ struct QuickReadView: View {
             }
             .padding(22)
             .background(cardBackground(level: .secondary))
-            .overlay(
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .stroke(theme.palette.cardStroke)
-            )
         }
     }
     
@@ -146,10 +130,6 @@ struct QuickReadView: View {
             }
             .padding(22)
             .background(cardBackground(level: .primary))
-            .overlay(
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .stroke(theme.palette.cardStroke)
-            )
         }
     }
     
@@ -233,10 +213,6 @@ struct QuickReadView: View {
         }
         .padding(22)
         .background(cardBackground(level: .primary))
-        .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
     
     private var dreamTransitCard: some View {
@@ -296,10 +272,6 @@ struct QuickReadView: View {
         }
         .padding(22)
         .background(cardBackground(level: .secondary))
-        .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
     
     private func cardBackground(level: CardLevel) -> some View {

@@ -232,20 +232,12 @@ private struct InsightsHeroCard: View {
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
                             .fill(theme.palette.cardFillSecondary)
                     )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .stroke(theme.palette.cardStroke)
-                    )
                 }
             }
         }
         .padding(22)
         .background(heroBackground)
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
         .shadow(color: .black.opacity(0.25), radius: 24, x: 0, y: 20)
     }
     
@@ -308,10 +300,6 @@ private struct InsightsTopSymbolsCard: View {
         .padding(22)
         .background(symbolsBackground)
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
     
     private func normalizedValue(for count: Int) -> Double {
@@ -393,10 +381,6 @@ private struct InsightsEmptyState: View {
         .background(
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .fill(theme.palette.cardFillSecondary)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(theme.palette.cardStroke)
         )
     }
 }

@@ -19,10 +19,6 @@ struct TodayStructuredView: View {
         .padding(24)
         .background(cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
 
     private var header: some View {
@@ -205,10 +201,6 @@ private struct MapRow: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(theme.palette.cardFillSecondary)
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
 }
 
@@ -257,10 +249,6 @@ private struct DreamCard: View {
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(theme.palette.cardFillSecondary)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(theme.palette.cardStroke)
         )
     }
 }

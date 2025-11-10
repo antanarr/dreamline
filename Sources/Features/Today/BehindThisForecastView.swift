@@ -25,10 +25,6 @@ struct BehindThisForecastView: View {
         .padding(24)
         .background(cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
     
     private var cardBackground: some View {

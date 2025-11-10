@@ -5,9 +5,9 @@ final class TodayViewModel: ObservableObject {
     @Published var summary: String = "Loading…"
     @Published var isLoading: Bool = true
     
-    func load(dreamStore: DreamStore? = nil) async {
+    func load(dreamStore: DreamStore? = nil, date: Date = Date()) async {
         isLoading = true
-        let transit = await AstroService.shared.transits(for: Date())
+        let transit = await AstroService.shared.transits(for: date)
         
         // Pull most recent dream themes/symbols from the store
         let recentMotif = extractRecentMotif(from: dreamStore)

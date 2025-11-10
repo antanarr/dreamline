@@ -60,10 +60,6 @@ struct InsightsHeatmapSection: View {
                 .padding(22)
                 .background(sectionBackground)
                 .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 26, style: .continuous)
-                        .stroke(theme.palette.cardStroke)
-                )
             }
             .buttonStyle(.plain)
         }

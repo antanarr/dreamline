@@ -274,10 +274,6 @@ private struct JournalEntryCard: View {
         }
         .padding(22)
         .background(cardBackground)
-        .overlay(
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
         .shadow(color: Color.black.opacity(0.18), radius: 16, x: 0, y: 12)
     }
     
@@ -465,17 +461,9 @@ struct ComposeDreamView: View {
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
                     .fill(theme.palette.cardFillSecondary)
             )
-            .overlay(
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .stroke(theme.palette.cardStroke)
-            )
         }
         .padding(24)
         .background(cardBackground(cornerRadius: 28, level: .primary))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
     
     private var recordButton: some View {
@@ -642,10 +630,6 @@ struct ComposeDreamView: View {
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
                     .fill(theme.palette.cardFillSecondary)
             )
-            .overlay(
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .stroke(theme.palette.cardStroke)
-            )
             
             if let transcriptionError {
                 Text(transcriptionError)
@@ -655,10 +639,6 @@ struct ComposeDreamView: View {
         }
         .padding(24)
         .background(cardBackground(cornerRadius: 28, level: .secondary))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
     
     private var footer: some View {

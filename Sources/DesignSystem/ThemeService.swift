@@ -91,36 +91,13 @@ private struct DreamlineScreenBackground: ViewModifier {
     var patternScale: CGFloat
     
     func body(content: Content) -> some View {
-        let scheme = theme.colorScheme ?? .dark
-        
-        let backgroundGradient: [Color]
-        let starOpacity: Double
-        let noiseOpacity: Double
-        
-        switch scheme {
-        case .light:
-            backgroundGradient = [
-                Color(hex: 0xF7F8FB),
-                Color(hex: 0xF1F4FA),
-                Color(hex: 0xECEFF7)
-            ]
-            starOpacity = 0.06
-            noiseOpacity = 0.04
-        default:
-            backgroundGradient = [
-                Color(hex: 0x0E1224),
-                Color(hex: 0x121836, alpha: 0.94),
-                Color(hex: 0x4C4FD6, alpha: 0.18)
-            ]
-            starOpacity = 0.10
-            noiseOpacity = 0.06
-        }
+        let palette = theme.palette
         
         return content
             .background(
                 ZStack {
                     LinearGradient(
-                        colors: backgroundGradient,
+                        colors: palette.screenBackgroundGradient,
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -128,13 +105,13 @@ private struct DreamlineScreenBackground: ViewModifier {
                     Image("pattern_stargrid_tile")
                         .resizable(resizingMode: .tile)
                         .scaleEffect(patternScale)
-                        .opacity(starOpacity)
+                        .opacity(palette.starOpacity)
                         .blendMode(.screen)
                     
                     Image("pattern_gradientnoise_tile")
                         .resizable(resizingMode: .tile)
                         .scaleEffect(patternScale)
-                        .opacity(noiseOpacity)
+                        .opacity(palette.noiseOpacity)
                         .blendMode(.plusLighter)
                 }
                 .ignoresSafeArea()

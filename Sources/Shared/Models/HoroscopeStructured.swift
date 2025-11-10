@@ -106,6 +106,18 @@ enum LifeArea: String, CaseIterable, Codable, Identifiable {
     case .mystery: return "planet_pluto_fill"
     }
   }
+  
+  var planetKey: String {
+    switch self {
+    case .relationships: return "venus"
+    case .wellbeing: return "moon"
+    case .career: return "saturn"
+    case .creativity: return "mercury"
+    case .intuition: return "neptune"
+    case .rest: return "moon"
+    case .mystery: return "pluto"
+    }
+  }
 }
 
 extension HoroscopeStructured {
@@ -235,6 +247,22 @@ extension HoroscopeStructured {
   
   var primaryDreamLink: DreamLink? {
     dreamLinks.first
+  }
+  
+  var aggregatedActions: (do: [String], dont: [String]) {
+    var doItems: [String] = []
+    var dontItems: [String] = []
+    
+    for area in areas {
+      if let doList = area.actions?.do_ {
+        doItems.append(contentsOf: doList.filter { !$0.isEmpty })
+      }
+      if let dontList = area.actions?.dont {
+        dontItems.append(contentsOf: dontList.filter { !$0.isEmpty })
+      }
+    }
+    
+    return (Array(doItems.prefix(4)), Array(dontItems.prefix(4)))
   }
   
   func expiryDescription(reference date: Date = Date()) -> String? {

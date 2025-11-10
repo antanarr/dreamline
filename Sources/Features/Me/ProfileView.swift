@@ -259,10 +259,6 @@ struct ProfileView: View {
         }
         .padding(22)
         .background(standardCardBackground(cornerRadius: 26))
-        .overlay(
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
     
     private var heroCard: some View {
@@ -326,10 +322,6 @@ struct ProfileView: View {
         .padding(24)
         .background(heroBackground)
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
     
     private var activityCard: some View {
@@ -361,19 +353,11 @@ struct ProfileView: View {
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
                             .fill(theme.palette.cardFillSecondary)
                     )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .stroke(theme.palette.cardStroke)
-                    )
                 }
             }
         }
         .padding(24)
         .background(standardCardBackground(cornerRadius: 26))
-        .overlay(
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
     
     private var birthCard: some View {
@@ -435,10 +419,6 @@ struct ProfileView: View {
         }
         .padding(24)
         .background(standardCardBackground(cornerRadius: 26))
-        .overlay(
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
     
     private var membershipCard: some View {
@@ -484,10 +464,6 @@ struct ProfileView: View {
         }
         .padding(24)
         .background(standardCardBackground(cornerRadius: 26))
-        .overlay(
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
     
     private var oracleCard: some View {
@@ -523,10 +499,6 @@ struct ProfileView: View {
         .padding(24)
         .background(oracleCardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
     
     private var securityCard: some View {
@@ -563,10 +535,6 @@ struct ProfileView: View {
         }
         .padding(24)
         .background(standardCardBackground(cornerRadius: 26))
-        .overlay(
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
     
     private var appearanceCard: some View {
@@ -591,10 +559,6 @@ struct ProfileView: View {
         }
         .padding(24)
         .background(standardCardBackground(cornerRadius: 26))
-        .overlay(
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
-                .stroke(theme.palette.cardStroke)
-        )
     }
     
     private var heroBackground: some View {
