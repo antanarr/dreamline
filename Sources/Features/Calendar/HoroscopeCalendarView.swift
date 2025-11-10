@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct HoroscopeCalendarView: View {
     @Environment(\.dismiss) private var dismiss
@@ -21,6 +22,7 @@ struct HoroscopeCalendarView: View {
                     .accessibilityIdentifier("horoscope-date-picker")
                 
                 Button {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     onSelect(selectedDate)
                     dismiss()
                 } label: {
@@ -34,6 +36,10 @@ struct HoroscopeCalendarView: View {
                 Spacer()
             }
             .padding(.top, 32)
+            .background(
+                Color.clear
+                    .dreamlineScreenBackground()
+            )
             .navigationTitle("Browse")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

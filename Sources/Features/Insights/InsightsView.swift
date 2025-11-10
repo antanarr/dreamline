@@ -132,17 +132,20 @@ struct InsightsView: View {
                 if hasDreams {
                     VStack(alignment: .leading, spacing: 24) {
                         InsightsHeroCard(metrics: metrics)
+                            .revealOnScroll()
                         
                         if !topSymbols.isEmpty {
                             InsightsTopSymbolsCard(symbols: topSymbols)
+                                .revealOnScroll()
                         }
                         
-                    InsightsHeatmapSection(
-                        tier: entitlements.tier,
+                        InsightsHeatmapSection(
+                            tier: entitlements.tier,
                             isFreeUser: entitlements.tier == .free,
                             lookbackDays: lookbackDays,
                             matrix: heatmapMatrix
-                    )
+                        )
+                        .revealOnScroll()
                 }
                     .padding(.horizontal, 20)
                     .padding(.vertical, 32)
@@ -156,6 +159,7 @@ struct InsightsView: View {
                 Color.clear
                     .dreamlineScreenBackground()
             )
+            .coordinateSpace(name: "scroll")
             .navigationTitle("Insights")
         }
     }
@@ -191,9 +195,13 @@ private struct InsightsHeroCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             HStack(spacing: 12) {
-                Image(systemName: "sparkles.rectangle.stack")
-                    .font(.system(size: 26, weight: .semibold))
+                DLAssetImage.oracleIcon
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 30, height: 30)
                     .foregroundStyle(Color.dlLilac)
+                    .opacity(0.9)
                 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Dreamline Pulse")
@@ -243,23 +251,21 @@ private struct InsightsHeroCard: View {
     
     private var heroBackground: some View {
         let shape = RoundedRectangle(cornerRadius: 28, style: .continuous)
-        let topColor = theme.isLight ? Color(hex: 0xF5F4FF, alpha: 0.95) : Color.dlSpace.opacity(0.9)
-        let bottomColor = theme.isLight ? Color(hex: 0xE5ECFF, alpha: 0.85) : Color.dlViolet.opacity(0.48)
         return shape
             .fill(
                 LinearGradient(
-                    colors: [topColor, bottomColor],
+                    colors: theme.palette.horoscopeCardBackground,
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
             )
             .overlay(
-                Image("pattern_gradientnoise_tile")
-                    .resizable(resizingMode: .tile)
-                    .opacity(theme.isLight ? 0.08 : 0.18)
-                    .blendMode(.plusLighter)
-                    .clipShape(shape)
+                DLAssetImage.heroBackground
+                    .resizable()
+                    .scaledToFill()
+                    .opacity(theme.isLight ? 0.18 : 0.14)
             )
+            .clipShape(shape)
     }
 }
 
@@ -309,23 +315,21 @@ private struct InsightsTopSymbolsCard: View {
     
     private var symbolsBackground: some View {
         let shape = RoundedRectangle(cornerRadius: 24, style: .continuous)
-        let topColor = theme.isLight ? Color(hex: 0xF4F2FF, alpha: 0.92) : Color.dlSpace.opacity(0.9)
-        let bottomColor = theme.isLight ? Color(hex: 0xE2ECFF, alpha: 0.82) : Color.dlIndigo.opacity(0.4)
         return shape
             .fill(
                 LinearGradient(
-                    colors: [topColor, bottomColor],
+                    colors: theme.palette.horoscopeCardBackground,
                     startPoint: .top,
                     endPoint: .bottomTrailing
                 )
             )
             .overlay(
-                Image("pattern_stargrid_tile")
-                    .resizable(resizingMode: .tile)
-                    .opacity(theme.isLight ? 0.08 : 0.18)
-                    .blendMode(.screen)
-                    .clipShape(shape)
+                DLAssetImage.heroBackground
+                    .resizable()
+                    .scaledToFill()
+                    .opacity(theme.isLight ? 0.16 : 0.12)
             )
+            .clipShape(shape)
     }
 }
 
@@ -355,32 +359,32 @@ private struct InsightsEmptyState: View {
     @Environment(ThemeService.self) private var theme: ThemeService
     
     var body: some View {
-        VStack(spacing: 22) {
-            Image(systemName: "sparkles.and.bubble.fill")
-                .font(.system(size: 48, weight: .semibold))
-                .foregroundStyle(Color.dlLilac)
+        VStack(spacing: 18) {
+            DLAssetImage.emptyInsights
+                .resizable()
+                .scaledToFit()
+                .frame(width: 160, height: 160)
+                .opacity(theme.isLight ? 0.95 : 0.9)
             
             VStack(spacing: 10) {
-                Text("Insights bloom after your first dream.")
-                    .font(DLFont.title(22))
+                Text("Patterns emerge with time")
+                    .dlType(.titleM)
+                    .fontWeight(.semibold)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.primary)
                 
-                Text("Log tonight’s dream in Journal. We’ll start surfacing symbol trends, streaks, and the seasonality map here.")
-                    .font(DLFont.body(15))
+                Text("Log a few dreams and we’ll start surfacing motifs and seasonality.")
+                    .dlType(.body)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
             
-            Text("Tip: interpreting a dream unlocks motif tracking.")
-                .font(DLFont.body(13))
-                .foregroundStyle(.secondary)
+            Text("Tip: interpretations help the Oracle track your recurring symbols.")
+                .dlType(.caption)
+                .foregroundStyle(.secondary.opacity(0.85))
         }
-        .padding(32)
+        .padding(.horizontal, 28)
+        .padding(.vertical, 36)
         .frame(maxWidth: .infinity)
-        .background(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .fill(theme.palette.cardFillSecondary)
-        )
     }
 }

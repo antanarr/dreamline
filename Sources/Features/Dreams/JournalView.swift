@@ -651,6 +651,7 @@ struct ComposeDreamView: View {
             }
             
             Button {
+                Feedback.impact(.medium)
                 Task { await saveDreamWithInterpretation() }
             } label: {
                 Text("Get Interpretation")
@@ -711,11 +712,11 @@ struct ComposeDreamView: View {
     }
     
     private var footerBackground: Color {
-        theme.isLight ? Color(hex: 0xEEF2FF, alpha: 0.92) : Color(hex: 0x0C1122, alpha: 0.9)
+        Color(theme.palette.background).opacity(theme.isLight ? 0.92 : 0.9)
     }
     
     private var placeholderColor: Color {
-        theme.isLight ? Color(hex: 0x6E7198, alpha: 0.7) : Color.white.opacity(0.38)
+        theme.palette.separator.opacity(theme.isLight ? 0.6 : 0.4)
     }
     
     private func saveDreamWithInterpretation() async {

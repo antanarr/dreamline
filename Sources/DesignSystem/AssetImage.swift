@@ -24,6 +24,8 @@ enum DLAssetImage {
     // Empty states
     static var emptyToday: Image { Image("empty_today") }
     static var emptyJournal: Image { Image("empty_journal") }
+    static var emptyInsights: Image { Image("empty_insights") }
+    static var emptyCalendar: Image { Image("empty_calendar") }
 
     // Dream symbols (if present), e.g. "ocean" -> "symbol_ocean"
     static func symbol(_ key: String) -> Image {

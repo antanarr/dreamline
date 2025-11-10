@@ -78,30 +78,21 @@ struct InsightsHeatmapSection: View {
     
     private var sectionBackground: some View {
         let shape = RoundedRectangle(cornerRadius: 26, style: .continuous)
-        let topColor = theme.isLight ? Color(hex: 0xF6F4FF, alpha: 0.92) : Color.dlSpace.opacity(0.92)
-        let bottomColor = theme.isLight ? Color(hex: 0xE6EEFF, alpha: 0.82) : Color.dlSpace.opacity(0.78)
         return shape
             .fill(
                 LinearGradient(
-                    colors: [topColor, bottomColor],
+                    colors: theme.palette.horoscopeCardBackground,
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
             )
             .overlay(
-                Image("pattern_stargrid_tile")
-                    .resizable(resizingMode: .tile)
-                    .opacity(theme.isLight ? 0.08 : 0.18)
-                    .blendMode(.screen)
-                    .clipShape(shape)
+                DLAssetImage.heroBackground
+                    .resizable()
+                    .scaledToFill()
+                    .opacity(theme.isLight ? 0.18 : 0.14)
             )
-            .overlay(
-                Image("pattern_gradientnoise_tile")
-                    .resizable(resizingMode: .tile)
-                    .opacity(theme.isLight ? 0.06 : 0.12)
-                    .blendMode(.softLight)
-                    .clipShape(shape)
-            )
+            .clipShape(shape)
     }
 }
 

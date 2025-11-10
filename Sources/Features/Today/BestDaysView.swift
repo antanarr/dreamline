@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct BestDaysView: View {
     let days: [BestDayInfo]
@@ -20,7 +21,10 @@ struct BestDaysView: View {
                 Spacer()
                 
                 if !isPro {
-                    Button(action: onUnlock) {
+                    Button {
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                        onUnlock()
+                    } label: {
                         Text("PRO")
                             .font(.caption.weight(.semibold))
                             .fontWeight(.semibold)
@@ -48,12 +52,49 @@ struct BestDaysView: View {
     }
     
     private var emptyState: some View {
-        Text("Best days calculation coming soon")
-            .dlType(.bodyS)
-            .foregroundStyle(.secondary)
-            .italic()
-            .frame(maxWidth: .infinity, alignment: .center)
-            .padding(.vertical, 24)
+        VStack(spacing: 18) {
+            DLAssetImage.emptyCalendar
+                .resizable()
+                .scaledToFit()
+                .frame(width: 140, height: 140)
+                .opacity(theme.isLight ? 0.95 : 0.9)
+            
+            Text(isPro ? "We’re mapping your week." : "Unlock Best Days to see when the cosmos aligns for you.")
+                .dlType(.body)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            if isPro {
+                Text("Astrology data refreshes daily—check back shortly.")
+                    .dlType(.caption)
+                    .foregroundStyle(.secondary.opacity(0.85))
+            } else {
+                Button {
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    onUnlock()
+                } label: {
+                    Text("Unlock Best Days")
+                        .dlType(.body)
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(
+                            LinearGradient(
+                                colors: [Color.dlIndigo, Color.dlViolet],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ),
+                            in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        )
+                        .foregroundStyle(Color.white)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 28)
+        .frame(maxWidth: .infinity)
     }
     
     private var proContent: some View {
@@ -63,7 +104,10 @@ struct BestDaysView: View {
             }
             
             if days.count > 2 {
-                Button(action: onViewFull) {
+                Button {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    onViewFull()
+                } label: {
                     HStack {
                         Text("View full calendar")
                             .dlType(.body)
@@ -93,7 +137,10 @@ struct BestDaysView: View {
                 BestDayRow(day: day, showContext: false, isLocked: true)
             }
             
-            Button(action: onUnlock) {
+            Button {
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                onUnlock()
+            } label: {
                 HStack {
                     DLAssetImage.oracleIcon
                         .renderingMode(.template)
