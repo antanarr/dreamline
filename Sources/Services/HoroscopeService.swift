@@ -109,52 +109,27 @@ final class HoroscopeService: ObservableObject {
         cached(period: period, tz: tz, uid: uid, reference: referenceDate)
     }
     
-    func fetchBestDays(uid: String = "me") async throws -> [BestDayInfo] {
-        guard let baseURL = baseURL else { throw URLError(.badURL) }
-        
-        let endpoint = baseURL.appendingPathComponent("bestDaysForWeek")
-        
-        var request = URLRequest(url: endpoint)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
+    func fetchBestDays(uid: String = "me", birthISO: String?) async throws -> [BestDayInfo] {
+        guard let url = self.apiEndpoint(path: "bestDays") else { throw URLError(.badURL) }
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         let payload: [String: Any] = [
             "uid": uid,
-            "birthISO": "" // TODO: Get from user profile
+            "birthISO": birthISO ?? ""
         ]
-        
-        request.httpBody = try JSONSerialization.data(withJSONObject: payload)
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            throw URLError(.badServerResponse)
+        req.httpBody = try JSONSerialization.data(withJSONObject: payload)
+        let (data, resp) = try await URLSession.shared.data(for: req)
+        guard (resp as? HTTPURLResponse)?.statusCode == 200 else { throw URLError(.badServerResponse) }
+        struct Envelope: Decodable {
+            struct Day: Decodable { let date: String; let title: String; let reason: String; let dreamContext: String? }
+            let days: [Day]
         }
-        
-        struct BestDaysResponse: Decodable {
-            let days: [BestDayResponseItem]
-            
-            struct BestDayResponseItem: Decodable {
-                let date: String
-                let title: String
-                let reason: String
-                let dreamContext: String?
-            }
-        }
-        
-        let decoder = JSONDecoder()
-        let envelope = try decoder.decode(BestDaysResponse.self, from: data)
-        
-        let dateFormatter = ISO8601DateFormatter()
-        
-        return envelope.days.compactMap { day in
-            guard let date = dateFormatter.date(from: day.date) else { return nil }
-            return BestDayInfo(
-                date: date,
-                title: day.title,
-                reason: day.reason,
-                dreamContext: day.dreamContext
-            )
+        let env = try JSONDecoder().decode(Envelope.self, from: data)
+        let df = ISO8601DateFormatter()
+        return env.days.compactMap { d in
+            guard let date = df.date(from: d.date) else { return nil }
+            return BestDayInfo(date: date, title: d.title, reason: d.reason, dreamContext: d.dreamContext)
         }
     }
 

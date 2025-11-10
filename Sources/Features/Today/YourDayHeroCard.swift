@@ -30,8 +30,10 @@ struct YourDayHeroCard: View {
     }
     
     @Environment(ThemeService.self) private var theme: ThemeService
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isPressed = false
     @State private var animateHalo = false
+    @State private var pulse: Bool = false
     
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -54,15 +56,23 @@ struct YourDayHeroCard: View {
                 .background(Color.white.opacity(0.15), in: Capsule())
 
                 if resonance?.isAlignmentEvent == true {
-                    Label("Today's Alignment", systemImage: "sparkles")
-                        .font(DLFont.body(13))
-                        .foregroundStyle(Color.white.opacity(0.95))
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .background(Color.white.opacity(0.18), in: Capsule())
-                        .scaleEffect(animateHalo ? 1.02 : 0.98)
-                        .animation(.easeInOut(duration: 1.6).repeatForever(autoreverses: true), value: animateHalo)
-                        .accessibilityAddTraits(.updatesFrequently)
+                    ZStack {
+                        Label("Today's Alignment", systemImage: "sparkles")
+                            .font(DLFont.body(13))
+                            .foregroundStyle(Color.white.opacity(0.95))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                            .background(Color.white.opacity(0.18), in: Capsule())
+                            .accessibilityAddTraits(.updatesFrequently)
+                        Circle()
+                            .strokeBorder(Color.white.opacity(0.22), lineWidth: 2.0)
+                            .scaleEffect(pulse ? 1.18 : 0.95)
+                            .opacity(pulse ? 0.0 : 0.6)
+                            .animation(reduceMotion ? nil : .easeOut(duration: 1.6).repeatForever(autoreverses: false), value: pulse)
+                            .allowsHitTesting(false)
+                    }
+                    .onAppear { pulse = true }
+                    .accessibilityLabel("Today's Alignment detected.")
                 }
                 
                 VStack(alignment: .leading, spacing: 14) {

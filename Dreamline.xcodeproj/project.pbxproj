@@ -38,6 +38,8 @@
 		59E88E532EBAACB900419139 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 59E88E522EBAACB900419139 /* FirebaseStorage */; };
 		6060EA136A801F3766631452 /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FCD0FAEC6BC42BF47BB7D4E /* InsightsView.swift */; };
 		E1F2A3B4C5D60718293A4B5D /* ConstellationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1F2A3B4C5D60718293A4B5C /* ConstellationView.swift */; };
+		F1A2B3C4D5E60718293A4B6E /* ConstellationCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E60718293A4B6D /* ConstellationCanvas.swift */; };
+		F1A2B3C4D5E60718293A4B70 /* ConstellationPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E60718293A4B6F /* ConstellationPreview.swift */; };
 		63F8B699D6B846DDA4BFE703 /* AstroGlossary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1515A3A92841469ABDA4437C /* AstroGlossary.swift */; };
 		67A267233C3D270FAF54CC6C /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32ADC0D196DC4835745CE17 /* AuthService.swift */; };
 		68575162CA37B1BF0AEAC795 /* RemoteConfigService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1475F32409336714801E1C1 /* RemoteConfigService.swift */; };
@@ -211,6 +213,8 @@
 		91EDFDF098441D0E836F6A42 /* DreamPatternService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamPatternService.swift; sourceTree = "<group>"; };
 		64F34A8543DD42DAFDFAB93A /* PaywallService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallService.swift; sourceTree = "<group>"; };
 		57E397D51940DFAE7C4E9796 /* DreamStreakService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamStreakService.swift; sourceTree = "<group>"; };
+		F1A2B3C4D5E60718293A4B6D /* ConstellationCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstellationCanvas.swift; sourceTree = "<group>"; };
+		F1A2B3C4D5E60718293A4B6F /* ConstellationPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstellationPreview.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -297,6 +301,15 @@
 				1FE5D781995B4B64A55C2638 /* SymbolSeasonalityDetailView.swift */,
 			);
 			path = Insights;
+			sourceTree = "<group>";
+		};
+		F1A2B3C4D5E60718293A4B72 /* Constellation */ = {
+			isa = PBXGroup;
+			children = (
+				F1A2B3C4D5E60718293A4B6D /* ConstellationCanvas.swift */,
+				F1A2B3C4D5E60718293A4B6F /* ConstellationPreview.swift */,
+			);
+			path = Constellation;
 			sourceTree = "<group>";
 		};
 		4A5C62B2DF6AF2A8C9074ED6 /* Monetization */ = {
@@ -539,6 +552,7 @@
 			children = (
 				E960A1607EF8715A6768FDD4 /* Dreams */,
 				48CAB2EB499E858CB491D9A4 /* Insights */,
+				F1A2B3C4D5E60718293A4B72 /* Constellation */,
 				446D930BA0C084218F3CFF70 /* Me */,
 				2636DA5396634B318F6D4071 /* OracleChat */,
 				8FC56233D6AEBC1A6948AF4D /* Today */,
@@ -703,6 +717,8 @@
 				327B5C8C870C1DC9944FBD66 /* InsightsGate.swift in Sources */,
 				6060EA136A801F3766631452 /* InsightsView.swift in Sources */,
 				E1F2A3B4C5D60718293A4B5D /* ConstellationView.swift in Sources */,
+				F1A2B3C4D5E60718293A4B6E /* ConstellationCanvas.swift in Sources */,
+				F1A2B3C4D5E60718293A4B70 /* ConstellationPreview.swift in Sources */,
 				0356C22E838247689A8C6792 /* InsightsHeatmapSection.swift in Sources */,
 				179FD4B77773418D962583E4 /* SymbolHeatmapView.swift in Sources */,
 				7C350A43F33E40A4BDBAB9C6 /* SymbolSeasonalityDetailView.swift in Sources */,

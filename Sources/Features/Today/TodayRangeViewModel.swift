@@ -10,19 +10,7 @@ final class TodayRangeViewModel: ObservableObject {
     private weak var dreamStoreRef: DreamStore?
     private var dreamsObserver: NSObjectProtocol?
 
-    init() {
-        dreamsObserver = NotificationCenter.default.addObserver(
-            forName: .dreamsDidChange,
-            object: nil,
-            queue: .main
-        ) { [weak self] notification in
-            Task { @MainActor [weak self] in
-                guard let self else { return }
-                guard let store = (notification.object as? DreamStore) ?? self.dreamStoreRef else { return }
-                await self.recomputeResonance(using: store)
-            }
-        }
-    }
+    init() {}
 
     deinit {
         if let observer = dreamsObserver {
@@ -39,6 +27,18 @@ final class TodayRangeViewModel: ObservableObject {
         let anchorKey = HoroscopeService.makeAnchorKey(uid: uid, period: period, tzIdentifier: tz, reference: reference)
         activeAnchorKey = anchorKey
         dreamStoreRef = dreamStore
+        if dreamsObserver == nil {
+            dreamsObserver = NotificationCenter.default.addObserver(
+                forName: .dreamsDidChange,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                guard let self, let item = self.item else { return }
+                Task { @MainActor in
+                    await self.rebuildResonance(for: item)
+                }
+            }
+        }
         
         let cached = HoroscopeService.shared.cached(period: period, tz: tz, uid: uid, reference: reference)
 
@@ -99,13 +99,12 @@ final class TodayRangeViewModel: ObservableObject {
         }
     }
 
-    private func recomputeResonance(using store: DreamStore) async {
-        guard let current = item else { return }
-        let anchorKey = current.anchorKey
-        guard activeAnchorKey == anchorKey else { return }
+    private func rebuildResonance(for current: HoroscopeStructured) async {
+        guard activeAnchorKey == current.anchorKey else { return }
+        guard let store = dreamStoreRef else { return }
 
         let refreshed = await ResonanceService.shared.buildResonance(
-            anchorKey: anchorKey,
+            anchorKey: current.anchorKey,
             headline: current.headline,
             summary: current.summary,
             dreams: store.entries,
@@ -117,7 +116,7 @@ final class TodayRangeViewModel: ObservableObject {
             return x
         } ?? current
 
-        if activeAnchorKey == anchorKey {
+        if activeAnchorKey == current.anchorKey {
             item = refreshed
         }
     }
@@ -126,18 +125,18 @@ final class TodayRangeViewModel: ObservableObject {
         if let urlError = error as? URLError {
             switch urlError.code {
             case .notConnectedToInternet:
-                return "You’re offline. Reconnect to pull the latest horoscope."
+                return "You're offline. Reconnect to pull the latest horoscope."
             case .timedOut:
                 return "The request timed out. Tap refresh to try again."
             case .cannotFindHost, .cannotConnectToHost, .networkConnectionLost:
-                return "We couldn’t reach Dreamline’s servers. Try again shortly."
+                return "We couldn't reach Dreamline's servers. Try again shortly."
             default:
                 break
             }
         }
 
         if error is DecodingError {
-            return "We hit a formatting issue pulling this range. We’re regenerating soon."
+            return "We hit a formatting issue pulling this range. We're regenerating soon."
         }
 
         return "Something blocked the horoscope fetch. Try refreshing in a moment."

@@ -14,6 +14,7 @@ struct TodayView: View {
     @State private var paywallContext: PaywallService.PaywallContext?
     @State private var presentCalendar = false
     @State private var selectedDate: Date = Date()
+    @State private var showConstellation = false
 
     var body: some View {
         NavigationStack {
@@ -39,8 +40,15 @@ struct TodayView: View {
                     }
                     
                     if let item = horoscopeVM.item, !item.dreamLinks.isEmpty {
-                            dreamThreadsSection(item: item)
-                                .revealOnScroll()
+                        dreamThreadsSection(item: item)
+                            .revealOnScroll()
+                    }
+
+                    if ConstellationStore.shared.neighbors.values.contains(where: { !$0.isEmpty }) {
+                        ConstellationPreview(count: ConstellationStore.shared.neighbors.count) {
+                            showConstellation = true
+                        }
+                        .revealOnScroll()
                     }
                     
                     // Areas of Life
@@ -119,8 +127,12 @@ struct TodayView: View {
                                        tz: TimeZone.current.identifier,
                                        dreamStore: store,
                                        reference: selectedDate)
-                // TODO: Fetch best days from backend
-                bestDays = [] // Placeholder
+                do {
+                    let birthISO = try? await ProfileService.shared.birthISO()
+                    bestDays = try await HoroscopeService.shared.fetchBestDays(uid: "me", birthISO: birthISO)
+                } catch {
+                    bestDays = []
+                }
             }
             .sheet(isPresented: $showRecorder, onDismiss: {
                 startRecordingOnCompose = false
@@ -139,6 +151,33 @@ struct TodayView: View {
             .sheet(isPresented: $showPaywall) {
                 PaywallView()
             }
+            .sheet(isPresented: $showConstellation) {
+                let store = ConstellationStore.shared
+                let edgesDict = store.neighbors
+
+                var seen = Set<String>()
+                let edges: [ConstellationCanvas.Edge] = edgesDict.flatMap { (a, neigh) in
+                    neigh.compactMap { nb in
+                        let key = a < nb.id ? "\(a)|\(nb.id)" : "\(nb.id)|\(a)"
+                        if seen.contains(key) { return nil }
+                        seen.insert(key)
+                        return ConstellationCanvas.Edge(id: key, a: a, b: nb.id, weight: CGFloat(nb.weight))
+                    }
+                }
+
+                let storeEntries = store.entries
+                let map = Dictionary(uniqueKeysWithValues: storeEntries.map { ($0.id, $0) })
+                let nodes: [ConstellationCanvas.Node] = store.coordinates.compactMap { (id, point) in
+                    guard let dream = map[id] else { return nil }
+                    let days = max(0, Date().timeIntervalSince(dream.createdAt) / 86_400)
+                    let recency = max(0.15, CGFloat(exp(-days / 21.0)))
+                    let label = dream.symbols?.first?.capitalized ?? "Dream"
+                    return ConstellationCanvas.Node(id: id, point: point, label: label, recencyWeight: recency)
+                }
+
+                ConstellationCanvas(nodes: nodes, edges: edges)
+                    .environment(ThemeService.self, theme)
+            }
             .sheet(isPresented: $presentCalendar) {
                 HoroscopeCalendarView(initialDate: selectedDate) { date in
                     selectedDate = date
@@ -148,6 +187,12 @@ struct TodayView: View {
                                                dreamStore: store,
                                                force: true,
                                                reference: date)
+                        do {
+                            let birthISO = try? await ProfileService.shared.birthISO()
+                            bestDays = try await HoroscopeService.shared.fetchBestDays(uid: "me", birthISO: birthISO)
+                        } catch {
+                            // keep prior bestDays
+                        }
                     }
                 }
                 .environment(theme)
@@ -245,7 +290,7 @@ struct TodayView: View {
     private func dreamThreadsSection(item: HoroscopeStructured) -> some View {
         VStack(alignment: .leading, spacing: 18) {
             HStack(spacing: 10) {
-                Text("Dream threads we’re weaving")
+                Text("Dream threads we're weaving")
                     .dlType(.bodyS)
                     .fontWeight(.semibold)
                     .foregroundStyle(.primary)
@@ -290,7 +335,12 @@ struct TodayView: View {
                                uid: "me",
                                force: true,
                                reference: selectedDate)
-        bestDays = []
+        do {
+            let birthISO = try? await ProfileService.shared.birthISO()
+            bestDays = try await HoroscopeService.shared.fetchBestDays(uid: "me", birthISO: birthISO)
+        } catch {
+            // Keep existing bestDays on failure
+        }
         
         let successGenerator = UINotificationFeedbackGenerator()
         successGenerator.notificationOccurred(.success)
@@ -337,14 +387,14 @@ struct TodayView: View {
                     .dlType(.titleM)
                     .fontWeight(.semibold)
                 
-                Text("We’re tuning to your sky. Add your birth details for a reading that feels like it knows you.")
+                Text("We're tuning to your sky. Add your birth details for a reading that feels like it knows you.")
                     .dlType(.body)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
             
-            Text("Tip: log last night’s dream to weave it into today’s reading.")
+            Text("Tip: log last night's dream to weave it into today's reading.")
                 .dlType(.caption)
                 .foregroundStyle(.secondary.opacity(0.8))
         }
