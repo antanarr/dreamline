@@ -4,6 +4,7 @@ struct TodayRangeView: View {
     @StateObject var vm = TodayRangeViewModel()
     @State private var selection: HoroscopeRange = .day
     @Environment(ThemeService.self) private var theme: ThemeService
+    @Environment(DreamStore.self) private var dreamStore
     private let options: [HoroscopeRange] = HoroscopeRange.allCases
     private let tzIdentifier = TimeZone.current.identifier
     private let rangeNotes: [HoroscopeRange: String] = [
@@ -47,9 +48,9 @@ struct TodayRangeView: View {
         }
         .padding(22)
         .background(cardBackground)
-        .task { await vm.load(period: selection, tz: tzIdentifier, force: false) }
+        .task { await vm.load(period: selection, tz: tzIdentifier, dreamStore: dreamStore, force: false) }
         .onChange(of: selection) { _, newValue in refresh(with: newValue, force: false) }
-        .refreshable { await vm.load(period: selection, tz: tzIdentifier, force: true) }
+        .refreshable { await vm.load(period: selection, tz: tzIdentifier, dreamStore: dreamStore, force: true) }
     }
     
     private var header: some View {
@@ -132,7 +133,7 @@ struct TodayRangeView: View {
     }
     
     private func refresh(with range: HoroscopeRange, force: Bool) {
-        Task { await vm.load(period: range, tz: tzIdentifier, force: force) }
+        Task { await vm.load(period: range, tz: tzIdentifier, dreamStore: dreamStore, force: force) }
     }
 }
 

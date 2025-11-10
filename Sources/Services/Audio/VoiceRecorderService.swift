@@ -1,6 +1,7 @@
 import Foundation
 import AVFoundation
 
+@MainActor
 final class VoiceRecorderService: NSObject, ObservableObject {
     enum State: Equatable {
         case idle
@@ -10,11 +11,6 @@ final class VoiceRecorderService: NSObject, ObservableObject {
         case error(String)
     }
     
-    private let session = AVAudioSession.sharedInstance()
-    private var recorder: AVAudioRecorder?
-    private var meterTimer: Timer?
-    private var startDate: Date?
-    
     private let settings: [String: Any] = [
         AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
         AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
@@ -23,12 +19,32 @@ final class VoiceRecorderService: NSObject, ObservableObject {
         AVSampleRateKey: 44_100.0
     ]
     
-    @Published var isRecording = false
-    @Published var currentTime: TimeInterval = 0
-    @Published var state: State = .idle
-    @Published var normalizedPower: Double = 0
+    private var recorder: AVAudioRecorder?
+    private var levelTimer: Timer?
     
-    var elapsed: TimeInterval = 0
+    @Published var state: State = .idle {
+        didSet {
+            switch (oldValue, state) {
+            case (.recording, .recording):
+                break
+            case (.recording, _):
+                stopMetering()
+            case (_, .recording):
+                startMetering()
+            default:
+                break
+            }
+        }
+    }
+    
+    /// Derived view for convenience; do NOT assign to this directly.
+    var isRecording: Bool {
+        if case .recording = state { return true }
+        return false
+    }
+    
+    @Published private(set) var normalizedPower: Double = 0
+    @Published private(set) var elapsed: TimeInterval = 0
     
     func toggleRecording() {
         switch state {
@@ -40,90 +56,112 @@ final class VoiceRecorderService: NSObject, ObservableObject {
     }
     
     func startRecording(autoActivate: Bool = true) async {
-        guard await requestPermission() else {
-            state = .permissionDenied
-            return
-        }
-        
         do {
             if autoActivate {
-                try session.setCategory(.playAndRecord, mode: .spokenAudio, options: [.duckOthers, .defaultToSpeaker])
-                try session.setActive(true, options: .notifyOthersOnDeactivation)
+                try await beginSession()
+            } else {
+                let granted = await requestPermission()
+                guard granted else {
+                    state = .permissionDenied
+                    return
+                }
             }
             
             let url = makeRecordingURL()
-            recorder = try AVAudioRecorder(url: url, settings: settings)
-            recorder?.delegate = self
-            recorder?.isMeteringEnabled = true
-            recorder?.record()
+            let audioRecorder = try AVAudioRecorder(url: url, settings: settings)
+            audioRecorder.delegate = self
+            audioRecorder.isMeteringEnabled = true
+            audioRecorder.record()
+            recorder = audioRecorder
             
-            startDate = Date()
             elapsed = 0
             normalizedPower = 0
             state = .recording
-            isRecording = true
-            currentTime = 0
-            startMeterUpdates()
         } catch {
+            if case .permissionDenied = state {
+                return
+            }
             state = .error(error.localizedDescription)
-            isRecording = false
+            endSession()
         }
     }
     
     func stopRecording() {
-        guard let recorder else { return }
-        recorder.stop()
-        recorder.updateMeters()
-        meterTimer?.invalidate()
-        meterTimer = nil
-        self.recorder = nil
-        sessionCleanup()
-        state = .finished(recorder.url)
-        isRecording = false
+        guard case .recording = state else { return }
+        let url = recorder?.url
+        recorder?.stop()
+        recorder = nil
+        awaitEndSession()
+        
+        if let url, FileManager.default.fileExists(atPath: url.path) {
+            state = .finished(url)
+        } else {
+            state = .idle
+        }
     }
     
     func discardRecording() {
-        if case .finished(let url) = state {
+        switch state {
+        case .recording:
+            recorder?.stop()
+            recorder = nil
+            awaitEndSession()
+        case .finished(let url):
             try? FileManager.default.removeItem(at: url)
+        default:
+            break
         }
-        meterTimer?.invalidate()
-        meterTimer = nil
-        recorder?.stop()
-        recorder = nil
-        sessionCleanup()
-        startDate = nil
+        
         elapsed = 0
-        currentTime = 0
         normalizedPower = 0
         state = .idle
-        isRecording = false
     }
     
-    private func startMeterUpdates() {
-        meterTimer?.invalidate()
-        meterTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-            self?.updateMeters()
+    private func beginSession() async throws {
+        let session = AVAudioSession.sharedInstance()
+        let granted = await requestPermission()
+        guard granted else {
+            state = .permissionDenied
+            throw NSError(domain: "MicPermission", code: 1, userInfo: nil)
         }
-        RunLoop.main.add(meterTimer!, forMode: .common)
+        try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
+        try session.setActive(true)
     }
     
-    private func updateMeters() {
-        guard let recorder else { return }
-        recorder.updateMeters()
-        if let startDate {
-            elapsed = Date().timeIntervalSince(startDate)
-        }
-        let power = recorder.averagePower(forChannel: 0)
-        let minDb: Float = -80
-        let clamped = max(minDb, power)
-        let range = minDb * -1
-        let normalized = (clamped + range) / range
-        normalizedPower = Double(normalized)
-        currentTime = elapsed
-    }
-    
-    private func sessionCleanup() {
+    private func endSession() {
+        let session = AVAudioSession.sharedInstance()
         try? session.setActive(false, options: .notifyOthersOnDeactivation)
+    }
+    
+    private func awaitEndSession() {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            self.endSession()
+        }
+    }
+    
+    private func startMetering() {
+        stopMetering()
+        elapsed = 0
+        levelTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self, case .recording = self.state else { return }
+                self.recorder?.updateMeters()
+                let power = self.recorder?.averagePower(forChannel: 0) ?? -60
+                let norm = max(0, min(1, (power + 60) / 60))
+                self.normalizedPower = Double(norm)
+                self.elapsed += 0.05
+            }
+        }
+        if let levelTimer {
+            RunLoop.main.add(levelTimer, forMode: .common)
+        }
+    }
+    
+    private func stopMetering() {
+        levelTimer?.invalidate()
+        levelTimer = nil
+        normalizedPower = 0
     }
     
     private func makeRecordingURL() -> URL {
@@ -139,20 +177,26 @@ final class VoiceRecorderService: NSObject, ObservableObject {
         if #available(iOS 17.0, *) {
             switch AVAudioApplication.shared.recordPermission {
             case .denied:
+                state = .permissionDenied
                 return false
             case .granted:
                 return true
             case .undetermined:
-                return await withCheckedContinuation { continuation in
+                let granted = await withCheckedContinuation { continuation in
                     AVAudioApplication.requestRecordPermission { granted in
                         continuation.resume(returning: granted)
                     }
                 }
+                if !granted { state = .permissionDenied }
+                return granted
             @unknown default:
+                state = .permissionDenied
                 return false
             }
         } else {
+            let session = AVAudioSession.sharedInstance()
             if session.recordPermission == .denied {
+                state = .permissionDenied
                 return false
             }
             
@@ -160,25 +204,37 @@ final class VoiceRecorderService: NSObject, ObservableObject {
                 return true
             }
             
-            return await withCheckedContinuation { continuation in
+            let granted = await withCheckedContinuation { continuation in
                 session.requestRecordPermission { granted in
                     continuation.resume(returning: granted)
                 }
             }
+            if !granted { state = .permissionDenied }
+            return granted
         }
+    }
+    
+    deinit {
+        levelTimer?.invalidate()
+        levelTimer = nil
+        recorder?.stop()
+        recorder = nil
+        let session = AVAudioSession.sharedInstance()
+        try? session.setActive(false, options: .notifyOthersOnDeactivation)
     }
 }
 
 extension VoiceRecorderService: AVAudioRecorderDelegate {
-    func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder, error: Error?) {
-        meterTimer?.invalidate()
-        meterTimer = nil
-        self.recorder = nil
-        sessionCleanup()
-        if let error {
-            state = .error(error.localizedDescription)
-        } else {
-            state = .error("Unknown recording error.")
+    nonisolated func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder, error: Error?) {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            self.recorder = nil
+            self.awaitEndSession()
+            if let error {
+                self.state = .error(error.localizedDescription)
+            } else {
+                self.state = .error("Unknown recording error.")
+            }
         }
     }
 }

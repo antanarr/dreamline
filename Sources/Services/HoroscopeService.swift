@@ -89,6 +89,11 @@ final class HoroscopeService: ObservableObject {
 
     // MARK: - Public API
 
+    func apiEndpoint(path: String) -> URL? {
+        guard let baseURL else { return nil }
+        return baseURL.appendingPathComponent(path)
+    }
+
     func cached(period: HoroscopeRange,
                 tz: String,
                 uid: String = "me",

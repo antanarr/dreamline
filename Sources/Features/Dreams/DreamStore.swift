@@ -30,10 +30,34 @@ import FirebaseCore
     }
 
     func add(rawText: String, transcriptURL: URL? = nil) {
-        let e = DreamEntry(rawText: rawText, transcriptURL: transcriptURL)
-        entries.insert(e, at: 0)
+        let extracted = SymbolExtractor.shared.extract(from: rawText, max: 10)
+        var entry = DreamEntry(rawText: rawText, transcriptURL: transcriptURL)
+        entry.symbols = extracted
+
+        entries.insert(entry, at: 0)
         saveToCache()
-        Task { await persistToFirestore(e) }
+        Task { await persistToFirestore(entry) }
+
+        let insertedEntry = entry
+
+        Task.detached { [weak self] in
+            guard let self else { return }
+            do {
+                let vec = try await EmbeddingService.shared.embedChunked(rawText)
+                await MainActor.run {
+                    var updated = insertedEntry
+                    updated.embedding = vec
+                    self.update(updated)
+                }
+                let snapshot = await MainActor.run { self.entries }
+                await ConstellationStore.shared.rebuild(from: snapshot)
+                await MainActor.run {
+                    NotificationCenter.default.post(name: .dreamsDidChange, object: self)
+                }
+            } catch {
+                print("embedding-on-save error: \(error)")
+            }
+        }
     }
     
     func update(_ entry: DreamEntry) {
@@ -43,6 +67,7 @@ import FirebaseCore
             entries[index] = updated
             saveToCache()
             Task { await persistToFirestore(updated) }
+            NotificationCenter.default.post(name: .dreamsDidChange, object: self)
         }
     }
     
@@ -146,4 +171,8 @@ import FirebaseCore
         // No-op when Firebase is not available
     }
     #endif
+}
+
+extension Notification.Name {
+    static let dreamsDidChange = Notification.Name("DreamsDidChange")
 }

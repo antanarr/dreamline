@@ -18,7 +18,7 @@ final class DreamPatternService: ObservableObject {
         // Group by symbols
         var symbolCounts: [String: [Date]] = [:]
         for dream in recentDreams {
-            for symbol in dream.symbols {
+            for symbol in dream.symbols ?? [] {
                 symbolCounts[symbol, default: []].append(dream.createdAt)
             }
         }

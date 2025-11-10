@@ -7,6 +7,7 @@ struct YourDayHeroCard: View {
     let dreamEnhancement: String?
     let doItems: [String]
     let dontItems: [String]
+    var resonance: ResonanceBundle?
     var showLogButton: Bool
     var onLogDream: (() -> Void)?
     
@@ -15,6 +16,7 @@ struct YourDayHeroCard: View {
          dreamEnhancement: String?,
          doItems: [String] = [],
          dontItems: [String] = [],
+         resonance: ResonanceBundle? = nil,
          showLogButton: Bool = false,
          onLogDream: (() -> Void)? = nil) {
         self.headline = headline
@@ -22,6 +24,7 @@ struct YourDayHeroCard: View {
         self.dreamEnhancement = dreamEnhancement
         self.doItems = doItems
         self.dontItems = dontItems
+        self.resonance = resonance
         self.showLogButton = showLogButton
         self.onLogDream = onLogDream
     }
@@ -49,6 +52,18 @@ struct YourDayHeroCard: View {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
                 .background(Color.white.opacity(0.15), in: Capsule())
+
+                if resonance?.isAlignmentEvent == true {
+                    Label("Today's Alignment", systemImage: "sparkles")
+                        .font(DLFont.body(13))
+                        .foregroundStyle(Color.white.opacity(0.95))
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(Color.white.opacity(0.18), in: Capsule())
+                        .scaleEffect(animateHalo ? 1.02 : 0.98)
+                        .animation(.easeInOut(duration: 1.6).repeatForever(autoreverses: true), value: animateHalo)
+                        .accessibilityAddTraits(.updatesFrequently)
+                }
                 
                 VStack(alignment: .leading, spacing: 14) {
                     Text(headline)
@@ -63,6 +78,22 @@ struct YourDayHeroCard: View {
                             .dlType(.body)
                             .foregroundStyle(Color.white.opacity(0.92))
                             .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    if let r = resonance,
+                       let first = r.topHits.first,
+                       !first.overlapSymbols.isEmpty {
+                        HStack(spacing: 8) {
+                            ForEach(Array(first.overlapSymbols.prefix(2)), id: \.self) { sym in
+                                Text(sym.capitalized)
+                                    .font(DLFont.body(13))
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color.white.opacity(0.16), in: Capsule())
+                                    .foregroundStyle(.white)
+                            }
+                        }
+                        .accessibilityLabel("Overlapping symbols: \(first.overlapSymbols.prefix(2).joined(separator: ", "))")
                     }
                     
                     if !doItems.isEmpty || !dontItems.isEmpty {

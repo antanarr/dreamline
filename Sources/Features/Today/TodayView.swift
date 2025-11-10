@@ -27,6 +27,7 @@ struct TodayView: View {
                             dreamEnhancement: dreamEnhancement,
                             doItems: heroActions.do,
                             dontItems: heroActions.dont,
+                            resonance: item.resonance,
                             showLogButton: false
                         )
                             .fadeIn(delay: 0.05)
@@ -114,7 +115,10 @@ struct TodayView: View {
                 .coordinateSpace(name: "scroll")
             .task {
                 await vm.load(dreamStore: store, date: selectedDate)
-                await horoscopeVM.load(period: .day, tz: TimeZone.current.identifier, reference: selectedDate)
+                await horoscopeVM.load(period: .day,
+                                       tz: TimeZone.current.identifier,
+                                       dreamStore: store,
+                                       reference: selectedDate)
                 // TODO: Fetch best days from backend
                 bestDays = [] // Placeholder
             }
@@ -141,6 +145,7 @@ struct TodayView: View {
                     Task {
                         await horoscopeVM.load(period: .day,
                                                tz: TimeZone.current.identifier,
+                                               dreamStore: store,
                                                force: true,
                                                reference: date)
                     }
@@ -172,7 +177,7 @@ struct TodayView: View {
         guard !todayDreams.isEmpty else { return nil }
         
         // Create brief enhancement text
-        let symbols = todayDreams.flatMap { $0.symbols }.prefix(2)
+        let symbols = todayDreams.flatMap { $0.symbols ?? [] }.prefix(2)
         if symbols.isEmpty { return nil }
         
         return "Your dreams this morning featured \(symbols.joined(separator: " and "))."
@@ -281,6 +286,7 @@ struct TodayView: View {
         await vm.load(dreamStore: store, date: selectedDate)
         await horoscopeVM.load(period: .day,
                                tz: TimeZone.current.identifier,
+                               dreamStore: store,
                                uid: "me",
                                force: true,
                                reference: selectedDate)

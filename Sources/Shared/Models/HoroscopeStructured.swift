@@ -27,6 +27,7 @@ struct HoroscopeStructured: Codable, Hashable {
   let transits: [TransitPill]
   let model: String
   let generatedAt: String
+  var resonance: ResonanceBundle?
   
   struct TransitPill: Codable, Hashable { 
     let label: String
