@@ -419,7 +419,7 @@ struct TodayView: View {
         if let item = horoscopeVM.item {
             YourDayHeroCard(
                 headline: item.headline,
-                summary: item.summary ?? "",
+                summary: item.summary,
                 dreamEnhancement: dreamEnhancement,
                 doItems: heroActions.do,
                 dontItems: heroActions.dont,
