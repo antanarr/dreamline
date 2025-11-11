@@ -44,20 +44,17 @@ public protocol EmbeddingBackend: Sendable {
 }
 
 /// Default on-device backend with deterministic, fast hash-based embeddings.
-/// This is *not* a semantic model; it is a development placeholder that preserves
-/// vector shape/flow and allows end-to-end wiring and scoring locally.
+/// This is *not* a semantic model; it preserves vector shape/flow for local wiring/testing.
 public struct LocalEmbeddingBackend: EmbeddingBackend {
     public init() {}
     public func embedChunk(_ text: String, dimension: Int) async throws -> DLVector {
         var vec = [Float](repeating: 0, count: dimension)
-        // Simple frequency-hash projection into `dimension` buckets.
-        // Deterministic across runs/platforms.
         var acc: Float = 0
         for scalar in text.unicodeScalars {
             let v = UInt32(truncatingIfNeeded: scalar.value &* 2654435761) // Knuth multiplicative hash
             let idx = Int(v % UInt32(dimension))
-            // Lightweight feature value; mix with a small rolling accumulator.
             acc = fmodf(acc + Float((v & 0xFF)) / 255.0, 1.0)
+            // NOTE: Float does not support '&+='; use standard '+='
             vec[idx] += 1.0 + acc
         }
         return EmbeddingService.normalize(vec)
@@ -86,17 +83,23 @@ public actor EmbeddingService {
     public func embed(items: [EmbeddingItem]) async throws -> [String: DLVector] {
         if items.isEmpty { return [:] }
 
+        // Capture actor state *before* leaving isolation for the task group.
+        let backend = self.backend
+        let config = self.config
+
         var result: [String: DLVector] = [:]
         result.reserveCapacity(items.count)
 
         // Simple bounded parallelism
-        let groups = items.chunked(maxChunkSize: max(1, items.count / config.parallelism))
+        let chunkSize = max(1, items.count / config.parallelism)
+        let groups = items.chunked(maxChunkSize: chunkSize)
+
         for group in groups {
             try await withThrowingTaskGroup(of: (String, DLVector).self) { tg in
                 for item in group {
-                    tg.addTask { [backend, config] in
+                    tg.addTask {
                         let chunks = EmbeddingService.chunk(text: item.text, threshold: config.chunkCharThreshold)
-                        var weighted = [Float](repeating: 0, count: config.dimension)
+                        var accumulator = [Float](repeating: 0, count: config.dimension)
                         var totalWeight: Float = 0
 
                         for c in chunks {
@@ -104,12 +107,16 @@ public actor EmbeddingService {
                             let vec = try await EmbeddingService.retrying(maxRetries: config.maxRetries, baseJitterMs: config.baseJitterMs) {
                                 try await backend.embedChunk(c, dimension: config.dimension)
                             }
-                            // Sum (length-weighted)
-                            vDSP_add(weighted, vec, weight: weight, into: &weighted)
+                            accumulateScaled(into: &accumulator, add: vec, scale: weight)
                             totalWeight += weight
                         }
 
-                        let averaged = totalWeight > 0 ? weighted.map { $0 / totalWeight } : weighted
+                        let averaged: [Float]
+                        if totalWeight > 0 {
+                            averaged = accumulator.map { $0 / totalWeight }
+                        } else {
+                            averaged = accumulator
+                        }
                         return (item.id, EmbeddingService.normalize(averaged))
                     }
                 }
@@ -180,15 +187,13 @@ public actor EmbeddingService {
     }
 }
 
-// MARK: - vDSP-lite helpers (no Accelerate dependency)
+// MARK: - Helpers (no Accelerate)
 
 @inline(__always)
-private func vDSP_add(_ a: [Float], _ b: [Float], weight: Float, into out: inout [Float]) {
-    // out = a + (b * weight); weighted accumulation
-    let n = min(a.count, b.count, out.count)
-    for i in 0..<n {
-        out[i] = a[i] + b[i] * weight
-    }
+private func accumulateScaled(into out: inout [Float], add v: [Float], scale: Float) {
+    let n = min(out.count, v.count)
+    if n == 0 || scale == 0 { return }
+    for i in 0..<n { out[i] += v[i] * scale }
 }
 
 // MARK: - Small stdlib helpers
