@@ -42,17 +42,7 @@ final class TodayRangeViewModel: ObservableObject {
         
         let cached = HoroscopeService.shared.cached(period: period, tz: tz, uid: uid, reference: reference)
 
-        if !force, var cachedItem = cached {
-            if let bundle = await ResonanceService.shared.buildResonance(
-                anchorKey: anchorKey,
-                headline: cachedItem.headline,
-                summary: cachedItem.summary,
-                dreams: dreamStore.entries,
-                horoscopeEmbedding: cachedItem.resonance?.horoscopeEmbedding,
-                updater: { updated in dreamStore.update(updated) }
-            ) {
-                cachedItem.resonance = bundle
-            }
+        if !force, let cachedItem = cached {
             item = cachedItem
             loading = false
             errorMessage = nil
@@ -71,20 +61,7 @@ final class TodayRangeViewModel: ObservableObject {
                                                                         force: force,
                                                                         reference: reference)
             guard activeAnchorKey == anchorKey else { return }
-            let dreams = dreamStore.entries
-            let enriched = await ResonanceService.shared.buildResonance(
-                anchorKey: anchorKey,
-                headline: fresh.headline,
-                summary: fresh.summary,
-                dreams: dreams,
-                horoscopeEmbedding: fresh.resonance?.horoscopeEmbedding,
-                updater: { updated in dreamStore.update(updated) }
-            ).map { bundle -> HoroscopeStructured in
-                var x = fresh
-                x.resonance = bundle
-                return x
-            } ?? fresh
-            item = enriched
+            item = fresh
             errorMessage = nil
         } catch {
             guard activeAnchorKey == anchorKey else { return }
@@ -101,24 +78,8 @@ final class TodayRangeViewModel: ObservableObject {
 
     private func rebuildResonance(for current: HoroscopeStructured) async {
         guard activeAnchorKey == current.anchorKey else { return }
-        guard let store = dreamStoreRef else { return }
-
-        let refreshed = await ResonanceService.shared.buildResonance(
-            anchorKey: current.anchorKey,
-            headline: current.headline,
-            summary: current.summary,
-            dreams: store.entries,
-            horoscopeEmbedding: current.resonance?.horoscopeEmbedding,
-            updater: { updated in store.update(updated) }
-        ).map { bundle -> HoroscopeStructured in
-            var x = current
-            x.resonance = bundle
-            return x
-        } ?? current
-
-        if activeAnchorKey == current.anchorKey {
-            item = refreshed
-        }
+        guard dreamStoreRef != nil else { return }
+        // Resonance is now computed via the extension method after load
     }
 
     private static func humanReadableMessage(for error: Error) -> String {

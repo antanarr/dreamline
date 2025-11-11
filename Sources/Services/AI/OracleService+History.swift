@@ -1,5 +1,9 @@
 import Foundation
 
+// STUB: This extension will be implemented when history-aware interpretation is ready.
+// Currently blocked on missing OracleInterpretation type definition.
+
+/*
 extension CloudOracleClient {
     func interpret(dreamText: String, extraction: OracleExtraction, transit: TransitSummary, history: MotifHistory) async throws -> OracleInterpretation {
         guard !baseURL.isEmpty else {
@@ -27,4 +31,4 @@ extension CloudOracleClient {
         return try JSONDecoder().decode(OracleInterpretation.self, from: respData)
     }
 }
-
+*/

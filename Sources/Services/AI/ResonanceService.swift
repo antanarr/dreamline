@@ -1,108 +1,150 @@
 import Foundation
 
-@MainActor
-final class ResonanceService {
-    static let shared = ResonanceService()
-    private init() {}
+// MARK: - Config Constants
 
-    private func cosine(_ a: [Float], _ b: [Float]) -> Float {
-        guard a.count == b.count, !a.isEmpty else { return 0 }
-        var dot: Float = 0
-        var na: Float = 0
-        var nb: Float = 0
-        for i in 0..<a.count {
-            dot += a[i] * b[i]
-            na += a[i] * a[i]
-            nb += b[i] * b[i]
+enum ResonanceConfig {
+    static let MIN_BASE: Float = 0.78
+    static let PERCENTILE: Float = 0.90
+    static let LOOKBACK_DAYS: Int = 90
+    static let TIME_DECAY_TAU_DAYS: Float = 21
+    static let SYMBOLS_MAX: Int = 10
+    static let OVERLAP_MAX_VISUAL: Int = 2
+}
+
+// MARK: - Math Utilities
+
+public enum ResonanceMath {
+    @inlinable
+    public static func cosine(_ a: [Float], _ b: [Float]) -> Float {
+        let n = min(a.count, b.count)
+        if n == 0 { return 0 }
+        var dot: Float = 0, na: Float = 0, nb: Float = 0
+        for i in 0..<n {
+            let x = a[i], y = b[i]
+            dot += x * y
+            na  += x * x
+            nb  += y * y
         }
-        let denom = (na.squareRoot() * nb.squareRoot())
-        return denom > 0 ? (dot / denom) : 0
+        let denom = sqrtf(na) * sqrtf(nb)
+        return denom > 1e-8 ? dot / denom : 0
     }
 
-    private func timeDecayWeight(since date: Date, tauDays: Float = 21) -> Float {
-        let days = Float(max(0, Date().timeIntervalSince(date) / 86_400))
-        return exp(-days / tauDays)
+    @inlinable
+    public static func timeDecayWeight(deltaDays: Float, tauDays: Float = 21) -> Float {
+        guard deltaDays.isFinite else { return 0 }
+        return expf(-deltaDays / max(tauDays, 1e-3))
     }
 
-    private func percentile(_ xs: [Float], p: Float) -> Float {
-        guard !xs.isEmpty else { return 0 }
-        let s = xs.sorted()
-        let idx = min(max(Int(Float(s.count - 1) * p), 0), s.count - 1)
-        return s[idx]
-    }
-
-    private func ensureEmbeddingsOrdered(_ dreams: [DreamEntry],
-                                         updater: @escaping (DreamEntry) -> Void) async {
-        let toEmbed = dreams.filter {
-            ($0.embedding == nil) && !$0.rawText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        }
-        guard !toEmbed.isEmpty else { return }
-        let items = toEmbed.map { EmbeddingItem(id: $0.id, text: $0.rawText) }
-        do {
-            let resultMap = try await EmbeddingService.shared.embed(items: items)
-            for dream in toEmbed {
-                if let vec = resultMap[dream.id] {
-                    var updated = dream
-                    updated.embedding = vec
-                    updater(updated)
-                }
-            }
-        } catch {
-            print("ensureEmbeddings error: \(error)")
-        }
-    }
-
-    func buildResonance(anchorKey: String,
-                        headline: String,
-                        summary: String?,
-                        dreams: [DreamEntry],
-                        horoscopeEmbedding prefetched: [Float]?,
-                        updater: @escaping (DreamEntry) -> Void) async -> ResonanceBundle? {
-        var hEmbed = prefetched
-        if hEmbed == nil {
-            let text = [headline, summary ?? ""].joined(separator: "\n")
-            do {
-                let items = [EmbeddingItem(id: "hero_\(anchorKey)", text: text)]
-                let resultMap = try await EmbeddingService.shared.embed(items: items)
-                hEmbed = resultMap["hero_\(anchorKey)"]
-            } catch {
-                print("hero embed failed: \(error)")
-            }
-        }
-        guard let hero = hEmbed, !hero.isEmpty else { return nil }
-
-        let cutoff = Calendar.current.date(byAdding: .day, value: -90, to: Date()) ?? Date.distantPast
-        let recent = dreams
-            .filter { $0.createdAt >= cutoff && !$0.rawText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-            .sorted { $0.createdAt > $1.createdAt }
-            .prefix(200)
-
-        await ensureEmbeddingsOrdered(Array(recent), updater: updater)
-
-        let horoscopeSymbols = SymbolExtractor.shared.extract(from: [headline, summary ?? ""].joined(separator: " "), max: 10)
-
-        var scored: [ResonanceHit] = []
-        var allScores: [Float] = []
-        for e in recent {
-            guard let v = e.embedding else { continue }
-            let base = cosine(hero, v)
-            let w = timeDecayWeight(since: e.createdAt)
-            let s = max(0, min(1, base * w))
-            allScores.append(s)
-            let overlap = Set(e.symbols ?? []).intersection(horoscopeSymbols).map { String($0) }
-            scored.append(ResonanceHit(dreamID: e.id, score: s, overlapSymbols: overlap, createdAt: e.createdAt))
-        }
-        scored.sort { $0.score > $1.score }
-        let top = Array(scored.prefix(3))
-
-        let dyn: Float = (allScores.count >= 10) ? percentile(Array(allScores.prefix(60)), p: 0.90) : 0.78
-
-        return ResonanceBundle(anchorKey: anchorKey,
-                               headline: headline,
-                               summary: summary,
-                               horoscopeEmbedding: hero,
-                               topHits: top,
-                               dynamicThreshold: dyn)
+    /// p‑tile in [0,1], guards for small samples.
+    public static func percentile(_ values: [Float], p: Float) -> Float {
+        let c = values.count
+        guard c >= 1 else { return 0 }
+        let clippedP = min(max(p, 0), 1)
+        let sorted = values.sorted()
+        if c == 1 { return sorted[0] }
+        let idx = Int(floorf(Float(c - 1) * clippedP))
+        return sorted[idx]
     }
 }
 
+public actor ResonanceService {
+    public static let shared = ResonanceService()
+
+    private var scoreHistory: [String: [Float]] = [:] // anchorKey → last ~60 scores
+
+    func buildBundle(anchorKey: String,
+                            headline: String,
+                            summary: String,
+                            horoscopeEmbedding: [Float]?,
+                            dreams: [DreamEntry],
+                            now: Date = Date()) async -> ResonanceBundle? {
+        let text = headline + "\n" + summary
+        // 1) Ensure horoscope embedding
+        let hVec: [Float]
+        if let he = horoscopeEmbedding, he.isEmpty == false {
+            hVec = he
+        } else {
+            let map = try? await EmbeddingService.shared.embed(items: [EmbeddingItem(id: "horoscope:\(anchorKey)", text: text)])
+            hVec = map?["horoscope:\(anchorKey)"] ?? []
+        }
+        guard !hVec.isEmpty else { return nil }
+
+        // 2) Gather recent dreams & ensure embeddings
+        let cutoff = Calendar.current.date(byAdding: .day, value: -ResonanceConfig.LOOKBACK_DAYS, to: now) ?? now
+        let recent = dreams.filter { $0.createdAt >= cutoff }
+        if recent.isEmpty { return nil }
+
+        // Embed any missing
+        let missing = recent.filter { ($0.embedding ?? []).isEmpty }
+        var idToVec: [String: [Float]] = [:]
+        if !missing.isEmpty {
+            let items = missing.map { EmbeddingItem(id: $0.id, text: $0.rawText) }
+            let map = try? await EmbeddingService.shared.embed(items: items)
+            idToVec = map ?? [:]
+        }
+
+        // 3) Horoscope symbols for overlap
+        let horoscopeSymbols = SymbolExtractor.extract(from: text, max: 10)
+
+        // 4) Score dreams
+        var scores: [(dream: DreamEntry, score: Float, overlap: [String])] = []
+        scores.reserveCapacity(recent.count)
+        let nowStart = Calendar.current.startOfDay(for: now)
+
+        for d in recent {
+            let dVec = !(d.embedding ?? []).isEmpty ? (d.embedding ?? []) : (idToVec[d.id] ?? [])
+            if dVec.isEmpty { continue }
+            let days = Float(Calendar.current.dateComponents([.day], from: Calendar.current.startOfDay(for: d.createdAt), to: nowStart).day ?? 0)
+            let cos = ResonanceMath.cosine(hVec, dVec)
+            let weight = ResonanceMath.timeDecayWeight(deltaDays: days)
+            let score = cos * weight
+
+            // Overlap symbols (use stored symbols if available; else quick extract)
+            let dreamSymbols = (d.symbols ?? SymbolExtractor.extract(from: d.rawText, max: 10))
+            let overlap = Array(Set(horoscopeSymbols).intersection(Set(dreamSymbols)))
+
+            scores.append((d, score, overlap))
+        }
+
+        if scores.isEmpty { return nil }
+
+        // 5) Thresholding: use p90 of recent history if enough samples; else fallback
+        let key = anchorKey
+        let rawScores = scores.map { $0.score }
+        let prior = scoreHistory[key] ?? []
+        let historySlice = Array((prior + rawScores).suffix(60))
+        scoreHistory[key] = historySlice
+
+        let threshold: Float
+        if historySlice.count >= 10 {
+            threshold = max(ResonanceMath.percentile(historySlice, p: ResonanceConfig.PERCENTILE), ResonanceConfig.MIN_BASE)
+        } else {
+            threshold = ResonanceConfig.MIN_BASE
+        }
+
+        // 6) Select top hits ≥ threshold and with at least one overlap symbol
+        let top = scores
+            .filter { $0.score >= threshold && !$0.overlap.isEmpty }
+            .sorted { $0.score > $1.score }
+            .prefix(3)
+            .map { t in
+                ResonanceHit(dreamID: t.dream.id, score: t.score, overlapSymbols: Array(t.overlap.prefix(2)), createdAt: t.dream.createdAt)
+            }
+
+        let bundle = ResonanceBundle(anchorKey: key,
+                                     headline: headline,
+                                     summary: summary.isEmpty ? nil : summary,
+                                     horoscopeEmbedding: hVec,
+                                     topHits: Array(top),
+                                     dynamicThreshold: threshold)
+
+        // 7) Metrics
+        DLAnalytics.log(.resonanceComputed(anchorKey: key,
+                                           nDreams: recent.count,
+                                           p90: (historySlice.count >= 10 ? ResonanceMath.percentile(historySlice, p: ResonanceConfig.PERCENTILE) : ResonanceConfig.MIN_BASE),
+                                           threshold: threshold,
+                                           nHits: bundle.topHits.count,
+                                           topScore: bundle.topHits.first?.score ?? 0))
+        return bundle.isAlignmentEvent ? bundle : nil
+    }
+}

@@ -30,7 +30,7 @@ import FirebaseCore
     }
 
     func add(rawText: String, transcriptURL: URL? = nil) {
-        let extracted = SymbolExtractor.shared.extract(from: rawText, max: 10)
+        let extracted = SymbolExtractor.extract(from: rawText, max: 10)
         var entry = DreamEntry(rawText: rawText, transcriptURL: transcriptURL)
         entry.symbols = extracted
 

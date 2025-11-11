@@ -12,7 +12,7 @@ public struct RemoteConfigSnapshot: Equatable, Codable {
 }
 
 @MainActor
-public extension RemoteConfigService {
+extension RemoteConfigService {
     func makeSnapshot() -> RemoteConfigSnapshot {
         RemoteConfigSnapshot(
             horoscopeEnabled: config.horoscopeEnabled,

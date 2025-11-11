@@ -85,6 +85,9 @@ struct TodayView: View {
     private func loadHoroscope() async {
         await vm.load(dreamStore: store, date: selectedDate)
         await horoscopeVM.load(period: .day, tz: TimeZone.current.identifier, dreamStore: store, reference: selectedDate)
+        Task { @MainActor in
+            await horoscopeVM.computeResonance(dreamStore: store, tz: TimeZone.current.identifier, reference: selectedDate)
+        }
         do {
             let birthISO = ProfileService.shared.birth.isoString()
             bestDays = try await HoroscopeService.shared.fetchBestDays(uid: "me", birthISO: birthISO)
@@ -97,6 +100,7 @@ struct TodayView: View {
         selectedDate = date
         Task {
             await horoscopeVM.load(period: .day, tz: TimeZone.current.identifier, dreamStore: store, force: true, reference: date)
+            await horoscopeVM.computeResonance(dreamStore: store, tz: TimeZone.current.identifier, reference: date)
             do {
                 let birthISO = ProfileService.shared.birth.isoString()
                 bestDays = try await HoroscopeService.shared.fetchBestDays(uid: "me", birthISO: birthISO)
@@ -241,6 +245,9 @@ struct TodayView: View {
                                uid: "me",
                                force: true,
                                reference: selectedDate)
+        Task { @MainActor in
+            await horoscopeVM.computeResonance(dreamStore: store, tz: TimeZone.current.identifier, reference: selectedDate)
+        }
         do {
             let birthISO = ProfileService.shared.birth.isoString()
             bestDays = try await HoroscopeService.shared.fetchBestDays(uid: "me", birthISO: birthISO)
@@ -254,17 +261,15 @@ struct TodayView: View {
     }
     
     /// One-shot a11y + haptic cue when an Alignment Event is present.
-    /// Also logs a lightweight metric for future tuning.
-    private func announceAlignmentIfNeeded(topScore: Float? = nil, overlapCount: Int? = nil) {
+    private func announceAlignmentIfNeeded() {
         guard !didAnnounceAlignment else { return }
         didAnnounceAlignment = true
         let impact = UIImpactFeedbackGenerator(style: .light)
         impact.prepare()
         impact.impactOccurred()
         if UIAccessibility.isVoiceOverRunning {
-            UIAccessibility.post(notification: .announcement, argument: "Today’s Alignment")
+            UIAccessibility.post(notification: .announcement, argument: "Today's Alignment")
         }
-        DLAnalytics.log(.alignmentShown(topScore: topScore ?? 0, overlapCount: overlapCount ?? 0))
     }
     
     @ViewBuilder
@@ -352,10 +357,11 @@ struct TodayView: View {
             .revealOnScroll()
             // Announce Alignment on first appearance for this date
             .task {
-                if let r = item.resonance, !r.topHits.isEmpty {
-                    let topScore = r.topHits.first?.score
-                    let overlapCount = r.topHits.first?.overlapSymbols.count
-                    announceAlignmentIfNeeded(topScore: topScore, overlapCount: overlapCount)
+                if let r = item.resonance, r.isAlignmentEvent {
+                    let topScore: Float = r.topHits.first?.score ?? 0
+                    let overlapCount: Int = r.topHits.first?.overlapSymbols.count ?? 0
+                    announceAlignmentIfNeeded()
+                    DLAnalytics.log(.alignmentShown(topScore: topScore, overlapCount: overlapCount))
                 }
             }
         } else if horoscopeVM.loading {

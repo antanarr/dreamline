@@ -10,6 +10,7 @@ struct YourDayHeroCard: View {
     var resonance: ResonanceBundle?
     var showLogButton: Bool
     var onLogDream: (() -> Void)?
+    var onAlignmentTap: (() -> Void)?
     
     init(headline: String,
          summary: String?,
@@ -18,7 +19,8 @@ struct YourDayHeroCard: View {
          dontItems: [String] = [],
          resonance: ResonanceBundle? = nil,
          showLogButton: Bool = false,
-         onLogDream: (() -> Void)? = nil) {
+         onLogDream: (() -> Void)? = nil,
+         onAlignmentTap: (() -> Void)? = nil) {
         self.headline = headline
         self.summary = summary
         self.dreamEnhancement = dreamEnhancement
@@ -27,6 +29,7 @@ struct YourDayHeroCard: View {
         self.resonance = resonance
         self.showLogButton = showLogButton
         self.onLogDream = onLogDream
+        self.onAlignmentTap = onAlignmentTap
     }
     
     @Environment(ThemeService.self) private var theme: ThemeService
@@ -55,24 +58,31 @@ struct YourDayHeroCard: View {
                 .padding(.vertical, 8)
                 .background(Color.white.opacity(0.15), in: Capsule())
 
-                if resonance?.isAlignmentEvent == true {
-                    ZStack {
-                        Label("Today's Alignment", systemImage: "sparkles")
-                            .font(DLFont.body(13))
-                            .foregroundStyle(Color.white.opacity(0.95))
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 8)
-                            .background(Color.white.opacity(0.18), in: Capsule())
-                            .accessibilityAddTraits(.updatesFrequently)
-                        Circle()
-                            .strokeBorder(Color.white.opacity(0.22), lineWidth: 2.0)
-                            .scaleEffect(pulse ? 1.18 : 0.95)
-                            .opacity(pulse ? 0.0 : 0.6)
-                            .animation(reduceMotion ? nil : .easeOut(duration: 1.6).repeatForever(autoreverses: false), value: pulse)
-                            .allowsHitTesting(false)
+                if let rb = resonance, rb.isAlignmentEvent {
+                    Button {
+                        DLAnalytics.log(.alignmentTapthrough(dest: .dreamDetail))
+                        onAlignmentTap?()
+                    } label: {
+                        ZStack {
+                            Label("Today's Alignment", systemImage: "sparkles")
+                                .font(DLFont.body(13))
+                                .foregroundStyle(Color.white.opacity(0.95))
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                                .background(Color.white.opacity(0.18), in: Capsule())
+                            Circle()
+                                .strokeBorder(Color.white.opacity(0.22), lineWidth: 2.0)
+                                .scaleEffect(pulse ? 1.18 : 0.95)
+                                .opacity(pulse ? 0.0 : 0.6)
+                                .animation(reduceMotion ? nil : .easeOut(duration: 1.6).repeatForever(autoreverses: false), value: pulse)
+                                .allowsHitTesting(false)
+                        }
                     }
+                    .buttonStyle(.plain)
                     .onAppear { pulse = true }
-                    .accessibilityLabel("Today's Alignment detected.")
+                    .accessibilityLabel("Today's Alignment")
+                    .accessibilityValue(alignmentValue(rb))
+                    .accessibilityAddTraits(.updatesFrequently)
                 }
                 
                 VStack(alignment: .leading, spacing: 14) {
@@ -245,6 +255,13 @@ struct YourDayHeroCard: View {
         .background(Color.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Dream weaving. \(enhancement)")
+    }
+    
+    private func alignmentValue(_ rb: ResonanceBundle) -> String {
+        if let hit = rb.topHits.first, let first = hit.overlapSymbols.first {
+            return first.replacingOccurrences(of: "_", with: " ")
+        }
+        return "Active"
     }
 }
 

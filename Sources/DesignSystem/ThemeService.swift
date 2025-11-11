@@ -84,32 +84,6 @@ extension View {
     func dreamlineScreenBackground(patternScale: CGFloat = 1.0) -> some View {
         modifier(DreamlineScreenBackground(patternScale: patternScale))
     }
-    
-    func readableScrim(_ opacity: Double = 0.40) -> some View {
-        overlay(
-            LinearGradient(colors: [Color.black.opacity(opacity), .clear],
-                          startPoint: .top, endPoint: .bottom)
-        )
-    }
-    
-    func safeRefresh(_ action: @escaping () async -> Void) -> some View {
-        modifier(SafeRefresh(action: action))
-    }
-}
-
-// Pull-to-refresh that avoids re-entrancy crashes
-private struct SafeRefresh: ViewModifier {
-    let action: () async -> Void
-    @State private var isRefreshing = false
-
-    func body(content: Content) -> some View {
-        content.refreshable {
-            if isRefreshing { return }
-            isRefreshing = true
-            defer { isRefreshing = false }
-            await action()
-        }
-    }
 }
 
 private struct DreamlineScreenBackground: ViewModifier {

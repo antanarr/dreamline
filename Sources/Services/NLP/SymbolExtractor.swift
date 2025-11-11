@@ -1,26 +1,51 @@
 import Foundation
 
-final class SymbolExtractor {
-    static let shared = SymbolExtractor()
-    private init() {}
-
-    private let stop: Set<String> = [
-        "the","and","a","an","to","of","in","on","at","for","with","from","by","as","is","are","was","were","be","been",
-        "it","that","this","these","those","i","you","he","she","we","they","me","my","your","our","their",
-        "but","or","if","so","then","than","just","very","really","there","here"
+/// Lightweight, local keyword extractor for single‑word tokens.
+/// Normalizes to lowercase snake_case, strips stopwords, caps to SYMBOLS_MAX.
+public enum SymbolExtractor {
+    private static let stopwords: Set<String> = [
+        "the","a","an","and","or","but","if","then","than","when","while","for","to","of","in","on","at","by",
+        "with","without","from","into","over","under","you","your","yours","is","are","was","were","be","being",
+        "been","it","its","as","that","this","these","those","we","our","ours","i","me","my","mine","they","them",
+        "their","theirs","he","she","his","her","hers","not","no","yes","do","does","did","done"
     ]
 
-    func extract(from text: String, max: Int = 10) -> [String] {
+    public static func extract(from text: String, max: Int = 10) -> [String] {
+        guard !text.isEmpty else { return [] }
+        // Split on non‑alphanumerics, keep ASCII letters/numbers
         let lower = text.lowercased()
-        let words = lower.split { !$0.isLetter && $0 != "'" }
-        var freq: [String: Int] = [:]
-        for raw in words {
-            let w = String(raw).trimmingCharacters(in: .punctuationCharacters)
-            if w.count < 3 || stop.contains(w) { continue }
-            freq[w, default: 0] += 1
+        var tokens: [String] = []
+        var current = ""
+        for ch in lower.unicodeScalars {
+            if CharacterSet.alphanumerics.contains(ch) {
+                current.unicodeScalars.append(ch)
+            } else {
+                flush(&current, into: &tokens)
+            }
         }
-        let sorted = freq.sorted { $0.value > $1.value }.map { $0.key }
-        return Array(sorted.prefix(max))
+        flush(&current, into: &tokens)
+
+        // Normalize and filter
+        var seen = Set<String>()
+        var out: [String] = []
+        out.reserveCapacity(max)
+        for raw in tokens {
+            if raw.count < 2 { continue }
+            if stopwords.contains(raw) { continue }
+            let norm = raw.replacingOccurrences(of: " ", with: "_")
+            if !seen.contains(norm) {
+                seen.insert(norm)
+                out.append(norm)
+                if out.count >= max { break }
+            }
+        }
+        return out
+    }
+
+    private static func flush(_ current: inout String, into tokens: inout [String]) {
+        if !current.isEmpty {
+            tokens.append(current)
+            current.removeAll(keepingCapacity: true)
+        }
     }
 }
-
