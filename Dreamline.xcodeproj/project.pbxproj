@@ -112,6 +112,7 @@
 		D6E5EA57803D78C199994371 /* TodayRangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D84C2E36FA13CA977D77446 /* TodayRangeView.swift */; };
 		DAF91D3AC3072E647348B6E8 /* SymbolSeasonalityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43636F9B22F5306B1A2BF234 /* SymbolSeasonalityDetailView.swift */; };
 		DB33F80575DB1EBAFD287189 /* StoreKitLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DB66BC88E5AB7C6AB8D3CC /* StoreKitLayer.swift */; };
+		DBCD129255DF0684E1A908E2 /* CopyEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D0EFDC0509307E8E9F9563 /* CopyEngine.swift */; };
 		DCBA0EF40FF17D9352FA6C49 /* BirthDataEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529C94BCCAB7E6CBA36FEA44 /* BirthDataEditorView.swift */; };
 		DDC59E26E9C19F8C0982D3A6 /* ConstellationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4996D980DFADEE9D1C0605C /* ConstellationStore.swift */; };
 		E1D21F3D53B4EF74CF0937F3 /* InterpretCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25C436F5531E47A44992601D /* InterpretCoordinator.swift */; };
@@ -126,6 +127,7 @@
 		EE532EF1CD26802316CF2437 /* DeepReadGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F364B5B852252478A372AFBD /* DeepReadGenerator.swift */; };
 		F2E925FEDEB07CA9DCF0B298 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 2A27E80C677EC938346E464A /* FirebaseMessaging */; };
 		F31A57DEC339F24A7B09166B /* OracleSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D006DB938F0A71062F6DFB24 /* OracleSchemaTests.swift */; };
+		F6BF6EDF5AC85FFD54748DE2 /* PromptBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509B285AACFAAACA11B67CF6 /* PromptBook.swift */; };
 		FC4B07B8F8849A5064DDA29A /* AstroService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFA543F810B15B3F844BCE2 /* AstroService.swift */; };
 		FE09777B1A9E2AE906CB519B /* BestDaysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1083DC6763C08039F9061A /* BestDaysView.swift */; };
 /* End PBXBuildFile section */
@@ -176,6 +178,7 @@
 		4C68F3255FA7EED401B88929 /* HistoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryService.swift; sourceTree = "<group>"; };
 		4FCD0FAEC6BC42BF47BB7D4E /* InsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsView.swift; sourceTree = "<group>"; };
 		50152123CE6525F960C1FA90 /* AlignmentAheadTeaser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlignmentAheadTeaser.swift; sourceTree = "<group>"; };
+		509B285AACFAAACA11B67CF6 /* PromptBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptBook.swift; sourceTree = "<group>"; };
 		50B27A75FF940DDA8063E1FE /* DreamDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamDetailScreen.swift; sourceTree = "<group>"; };
 		5172B5B35B51DE35206089FC /* AnchorKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnchorKey.swift; sourceTree = "<group>"; };
 		529C94BCCAB7E6CBA36FEA44 /* BirthDataEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirthDataEditorView.swift; sourceTree = "<group>"; };
@@ -198,6 +201,7 @@
 		723E6A52D7B333E782EE0FF6 /* AstroGlossary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AstroGlossary.swift; sourceTree = "<group>"; };
 		738C88E69026F7ECD6BAAAA1 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		73B92519A92C5836BB447CAF /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		74D0EFDC0509307E8E9F9563 /* CopyEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyEngine.swift; sourceTree = "<group>"; };
 		77AB4061BECB32A5C0F26350 /* BehindThisForecastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehindThisForecastView.swift; sourceTree = "<group>"; };
 		7B078092D64F5C5D7AC7B6C1 /* EntitlementsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementsService.swift; sourceTree = "<group>"; };
 		861F4409E3A5F962980D7B2E /* InsightsHeatmapSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsHeatmapSection.swift; sourceTree = "<group>"; };
@@ -296,9 +300,11 @@
 			isa = PBXGroup;
 			children = (
 				A4996D980DFADEE9D1C0605C /* ConstellationStore.swift */,
+				74D0EFDC0509307E8E9F9563 /* CopyEngine.swift */,
 				28D0CB80DC9AA648A91D58EA /* EmbeddingService.swift */,
 				E07790A9FE0B47C5A4AA6466 /* OracleService.swift */,
 				FAF0C4D94339B5C061B8087F /* OracleService+History.swift */,
+				509B285AACFAAACA11B67CF6 /* PromptBook.swift */,
 				68C151CDD228236CC7035AF6 /* ResonanceService.swift */,
 				FB56FE877C53F1EF21E3E0E1 /* TranscriptionService.swift */,
 			);
@@ -819,6 +825,7 @@
 				DDC59E26E9C19F8C0982D3A6 /* ConstellationStore.swift in Sources */,
 				635464FF785C26754F456772 /* ConstellationView.swift in Sources */,
 				74DE7A7EA110E04B88F04624 /* ContentView.swift in Sources */,
+				DBCD129255DF0684E1A908E2 /* CopyEngine.swift in Sources */,
 				6CADC6136D5BFB57D69C51A2 /* DLAnalytics.swift in Sources */,
 				EE532EF1CD26802316CF2437 /* DeepReadGenerator.swift in Sources */,
 				0AC0536EC58E209CCD2060CD /* DreamDetailExtras.swift in Sources */,
@@ -864,6 +871,7 @@
 				B889283D8B8C8007676D1ED6 /* ProBadge.swift in Sources */,
 				61146BC3E954A52EF1564183 /* ProfileService.swift in Sources */,
 				9BD282320C85AF5D1C35A3B0 /* ProfileView.swift in Sources */,
+				F6BF6EDF5AC85FFD54748DE2 /* PromptBook.swift in Sources */,
 				A7C2CB8E0C0F6F87B989947B /* PushService.swift in Sources */,
 				6FEF07E474A0B3F789431C5A /* QuickCaptureBridge.swift in Sources */,
 				3A80C8438FCFE9239B3ADBD5 /* QuickReadInterpretationView.swift in Sources */,

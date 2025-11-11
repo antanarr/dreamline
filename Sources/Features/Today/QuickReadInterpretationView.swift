@@ -9,13 +9,15 @@ struct QuickReadInterpretationView: View {
     let onOpenDream: () -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @State private var h1: String = "Your dream speaks"
+    @State private var sub: String = "Let the pattern name itself."
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Your dream speaks")
+            Text(h1)
                 .font(DLFont.body(17).weight(.semibold))
 
-            Text("Goosebumps mean truth has found you.")
+            Text(sub)
                 .font(DLFont.body(14))
                 .foregroundStyle(.secondary)
 
@@ -68,6 +70,12 @@ struct QuickReadInterpretationView: View {
         )
         .padding()
         .accessibilityElement(children: .contain)
+        .task {
+            // Async upgrade: ask the model for better h1/sub; fallback is already set.
+            let lines = await CopyEngine.shared.quickReadLines(overlap: overlapSymbols, score: score)
+            h1 = lines.h1
+            sub = lines.sub
+        }
     }
 
     private func snippet(_ text: String) -> String {
