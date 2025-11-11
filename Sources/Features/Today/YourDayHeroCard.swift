@@ -58,13 +58,13 @@ struct YourDayHeroCard: View {
                 .padding(.vertical, 8)
                 .background(Color.white.opacity(0.15), in: Capsule())
 
-                if let rb = resonance, rb.isAlignmentEvent {
+                if FeatureFlags.resonanceUIEnabled, let rb = resonance, rb.isAlignmentEvent {
                     Button {
                         DLAnalytics.log(.alignmentTapthrough(dest: .dreamDetail))
                         onAlignmentTap?()
                     } label: {
                         ZStack {
-                            Label("Today's Alignment", systemImage: "sparkles")
+                            Label("Today’s Alignment", systemImage: "sparkles")
                                 .font(DLFont.body(13))
                                 .foregroundStyle(Color.white.opacity(0.95))
                                 .padding(.horizontal, 14)
@@ -80,7 +80,7 @@ struct YourDayHeroCard: View {
                     }
                     .buttonStyle(.plain)
                     .onAppear { pulse = true }
-                    .accessibilityLabel("Today's Alignment")
+                    .accessibilityLabel("Today’s Alignment")
                     .accessibilityValue(alignmentValue(rb))
                     .accessibilityAddTraits(.updatesFrequently)
                 }
@@ -100,12 +100,14 @@ struct YourDayHeroCard: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
-                    if let r = resonance,
+                    if FeatureFlags.resonanceUIEnabled,
+                       let r = resonance,
                        let first = r.topHits.first,
                        !first.overlapSymbols.isEmpty {
+                        let chips = first.overlapSymbols.prefix(ResonanceConfig.OVERLAP_MAX_VISUAL)
                         HStack(spacing: 8) {
-                            ForEach(Array(first.overlapSymbols.prefix(2)), id: \.self) { sym in
-                                Text(sym.capitalized)
+                            ForEach(Array(chips), id: \.self) { sym in
+                                Text(sym.replacingOccurrences(of: "_", with: " "))
                                     .font(DLFont.body(13))
                                     .padding(.horizontal, 10)
                                     .padding(.vertical, 6)
@@ -113,7 +115,7 @@ struct YourDayHeroCard: View {
                                     .foregroundStyle(.white)
                             }
                         }
-                        .accessibilityLabel("Overlapping symbols: \(first.overlapSymbols.prefix(2).joined(separator: ", "))")
+                        .accessibilityLabel("Overlapping symbols: \(chips.map { $0.replacingOccurrences(of: "_", with: " ") }.joined(separator: ", "))")
                     }
                     
                     if !doItems.isEmpty || !dontItems.isEmpty {

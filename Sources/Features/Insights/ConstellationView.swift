@@ -18,20 +18,20 @@ struct ConstellationView: View {
                     ctx.fill(Path(ellipseIn: nodeRect), with: .color(.white.opacity(0.9)))
                     if let nodeNeighbors = ConstellationStore.shared.neighbors[d.id] {
                         for nb in nodeNeighbors {
-                            if let j = dreams.firstIndex(where: { $0.id == nb.id }) {
-                            let ang2 = Double(j) / Double(max(1, count)) * .pi * 2
-                            let p2 = CGPoint(
-                                x: center.x + CGFloat(cos(ang2)) * r,
-                                y: center.y + CGFloat(sin(ang2)) * r
-                            )
-                            var path = Path()
-                            path.move(to: p)
-                            path.addLine(to: p2)
-                            ctx.stroke(
-                                path,
-                                with: .color(.white.opacity(0.2)),
-                                lineWidth: CGFloat(0.5 + Double(nb.weight) * 0.8)
-                            )
+                            if let j = dreams.firstIndex(where: { $0.id == nb.neighborID }) {
+                                let ang2 = Double(j) / Double(max(1, count)) * .pi * 2
+                                let p2 = CGPoint(
+                                    x: center.x + CGFloat(cos(ang2)) * r,
+                                    y: center.y + CGFloat(sin(ang2)) * r
+                                )
+                                var path = Path()
+                                path.move(to: p)
+                                path.addLine(to: p2)
+                                ctx.stroke(
+                                    path,
+                                    with: .color(.white.opacity(0.2)),
+                                    lineWidth: CGFloat(0.5 + Double(nb.weight) * 0.8)
+                                )
                             }
                         }
                     }

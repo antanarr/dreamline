@@ -10,9 +10,8 @@ public enum SymbolExtractor {
         "their","theirs","he","she","his","her","hers","not","no","yes","do","does","did","done"
     ]
 
-    public static func extract(from text: String, max: Int = 10) -> [String] {
+    public static func extract(from text: String, max: Int = ResonanceConfig.SYMBOLS_MAX) -> [String] {
         guard !text.isEmpty else { return [] }
-        // Split on non‑alphanumerics, keep ASCII letters/numbers
         let lower = text.lowercased()
         var tokens: [String] = []
         var current = ""
@@ -25,7 +24,6 @@ public enum SymbolExtractor {
         }
         flush(&current, into: &tokens)
 
-        // Normalize and filter
         var seen = Set<String>()
         var out: [String] = []
         out.reserveCapacity(max)

@@ -1,144 +1,112 @@
+import CoreGraphics
 import Foundation
 import SwiftUI
-import CoreGraphics
 
+/// Maintains a local dream↔dream graph for last ~90 days.
 @MainActor
-final class ConstellationStore: ObservableObject {
-    static let shared = ConstellationStore()
+public final class ConstellationStore: ObservableObject {
+    public static let shared = ConstellationStore()
 
-    struct Neighbor: Codable, Hashable {
-        let id: String
-        let weight: Float
-        let lastTouched: Date
+    /// dreamID → list of neighbors (neighborID, weight, lastTouched)
+    @Published public private(set) var neighbors: [String: [(neighborID: String, weight: Float, lastTouched: Date)]] = [:]
+
+    /// Optional coordinates for a future canvas; persisted in UserDefaults.
+    @Published public private(set) var coordinates: [String: CGPoint] = [:]
+
+    private let coordsKey = "constellation.coordinates.v1"
+
+    /// Convenience for views to gate UI without peeking into internals.
+    public var hasGraph: Bool { neighbors.values.contains { !$0.isEmpty } }
+    public var nodeCount: Int { neighbors.keys.count }
+    public var averageDegree: Float {
+        guard !neighbors.isEmpty else { return 0 }
+        let sum = neighbors.values.map { $0.count }.reduce(0, +)
+        return Float(sum) / Float(neighbors.count)
     }
 
-    // Graph: node id → neighbors (top‑k with weights)
-    @Published private(set) var neighbors: [String: [Neighbor]] = [:]
-    // 2D coordinates normalized to [-1, 1]
-    @Published private(set) var coordinates: [String: CGPoint] = [:]
-
-    // Persistence keys
-    private let neighborsKey = "dreamline.constellation.neighbors.v1"
-    private let coordsKey    = "dreamline.constellation.coords.v1"
-
-    private init() { load() }
-
-    // Public surface
-    var hasGraph: Bool { neighbors.values.contains { !$0.isEmpty } && coordinates.count >= 2 }
-    var nodeCount: Int { neighbors.keys.count }
-    var edgeCount: Int { neighbors.values.reduce(0) { $0 + $1.count } / 2 }
-
-    func reset() {
-        neighbors = [:]
-        coordinates = [:]
-        save()
+    public init() {
+        loadCoordinates()
     }
 
-    // Build/refresh graph from dreams (last 90 days, up to 200 entries)
-    func rebuild(from dreams: [DreamEntry], topK: Int = 5, threshold: Float = 0.65, tauDays: Float = 21) async {
-        let now = Date()
-        let cutoff = Calendar.current.date(byAdding: .day, value: -90, to: now) ?? .distantPast
+    /// Rebuild top‑k neighbors for recent dreams. Weight = cosine × time‑decay.
+    func rebuild(from entries: [DreamEntry], now: Date = Date()) async {
+        let cutoff = Calendar.current.date(byAdding: .day, value: -ResonanceConfig.RESONANCE_LOOKBACK_DAYS, to: now) ?? now
+        let recent = entries.filter { $0.createdAt >= cutoff && (($0.embedding ?? []).isEmpty == false) }
 
-        let nodes = dreams
-            .filter { $0.createdAt >= cutoff && ($0.embedding?.isEmpty == false) }
-            .prefix(200)
-
-        guard !nodes.isEmpty else {
+        var map: [String: [(neighborID: String, weight: Float, lastTouched: Date)]] = [:]
+        let n = recent.count
+        guard n > 1 else {
             neighbors = [:]
-            coordinates = [:]
-            save()
+            DLAnalytics.log(.constellationBuilt(nodes: n, avgDegree: 0))
             return
         }
 
-        // Indexable arrays
-        let ids   = nodes.map { $0.id }
-        let vecs  = nodes.map { $0.embedding! }   // safe due to filter above
-        let dates = nodes.map { $0.createdAt }
+        let byID = Dictionary(uniqueKeysWithValues: recent.map { ($0.id, $0) })
+        let ids = recent.map { $0.id }
 
-        // Pairwise scores with time‑decay
-        var adj: [String: [Neighbor]] = [:]
-        for i in 0..<ids.count {
-            var heap: [(String, Float, Date)] = []
-            for j in 0..<ids.count where j != i {
-                let sim = cosine(vecs[i], vecs[j])
-                if sim <= 0 { continue }
-                let recent = max(dates[i], dates[j])
-                let w = sim * timeDecayWeight(since: recent, tauDays: tauDays)
-                if w >= threshold { heap.append((ids[j], w, recent)) }
+        for i in 0..<n {
+            guard let di = byID[ids[i]], let vi = di.embedding, !vi.isEmpty else { continue }
+            var heap: [(id: String, w: Float)] = []
+            for j in 0..<n where j != i {
+                guard let dj = byID[ids[j]], let vj = dj.embedding, !vj.isEmpty else { continue }
+                let daysFromNow = Float(Calendar.current.dateComponents([.day],
+                                                                         from: Calendar.current.startOfDay(for: max(di.createdAt, dj.createdAt)),
+                                                                         to: Calendar.current.startOfDay(for: now)).day ?? 0)
+                let cos = ResonanceMath.cosine(vi, vj)
+                let w = cos * ResonanceMath.timeDecayWeight(deltaDays: daysFromNow)
+                if w >= ResonanceConfig.GRAPH_EDGE_MIN {
+                    heap.append((id: dj.id, w: w))
+                }
             }
-            heap.sort { $0.1 > $1.1 }
-            let top = heap.prefix(topK).map { Neighbor(id: $0.0, weight: $0.1, lastTouched: $0.2) }
-            if !top.isEmpty { adj[ids[i]] = top }
+            heap.sort { $0.w > $1.w }
+            let top = heap.prefix(ResonanceConfig.GRAPH_TOP_K)
+            if !top.isEmpty {
+                map[di.id] = top.map { (neighborID: $0.id, weight: $0.w, lastTouched: now) }
+            }
         }
 
-        neighbors = adj
-        // Seed coordinates for any NEW nodes; preserve existing for stability
-        assignInitialLayout(nodeIDs: Set(ids), dates: Dictionary(uniqueKeysWithValues: zip(ids, dates)))
-        save()
+        neighbors = map
+        let avgDegree = map.isEmpty ? 0 : Float(map.values.map { $0.count }.reduce(0, +)) / Float(map.count)
+        DLAnalytics.log(.constellationBuilt(nodes: n, avgDegree: avgDegree))
+        seedCoordinatesIfNeeded(ids: ids)
+        saveCoordinates()
     }
 
-    // MARK: - Layout (radial by recency, stable angle + jitter by id hash)
-    private func assignInitialLayout(nodeIDs: Set<String>, dates: [String: Date]) {
-        var coords = coordinates // keep existing
-        let sorted = nodeIDs.sorted { (dates[$0] ?? .distantPast) > (dates[$1] ?? .distantPast) }
-        let n = max(sorted.count, 1)
-        for (idx, id) in sorted.enumerated() {
-            if coords[id] != nil { continue } // keep existing
-            // recency in [0,1]: 0 newest, 1 oldest → newer closer to center
-            let rec = n > 1 ? Float(idx) / Float(n - 1) : 0
-            let r = 0.15 + (0.90 - 0.15) * Double(1 - rec) // 0.15..0.90
-            let base = stableAngle(for: id)
-            let jitter = stableJitter(for: id) * 0.08
-            let theta = base + jitter
-            coords[id] = CGPoint(x: r * cos(theta), y: r * sin(theta))
-        }
-        coordinates = coords
+    public func topNeighbors(for dreamID: String, k: Int = ResonanceConfig.GRAPH_TOP_K) -> [(id: String, weight: Float)] {
+        let arr = neighbors[dreamID] ?? []
+        return Array(arr.sorted { $0.weight > $1.weight }.prefix(k).map { ($0.neighborID, $0.weight) })
     }
 
-    // MARK: - Persistence
-    private func load() {
-        let ud = UserDefaults.standard
-        if let data = ud.data(forKey: neighborsKey),
-           let decoded = try? JSONDecoder().decode([String: [Neighbor]].self, from: data) {
-            neighbors = decoded
-        }
-        if let data = ud.data(forKey: coordsKey),
-           let decoded = try? JSONDecoder().decode([String: [Double]].self, from: data) {
-            var map: [String: CGPoint] = [:]
-            decoded.forEach { id, xy in if xy.count == 2 { map[id] = CGPoint(x: xy[0], y: xy[1]) } }
-            coordinates = map
+    // MARK: - Coordinates persistence
+
+    private func seedCoordinatesIfNeeded(ids: [String]) {
+        guard coordinates.isEmpty else { return }
+        let count = max(ids.count, 1)
+        for (idx, id) in ids.enumerated() {
+            let t = Double(idx) / Double(count)
+            let angle = t * 2.0 * Double.pi
+            coordinates[id] = CGPoint(x: CGFloat(cos(angle)), y: CGFloat(sin(angle)))
         }
     }
 
-    private func save() {
-        let ud = UserDefaults.standard
-        if let data = try? JSONEncoder().encode(neighbors) { ud.set(data, forKey: neighborsKey) }
-        let compact: [String: [Double]] = coordinates.mapValues { [Double($0.x), Double($0.y)] }
-        if let data = try? JSONEncoder().encode(compact) { ud.set(data, forKey: coordsKey) }
+    private func saveCoordinates() {
+        let enc = JSONEncoder()
+        let dict = coordinates.mapValues { ["x": Double($0.x), "y": Double($0.y)] }
+        if let data = try? enc.encode(dict) {
+            UserDefaults.standard.set(data, forKey: coordsKey)
+        }
     }
 
-    // MARK: - Math helpers
-    private func cosine(_ a: [Float], _ b: [Float]) -> Float {
-        guard a.count == b.count, !a.isEmpty else { return 0 }
-        var dot: Float = 0, na: Float = 0, nb: Float = 0
-        for i in 0..<a.count { dot += a[i]*b[i]; na += a[i]*a[i]; nb += b[i]*b[i] }
-        let denom = (na.squareRoot() * nb.squareRoot())
-        return denom > 0 ? (dot/denom) : 0
-    }
-    private func timeDecayWeight(since date: Date, tauDays: Float = 21) -> Float {
-        let days = Float(max(0, Date().timeIntervalSince(date) / 86_400))
-        return exp(-days / tauDays)
-    }
-    private func stableAngle(for id: String) -> Double {
-        var h: UInt64 = 1469598103934665603 // FNV offset
-        for u in id.utf8 { h = (h ^ UInt64(u)) &* 1099511628211 }
-        return Double(h % 6_283) / 1000.0 // ~[0, 2π)
-    }
-    private func stableJitter(for id: String) -> Double {
-        var h: UInt64 = 7809847782465536322
-        for u in id.utf8 { h = (h &+ UInt64(u)) &* 6364136223846793005 &+ 1 }
-        return Double(h % 1_000) / 1_000.0 // [0,1)
+    private func loadCoordinates() {
+        guard let data = UserDefaults.standard.data(forKey: coordsKey) else { return }
+        if let dict = try? JSONDecoder().decode([String:[String:Double]].self, from: data) {
+            var out: [String: CGPoint] = [:]
+            for (k, v) in dict {
+                if let x = v["x"], let y = v["y"] {
+                    out[k] = CGPoint(x: x, y: y)
+                }
+            }
+            coordinates = out
+        }
     }
 }
-
-

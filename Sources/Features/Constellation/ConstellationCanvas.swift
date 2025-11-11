@@ -5,7 +5,7 @@ struct ConstellationCanvas: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     let entries: [DreamEntry]
-    let neighbors: [String: [ConstellationStore.Neighbor]]
+    let neighbors: [String: [(neighborID: String, weight: Float, lastTouched: Date)]]
     let coordinates: [String: CGPoint]
 
     @State private var scale: CGFloat = 1.0
@@ -29,9 +29,9 @@ struct ConstellationCanvas: View {
                     let p1 = CGPoint(x: center.x + CGFloat(p1n.x) * base * scale,
                                      y: center.y + CGFloat(p1n.y) * base * scale)
                     for n in neighs {
-                        let key = a < n.id ? "\(a)|\(n.id)" : "\(n.id)|\(a)"
+                        let key = a < n.neighborID ? "\(a)|\(n.neighborID)" : "\(n.neighborID)|\(a)"
                         if !drawn.insert(key).inserted { continue }
-                        guard let p2n = coordinates[n.id] else { continue }
+                        guard let p2n = coordinates[n.neighborID] else { continue }
                         let p2 = CGPoint(x: center.x + CGFloat(p2n.x) * base * scale,
                                          y: center.y + CGFloat(p2n.y) * base * scale)
                         let alpha = max(0.08, min(0.35, Double(n.weight) * 0.35))

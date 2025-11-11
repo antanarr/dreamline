@@ -30,36 +30,9 @@ import FirebaseCore
     }
 
     func add(rawText: String, transcriptURL: URL? = nil) {
-        let extracted = SymbolExtractor.extract(from: rawText, max: 10)
-        var entry = DreamEntry(rawText: rawText, transcriptURL: transcriptURL)
-        entry.symbols = extracted
-
-        entries.insert(entry, at: 0)
-        saveToCache()
-        Task { await persistToFirestore(entry) }
-
-        let insertedEntry = entry
-
-        Task.detached { [weak self] in
-            guard let self else { return }
-            do {
-                let items = [EmbeddingItem(id: insertedEntry.id, text: rawText)]
-                let resultMap = try await EmbeddingService.shared.embed(items: items)
-                if let vec = resultMap[insertedEntry.id] {
-                    await MainActor.run {
-                        var updated = insertedEntry
-                        updated.embedding = vec
-                        self.update(updated)
-                    }
-                    let snapshot = await MainActor.run { self.entries }
-                    await ConstellationStore.shared.rebuild(from: snapshot)
-                    await MainActor.run {
-                        NotificationCenter.default.post(name: .dreamsDidChange, object: self)
-                    }
-                }
-            } catch {
-                print("embedding-on-save error: \(error)")
-            }
+        let entry = DreamEntry(rawText: rawText, transcriptURL: transcriptURL)
+        Task { @MainActor in
+            _ = await processOnSave(entry)
         }
     }
     
@@ -175,7 +148,40 @@ import FirebaseCore
     }
     #endif
 }
+@MainActor
+extension DreamStore {
+    /// Enrich an entry at save-time: extract symbols, embed text, upsert, rebuild constellation, post event.
+    /// Returns the updated entry (with symbols/embedding).
+    func processOnSave(_ entry: DreamEntry) async -> DreamEntry {
+        var updated = entry
 
-extension Notification.Name {
-    static let dreamsDidChange = Notification.Name("DreamsDidChange")
+        if (updated.symbols ?? []).isEmpty {
+            updated.symbols = SymbolExtractor.extract(from: updated.rawText, max: ResonanceConfig.SYMBOLS_MAX)
+        }
+
+        if (updated.embedding ?? []).isEmpty {
+            if let map = try? await EmbeddingService.shared.embed(items: [EmbeddingItem(id: updated.id, text: updated.rawText)]),
+               let vec = map[updated.id] {
+                updated.embedding = vec
+            }
+        }
+
+        if let idx = entries.firstIndex(where: { $0.id == updated.id }) {
+            entries[idx] = updated
+        } else {
+            entries.insert(updated, at: 0)
+        }
+
+        saveToCache()
+        Task { await persistToFirestore(updated) }
+
+        await ConstellationStore.shared.rebuild(from: entries)
+        NotificationCenter.default.post(name: .dreamsDidChange, object: nil)
+        await ResonanceService.shared.invalidateRecent()
+
+        DLAnalytics.log(.dreamSaved(hasSymbols: !(updated.symbols ?? []).isEmpty,
+                                    lenChars: updated.rawText.count,
+                                    embeddedOK: !(updated.embedding ?? []).isEmpty))
+        return updated
+    }
 }

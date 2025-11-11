@@ -4,7 +4,7 @@ struct ConstellationPreview: View {
     @Environment(ThemeService.self) private var theme
 
     let entries: [DreamEntry]
-    let neighbors: [String: [ConstellationStore.Neighbor]]
+    let neighbors: [String: [(neighborID: String, weight: Float, lastTouched: Date)]]
     let coordinates: [String: CGPoint]
     let onOpen: () -> Void
 
@@ -46,7 +46,7 @@ struct ConstellationPreview: View {
 private struct ConstellationMiniCanvas: View {
     @Environment(ThemeService.self) private var theme
     let entries: [DreamEntry]
-    let neighbors: [String: [ConstellationStore.Neighbor]]
+    let neighbors: [String: [(neighborID: String, weight: Float, lastTouched: Date)]]
     let coordinates: [String: CGPoint]
 
     var body: some View {
@@ -60,9 +60,9 @@ private struct ConstellationMiniCanvas: View {
                     let p1 = CGPoint(x: center.x + CGFloat(p1n.x) * base,
                                      y: center.y + CGFloat(p1n.y) * base)
                     for n in neighs {
-                        let key = a < n.id ? "\(a)|\(n.id)" : "\(n.id)|\(a)"
+                        let key = a < n.neighborID ? "\(a)|\(n.neighborID)" : "\(n.neighborID)|\(a)"
                         if !drawn.insert(key).inserted { continue }
-                        guard let p2n = coordinates[n.id] else { continue }
+                        guard let p2n = coordinates[n.neighborID] else { continue }
                         let p2 = CGPoint(x: center.x + CGFloat(p2n.x) * base,
                                          y: center.y + CGFloat(p2n.y) * base)
                         let alpha = max(0.06, min(0.22, Double(n.weight) * 0.25))
