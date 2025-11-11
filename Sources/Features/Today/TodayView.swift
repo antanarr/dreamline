@@ -23,6 +23,9 @@ struct TodayView: View {
     // Alignment tap-through
     @State private var selectedAlignedDreamID: String? = nil
     @State private var presentAlignedDream = false
+    @State private var presentQuickRead = false
+    @State private var quickReadSymbols: [String] = []
+    @State private var quickReadScore: Float = 0
 
     var body: some View {
         NavigationStack {
@@ -72,13 +75,36 @@ struct TodayView: View {
                             .padding()
                     }
                 }
+                .sheet(isPresented: $presentQuickRead, onDismiss: {
+                    presentQuickRead = false
+                }) {
+                    if let id = selectedAlignedDreamID,
+                       let binding = bindingForEntry(id: id) {
+                        QuickReadInterpretationView(entry: binding,
+                                                    overlapSymbols: quickReadSymbols,
+                                                    score: quickReadScore,
+                                                    onOpenDream: {
+                                                        presentAlignedDream = true
+                                                    })
+                        .environment(theme)
+                    } else {
+                        Text("Dream not found")
+                            .font(.headline)
+                            .padding()
+                    }
+                }
                 .onReceive(NotificationCenter.default.publisher(for: .dlStartVoiceCapture)) { _ in
                     startRecordingOnCompose = true
                     showRecorder = true
                 }
                 .task { await ConstellationStore.shared.rebuild(from: store.entries) }
                 .onReceive(NotificationCenter.default.publisher(for: .dreamsDidChange)) { _ in
-                    Task { await ConstellationStore.shared.rebuild(from: store.entries) }
+                    Task {
+                        await ConstellationStore.shared.rebuild(from: store.entries)
+                        await horoscopeVM.computeResonance(dreamStore: store,
+                                                           tz: TimeZone.current.identifier,
+                                                           reference: selectedDate)
+                    }
                 }
                 // Reset one-shot Alignment announcement when the reference date changes
                 .onChange(of: selectedDate) { _, newDate in
@@ -397,6 +423,15 @@ struct TodayView: View {
                           let topID = bundle.topHits.first?.dreamID else { return }
                     selectedAlignedDreamID = topID
                     presentAlignedDream = true
+                },
+                onAlignmentQuickRead: {
+                    guard FeatureFlags.resonanceUIEnabled,
+                          let bundle = item.resonance,
+                          let hit = bundle.topHits.first else { return }
+                    selectedAlignedDreamID = hit.dreamID
+                    quickReadSymbols = hit.overlapSymbols
+                    quickReadScore = hit.score
+                    presentQuickRead = true
                 }
             )
             .accessibilityElement(children: .contain)

@@ -1,0 +1,80 @@
+import SwiftUI
+
+/// Poetic, lightweight interpretation peek from the Alignment pill.
+/// Shows overlap symbols and a subtle score hint; avoids "AI mechanics".
+struct QuickReadInterpretationView: View {
+    @Binding var entry: DreamEntry
+    let overlapSymbols: [String]
+    let score: Float
+    let onOpenDream: () -> Void
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Your dream speaks")
+                .font(DLFont.body(17).weight(.semibold))
+
+            Text("Goosebumps mean truth has found you.")
+                .font(DLFont.body(14))
+                .foregroundStyle(.secondary)
+
+            if !overlapSymbols.isEmpty {
+                HStack(spacing: 8) {
+                    ForEach(overlapSymbols.prefix(ResonanceConfig.OVERLAP_MAX_VISUAL), id: \.self) { sym in
+                        Text(sym.replacingOccurrences(of: "_", with: " "))
+                            .font(DLFont.body(12).weight(.semibold))
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(Color.dlMint.opacity(0.12), in: Capsule())
+                            .accessibilityLabel("Symbol \(sym)")
+                    }
+                }
+            }
+
+            Text("There’s a strong echo here.")
+                .font(DLFont.body(13))
+                .foregroundStyle(.secondary)
+                .opacity(score >= 0.82 ? 1.0 : (score >= 0.78 ? 0.9 : 0.7))
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("From your dream")
+                    .font(DLFont.body(13).weight(.semibold))
+                Text(snippet(entry.rawText))
+                    .font(DLFont.body(13))
+                    .foregroundStyle(.primary)
+                    .lineLimit(5)
+            }
+
+            HStack {
+                Spacer()
+                Button {
+                    dismiss()
+                    onOpenDream()
+                } label: {
+                    Label("Open Dream", systemImage: "book")
+                        .font(.body.weight(.semibold))
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(Color.dlMint.opacity(0.18), in: Capsule())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .fill(.ultraThinMaterial)
+        )
+        .padding()
+        .accessibilityElement(children: .contain)
+    }
+
+    private func snippet(_ text: String) -> String {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.count > 160 else { return trimmed }
+        let index = trimmed.index(trimmed.startIndex, offsetBy: 160)
+        return String(trimmed[..<index]) + "…"
+    }
+}
+

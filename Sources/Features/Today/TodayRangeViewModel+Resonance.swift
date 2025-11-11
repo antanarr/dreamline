@@ -6,12 +6,7 @@ extension TodayRangeViewModel {
     @MainActor
     func computeResonance(dreamStore: DreamStore, tz: String, reference: Date, uid: String = "me") async {
         guard let item = self.item else { return }
-        let df = DateFormatter()
-        df.calendar = Calendar(identifier: .gregorian)
-        df.timeZone = TimeZone(identifier: tz)
-        df.dateFormat = "yyyy-MM-dd"
-        let dateKey = df.string(from: reference)
-        let anchorKey = "\(uid)|day|\(tz)|\(dateKey)"
+        let anchorKey = AnchorKey.day(uid: uid, tz: tz, date: reference)
 
         let summaryText = item.summary.isEmpty ? item.headline : item.summary
         

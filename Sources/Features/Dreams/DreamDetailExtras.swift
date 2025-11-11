@@ -16,12 +16,7 @@ struct DreamDetailExtras: View {
     // Anchor key for "today" (local tz). Uses same shape as Today’s anchor.
     private var todayAnchorKey: String {
         let tz = TimeZone.current.identifier
-        let df = DateFormatter()
-        df.calendar = .init(identifier: .gregorian)
-        df.timeZone = TimeZone(identifier: tz)
-        df.dateFormat = "yyyy-MM-dd"
-        let dateKey = df.string(from: Date())
-        return "me|day|\(tz)|\(dateKey)"
+        return AnchorKey.day(uid: "me", tz: tz, date: Date())
     }
 
     private var neighborEntries: [(DreamEntry, Float)] {

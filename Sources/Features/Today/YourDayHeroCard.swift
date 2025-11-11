@@ -11,6 +11,7 @@ struct YourDayHeroCard: View {
     var showLogButton: Bool
     var onLogDream: (() -> Void)?
     var onAlignmentTap: (() -> Void)?
+    var onAlignmentQuickRead: (() -> Void)?
     
     init(headline: String,
          summary: String?,
@@ -20,7 +21,8 @@ struct YourDayHeroCard: View {
          resonance: ResonanceBundle? = nil,
          showLogButton: Bool = false,
          onLogDream: (() -> Void)? = nil,
-         onAlignmentTap: (() -> Void)? = nil) {
+         onAlignmentTap: (() -> Void)? = nil,
+         onAlignmentQuickRead: (() -> Void)? = nil) {
         self.headline = headline
         self.summary = summary
         self.dreamEnhancement = dreamEnhancement
@@ -30,6 +32,7 @@ struct YourDayHeroCard: View {
         self.showLogButton = showLogButton
         self.onLogDream = onLogDream
         self.onAlignmentTap = onAlignmentTap
+        self.onAlignmentQuickRead = onAlignmentQuickRead
     }
     
     @Environment(ThemeService.self) private var theme: ThemeService
@@ -79,6 +82,21 @@ struct YourDayHeroCard: View {
                         }
                     }
                     .buttonStyle(.plain)
+            .contextMenu {
+                Button {
+                    DLAnalytics.log(.alignmentTapthrough(dest: .interpretation))
+                    onAlignmentQuickRead?()
+                } label: {
+                    Label("Quick Read", systemImage: "sparkles")
+                }
+
+                Button {
+                    DLAnalytics.log(.alignmentTapthrough(dest: .dreamDetail))
+                    onAlignmentTap?()
+                } label: {
+                    Label("Open Dream", systemImage: "book")
+                }
+            }
                     .onAppear { pulse = true }
                     .accessibilityLabel("Today’s Alignment")
                     .accessibilityValue(alignmentValue(rb))

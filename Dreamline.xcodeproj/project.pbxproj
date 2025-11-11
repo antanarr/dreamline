@@ -90,6 +90,7 @@
 		AF9E5DB60B63139E38C1B398 /* UsageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9FFAB1A7579463FED35BB73 /* UsageService.swift */; };
 		D7E1C5B64F134580AA29F675 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F5A3BC7C534A6395D316F4 /* SettingsView.swift */; };
 		B07234DE31905C50E563EB5F /* SymbolExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D553A904BE255279105578BF /* SymbolExtractor.swift */; };
+		5A9B7C4E0F3A2E7B11223344 /* QuickReadInterpretationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9B7C4D0F3A2E7B11223344 /* QuickReadInterpretationView.swift */; };
 		B32232A9AE9899A04406063A /* OracleService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E07790A9FE0B47C5A4AA6466 /* OracleService.swift */; };
 		B8A97A59714A9C3A0ED914C1 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99088FFDF6AE6507637CFCA7 /* Typography.swift */; };
 		B93F2B91EA0B2A5FDA347B6A /* TodayRangeViewModel+Resonance.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA8A51D3FDCC9C7141D5AB65 /* TodayRangeViewModel+Resonance.swift */; };
@@ -116,6 +117,7 @@
 		EDBD2571986EA294130FB218 /* EmbeddingServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7BF23FE386FF90AB3195484 /* EmbeddingServiceTests.swift */; };
 		EE135BDFFE01BF995CB47881 /* OracleShimmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C082D508A5BE853682686929 /* OracleShimmer.swift */; };
 		EE532EF1CD26802316CF2437 /* DeepReadGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F364B5B852252478A372AFBD /* DeepReadGenerator.swift */; };
+		7C1A6C32A0F6C2C500123ABC /* AnchorKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1A6C31A0F6C2C500123ABC /* AnchorKey.swift */; };
 		F3DFA8C25E544B4FAD9D67E6 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F68D3B19D54B57B9ADBCDD /* Notifications.swift */; };
 		F2E925FEDEB07CA9DCF0B298 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 2A27E80C677EC938346E464A /* FirebaseMessaging */; };
 		F31A57DEC339F24A7B09166B /* OracleSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D006DB938F0A71062F6DFB24 /* OracleSchemaTests.swift */; };
@@ -218,6 +220,7 @@
 		C9FFAB1A7579463FED35BB73 /* UsageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageService.swift; sourceTree = "<group>"; };
 		CFA0AD26C031A571A0135EE6 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		B00F8A6C5F904DD481E00A2B /* FeatureFlags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlags.swift; sourceTree = "<group>"; };
+		7C1A6C31A0F6C2C500123ABC /* AnchorKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnchorKey.swift; sourceTree = "<group>"; };
 		D006DB938F0A71062F6DFB24 /* OracleSchemaTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleSchemaTests.swift; sourceTree = "<group>"; };
 		D37481319B28DC7E1F017B47 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		C5F68D3B19D54B57B9ADBCDD /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
@@ -230,6 +233,7 @@
 		DB00E5FC10AF748766B3E08D /* DreamDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamDetailView.swift; sourceTree = "<group>"; };
 		1C3F0141581769740C6E4FAE /* DreamDetailExtras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamDetailExtras.swift; sourceTree = "<group>"; };
 		DC88815A42B90ED59801838F /* YourDayHeroCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YourDayHeroCard.swift; sourceTree = "<group>"; };
+		5A9B7C4D0F3A2E7B11223344 /* QuickReadInterpretationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickReadInterpretationView.swift; sourceTree = "<group>"; };
 		E07790A9FE0B47C5A4AA6466 /* OracleService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleService.swift; sourceTree = "<group>"; };
 		E6E67FAEBC89A81C8E46D01A /* DreamStreakService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamStreakService.swift; sourceTree = "<group>"; };
 		EA63262E7068CBD5081F58F5 /* DreamEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamEntry.swift; sourceTree = "<group>"; };
@@ -320,6 +324,7 @@
 			children = (
 				CFA0AD26C031A571A0135EE6 /* ContentView.swift */,
 				B00F8A6C5F904DD481E00A2B /* FeatureFlags.swift */,
+				7C1A6C31A0F6C2C500123ABC /* AnchorKey.swift */,
 				C48689CF08F88CDAC666943D /* RootRouterView.swift */,
 				AEE10FA9425E0CBBE2781D53 /* Env */,
 				6F5372C9FFEB221E504FB4C1 /* Models */,
@@ -463,6 +468,7 @@
 				887E0F168FD8290C58FFDA87 /* TodayView.swift */,
 				4088626376277D9767BB486B /* TodayViewModel.swift */,
 				98E345CE91BAA352FFABDC62 /* TransitDiagramView.swift */,
+				5A9B7C4D0F3A2E7B11223344 /* QuickReadInterpretationView.swift */,
 				DC88815A42B90ED59801838F /* YourDayHeroCard.swift */,
 			);
 			path = Today;
@@ -794,6 +800,7 @@
 				635464FF785C26754F456772 /* ConstellationView.swift in Sources */,
 				74DE7A7EA110E04B88F04624 /* ContentView.swift in Sources */,
 				C1AA9F7D5125407FBA339E5C /* FeatureFlags.swift in Sources */,
+				7C1A6C32A0F6C2C500123ABC /* AnchorKey.swift in Sources */,
 				6CADC6136D5BFB57D69C51A2 /* DLAnalytics.swift in Sources */,
 				EE532EF1CD26802316CF2437 /* DeepReadGenerator.swift in Sources */,
 				9613663DF8226ACB5021994B /* DreamDetailView.swift in Sources */,
@@ -840,6 +847,7 @@
 				A7C2CB8E0C0F6F87B989947B /* PushService.swift in Sources */,
 				6FEF07E474A0B3F789431C5A /* QuickCaptureBridge.swift in Sources */,
 				200D30951D6B0E7BF2AFC79F /* QuickReadView.swift in Sources */,
+				5A9B7C4E0F3A2E7B11223344 /* QuickReadInterpretationView.swift in Sources */,
 				1E53A0F26843098A18DD2E32 /* RecordDreamIntent.swift in Sources */,
 				68575162CA37B1BF0AEAC795 /* RemoteConfigService.swift in Sources */,
 				E7802E9642B7BA6E2A7BE9FA /* RemoteConfigSnapshot.swift in Sources */,
