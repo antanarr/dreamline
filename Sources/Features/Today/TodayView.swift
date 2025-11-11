@@ -19,6 +19,10 @@ struct TodayView: View {
     @State private var refreshToken = UUID()
     // Announces Alignment once per selected date (a11y + haptics)
     @State private var didAnnounceAlignment = false
+    @State private var showSettings = false
+    // Alignment tap-through
+    @State private var selectedAlignedDreamID: String? = nil
+    @State private var presentAlignedDream = false
 
     var body: some View {
         NavigationStack {
@@ -41,12 +45,32 @@ struct TodayView: View {
                 }
                 .sheet(isPresented: $showPaywall) { PaywallView() }
                 .sheet(isPresented: $presentConstellation) {
-                    ConstellationCanvas(entries: store.entries, neighbors: constellation.neighbors, coordinates: constellation.coordinates)
-                        .environment(theme)
+                    if FeatureFlags.constellationCanvasEnabled {
+                        ConstellationCanvas(entries: store.entries, neighbors: constellation.neighbors, coordinates: constellation.coordinates)
+                            .environment(theme)
+                    }
                 }
                 .sheet(isPresented: $presentCalendar) {
                     HoroscopeCalendarView(initialDate: selectedDate, onSelect: handleDateSelection)
                         .environment(theme)
+                }
+                .sheet(isPresented: $showSettings) {
+                    SettingsView()
+                }
+                .sheet(isPresented: $presentAlignedDream, onDismiss: {
+                    presentAlignedDream = false
+                    selectedAlignedDreamID = nil
+                }) {
+                    if let id = selectedAlignedDreamID,
+                       let binding = bindingForEntry(id: id) {
+                        DreamDetailScreen(entry: binding)
+                            .environment(theme)
+                            .environment(store)
+                    } else {
+                        Text("Dream not found")
+                            .font(.headline)
+                            .padding()
+                    }
                 }
                 .onReceive(NotificationCenter.default.publisher(for: .dlStartVoiceCapture)) { _ in
                     startRecordingOnCompose = true
@@ -57,8 +81,12 @@ struct TodayView: View {
                     Task { await ConstellationStore.shared.rebuild(from: store.entries) }
                 }
                 // Reset one-shot Alignment announcement when the reference date changes
-                .onChange(of: selectedDate) {
+                .onChange(of: selectedDate) { _, newDate in
                     didAnnounceAlignment = false
+                    let offset = Calendar.current.dateComponents([.day],
+                                                                 from: Calendar.current.startOfDay(for: Date()),
+                                                                 to: Calendar.current.startOfDay(for: newDate)).day ?? 0
+                    DLAnalytics.log(.calendarVisit(dateOffsetDays: offset))
                 }
         }
     }
@@ -79,15 +107,21 @@ struct TodayView: View {
             }
             .accessibilityLabel("Log a dream")
         }
+        ToolbarItem(placement: .topBarLeading) {
+            Button {
+                showSettings = true
+            } label: {
+                Image(systemName: "gearshape")
+            }
+            .accessibilityLabel("Settings")
+        }
     }
     
     @Sendable
     private func loadHoroscope() async {
         await vm.load(dreamStore: store, date: selectedDate)
         await horoscopeVM.load(period: .day, tz: TimeZone.current.identifier, dreamStore: store, reference: selectedDate)
-        Task { @MainActor in
-            await horoscopeVM.computeResonance(dreamStore: store, tz: TimeZone.current.identifier, reference: selectedDate)
-        }
+        await horoscopeVM.computeResonance(dreamStore: store, tz: TimeZone.current.identifier, reference: selectedDate)
         do {
             let birthISO = ProfileService.shared.birth.isoString()
             bestDays = try await HoroscopeService.shared.fetchBestDays(uid: "me", birthISO: birthISO)
@@ -245,9 +279,7 @@ struct TodayView: View {
                                uid: "me",
                                force: true,
                                reference: selectedDate)
-        Task { @MainActor in
-            await horoscopeVM.computeResonance(dreamStore: store, tz: TimeZone.current.identifier, reference: selectedDate)
-        }
+        await horoscopeVM.computeResonance(dreamStore: store, tz: TimeZone.current.identifier, reference: selectedDate)
         do {
             let birthISO = ProfileService.shared.birth.isoString()
             bestDays = try await HoroscopeService.shared.fetchBestDays(uid: "me", birthISO: birthISO)
@@ -268,8 +300,16 @@ struct TodayView: View {
         impact.prepare()
         impact.impactOccurred()
         if UIAccessibility.isVoiceOverRunning {
-            UIAccessibility.post(notification: .announcement, argument: "Today's Alignment")
+            UIAccessibility.post(notification: .announcement, argument: "Today’s Alignment")
         }
+    }
+
+    private func bindingForEntry(id: String) -> Binding<DreamEntry>? {
+        guard let idx = store.entries.firstIndex(where: { $0.id == id }) else { return nil }
+        return Binding(
+            get: { store.entries[idx] },
+            set: { store.entries[idx] = $0 }
+        )
     }
     
     @ViewBuilder
@@ -282,7 +322,7 @@ struct TodayView: View {
                     .revealOnScroll()
             }
 
-            if constellation.hasGraph {
+            if FeatureFlags.constellationCanvasEnabled, constellation.hasGraph {
                 ConstellationPreview(
                     entries: store.entries,
                     neighbors: constellation.neighbors,
@@ -350,7 +390,14 @@ struct TodayView: View {
                 doItems: heroActions.do,
                 dontItems: heroActions.dont,
                 resonance: item.resonance,
-                showLogButton: false
+                showLogButton: false,
+                onAlignmentTap: {
+                    guard FeatureFlags.resonanceUIEnabled,
+                          let bundle = item.resonance,
+                          let topID = bundle.topHits.first?.dreamID else { return }
+                    selectedAlignedDreamID = topID
+                    presentAlignedDream = true
+                }
             )
             .accessibilityElement(children: .contain)
             .fadeIn(delay: 0.05)
