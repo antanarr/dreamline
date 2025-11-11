@@ -17,6 +17,8 @@ struct TodayView: View {
     @State private var selectedDate: Date = Date()
     @State private var presentConstellation = false
     @State private var refreshToken = UUID()
+    // Announces Alignment once per selected date (a11y + haptics)
+    @State private var didAnnounceAlignment = false
 
     var body: some View {
         NavigationStack {
@@ -53,6 +55,10 @@ struct TodayView: View {
                 .task { await ConstellationStore.shared.rebuild(from: store.entries) }
                 .onReceive(NotificationCenter.default.publisher(for: .dreamsDidChange)) { _ in
                     Task { await ConstellationStore.shared.rebuild(from: store.entries) }
+                }
+                // Reset one-shot Alignment announcement when the reference date changes
+                .onChange(of: selectedDate) {
+                    didAnnounceAlignment = false
                 }
         }
     }
@@ -242,6 +248,17 @@ struct TodayView: View {
         successGenerator.notificationOccurred(.success)
     }
     
+    /// One-shot a11y + haptic cue when an Alignment Event is present.
+    private func announceAlignmentIfNeeded() {
+        guard !didAnnounceAlignment else { return }
+        didAnnounceAlignment = true
+        let impact = UIImpactFeedbackGenerator(style: .light)
+        impact.impactOccurred()
+        if UIAccessibility.isVoiceOverRunning {
+            UIAccessibility.post(notification: .announcement, argument: "Today's Alignment")
+        }
+    }
+    
     @ViewBuilder
     private var mainContent: some View {
         LazyVStack(alignment: .leading, spacing: 16) {
@@ -322,8 +339,15 @@ struct TodayView: View {
                 resonance: item.resonance,
                 showLogButton: false
             )
+            .accessibilityElement(children: .contain)
             .fadeIn(delay: 0.05)
             .revealOnScroll()
+            // Announce Alignment on first appearance for this date
+            .task {
+                if let r = item.resonance, !r.topHits.isEmpty {
+                    announceAlignmentIfNeeded()
+                }
+            }
         } else if horoscopeVM.loading {
             loadingShimmer
         } else {
