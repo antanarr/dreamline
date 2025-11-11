@@ -226,8 +226,12 @@ struct TodayView: View {
         )
     }
     
+    /// Policy: haptics stay enabled regardless of Reduce Motion (that setting targets animations).
+    /// Pre-arm generators so cues feel crisp.
     private func refreshContent() async {
+        // Pre-arm for crisper feel; haptics are intentionally not gated by Reduce Motion.
         let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.prepare()
         generator.impactOccurred()
         
         await vm.load(dreamStore: store, date: selectedDate)
@@ -245,18 +249,22 @@ struct TodayView: View {
         }
         
         let successGenerator = UINotificationFeedbackGenerator()
+        successGenerator.prepare()
         successGenerator.notificationOccurred(.success)
     }
     
     /// One-shot a11y + haptic cue when an Alignment Event is present.
-    private func announceAlignmentIfNeeded() {
+    /// Also logs a lightweight metric for future tuning.
+    private func announceAlignmentIfNeeded(topScore: Float? = nil, overlapCount: Int? = nil) {
         guard !didAnnounceAlignment else { return }
         didAnnounceAlignment = true
         let impact = UIImpactFeedbackGenerator(style: .light)
+        impact.prepare()
         impact.impactOccurred()
         if UIAccessibility.isVoiceOverRunning {
-            UIAccessibility.post(notification: .announcement, argument: "Today's Alignment")
+            UIAccessibility.post(notification: .announcement, argument: "Today’s Alignment")
         }
+        DLAnalytics.log(.alignmentShown(topScore: topScore ?? 0, overlapCount: overlapCount ?? 0))
     }
     
     @ViewBuilder
@@ -345,7 +353,9 @@ struct TodayView: View {
             // Announce Alignment on first appearance for this date
             .task {
                 if let r = item.resonance, !r.topHits.isEmpty {
-                    announceAlignmentIfNeeded()
+                    let topScore = r.topHits.first?.score
+                    let overlapCount = r.topHits.first?.overlapSymbols.count
+                    announceAlignmentIfNeeded(topScore: topScore, overlapCount: overlapCount)
                 }
             }
         } else if horoscopeVM.loading {
