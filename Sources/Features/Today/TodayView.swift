@@ -26,6 +26,7 @@ struct TodayView: View {
     @State private var presentQuickRead = false
     @State private var quickReadSymbols: [String] = []
     @State private var quickReadScore: Float = 0
+    @State private var appearTime: Date = Date()
 
     var body: some View {
         NavigationStack {
@@ -106,8 +107,12 @@ struct TodayView: View {
                                                            reference: selectedDate)
                     }
                 }
-                .onReceive(NotificationCenter.default.publisher(for: .presentPaywall)) { _ in
+                .onReceive(NotificationCenter.default.publisher(for: .presentPaywall)) { note in
                     showPaywall = true
+                    let elapsed = Date().timeIntervalSince(appearTime)
+                    let sourceRaw = (note.userInfo?["source"] as? String) ?? DLAnalytics.PaywallSource.alignmentAheadTeaser.rawValue
+                    let source = DLAnalytics.PaywallSource(rawValue: sourceRaw) ?? .alignmentAheadTeaser
+                    DLAnalytics.log(.paywallOpen(source: source, secondsSinceAppear: elapsed))
                 }
                 // Reset one-shot Alignment announcement when the reference date changes
                 .onChange(of: selectedDate) { _, newDate in
@@ -118,6 +123,7 @@ struct TodayView: View {
                     DLAnalytics.log(.calendarVisit(dateOffsetDays: offset))
                 }
         }
+        .onAppear { appearTime = Date() }
     }
     
     @ViewBuilder
@@ -390,7 +396,6 @@ struct TodayView: View {
                 },
                 onUnlock: {
                     paywallContext = .bestDays
-                    NotificationCenter.default.post(name: .presentPaywall, object: nil)
                 }
             )
             .revealOnScroll()
@@ -414,12 +419,11 @@ struct TodayView: View {
         if let item = horoscopeVM.item {
             YourDayHeroCard(
                 headline: item.headline,
-                summary: item.summary,
+                summary: item.summary ?? "",
                 dreamEnhancement: dreamEnhancement,
                 doItems: heroActions.do,
                 dontItems: heroActions.dont,
                 resonance: item.resonance,
-                showLogButton: false,
                 onAlignmentTap: {
                     guard FeatureFlags.resonanceUIEnabled,
                           let bundle = item.resonance,
@@ -427,7 +431,19 @@ struct TodayView: View {
                     selectedAlignedDreamID = topID
                     presentAlignedDream = true
                 },
-                onAlignmentQuickRead: {
+                onDiveDeeper: {
+                    if let bundle = item.resonance, let hit = bundle.topHits.first {
+                        selectedAlignedDreamID = hit.dreamID
+                        quickReadSymbols = hit.overlapSymbols
+                        quickReadScore = hit.score
+                    } else {
+                        selectedAlignedDreamID = store.entries.first?.id
+                        quickReadSymbols = []
+                        quickReadScore = 0
+                    }
+                    presentQuickRead = true
+                },
+                onExplainResonance: {
                     guard FeatureFlags.resonanceUIEnabled,
                           let bundle = item.resonance,
                           let hit = bundle.topHits.first else { return }

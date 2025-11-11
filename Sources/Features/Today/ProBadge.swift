@@ -7,9 +7,8 @@ struct ProBadge: View {
             .font(.caption2.weight(.bold))
             .padding(.horizontal, 6)
             .padding(.vertical, 3)
-            .background(Color.dlViolet.opacity(0.18), in: Capsule())
-            .foregroundStyle(Color.dlViolet)
+            .background(Color.purple.opacity(0.18), in: Capsule())
+            .foregroundStyle(Color.purple)
             .accessibilityLabel("Pro")
     }
 }
-

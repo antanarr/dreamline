@@ -2,6 +2,13 @@ import Foundation
 
 public enum DLAnalytics {
     public enum TapDestination: String { case dreamDetail, interpretation }
+    public enum PaywallSource: String {
+        case bestDaysTeaser
+        case diveDeeperUpsell
+        case alignmentExplainer
+        case calendarPreview
+        case alignmentAheadTeaser
+    }
 
     public enum Event {
         case alignmentShown(topScore: Float, overlapCount: Int)
@@ -10,6 +17,7 @@ public enum DLAnalytics {
         case constellationBuilt(nodes: Int, avgDegree: Float)
         case dreamSaved(hasSymbols: Bool, lenChars: Int, embeddedOK: Bool)
         case calendarVisit(dateOffsetDays: Int)
+        case paywallOpen(source: PaywallSource, secondsSinceAppear: TimeInterval)
     }
 
     @inlinable
@@ -28,6 +36,8 @@ public enum DLAnalytics {
             print("[analytics] dream_saved hasSymbols=\(hasSymbols) lenChars=\(lenChars) embeddedOK=\(embeddedOK)")
         case let .calendarVisit(dateOffsetDays):
             print("[analytics] calendar_visit offset_days=\(dateOffsetDays)")
+        case let .paywallOpen(source, secondsSinceAppear):
+            print("[analytics] paywall_open source=\(source.rawValue) sinceAppear=\(String(format: "%.2f", secondsSinceAppear))")
         }
         #endif
     }
