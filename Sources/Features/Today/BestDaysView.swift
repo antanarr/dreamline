@@ -11,32 +11,26 @@ struct BestDaysView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text("YOUR BEST DAYS")
-                    .dlType(.caption)
-                    .foregroundStyle(.secondary)
-                    .kerning(1.2)
-                    .textCase(.uppercase)
-                
-                Spacer()
-                
-                if !isPro {
-                    Button {
-                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                        onUnlock()
-                    } label: {
-                        Text("PRO")
-                            .font(.caption.weight(.semibold))
-                            .fontWeight(.semibold)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.dlViolet)
-                            .foregroundStyle(.white)
-                            .clipShape(Capsule())
-                    }
-                    .buttonStyle(.plain)
-                }
+            card
+            
+            if !isPro {
+                BestDaysTeaser(onTap: {
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    onUnlock()
+                    NotificationCenter.default.post(name: .presentPaywall, object: nil)
+                })
+                .padding(.top, 4)
             }
+        }
+    }
+
+    private var card: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("YOUR BEST DAYS")
+                .dlType(.caption)
+                .foregroundStyle(.secondary)
+                .kerning(1.2)
+                .textCase(.uppercase)
             
             if days.isEmpty {
                 emptyState
@@ -69,27 +63,6 @@ struct BestDaysView: View {
                 Text("Astrology data refreshes daily—check back shortly.")
                     .dlType(.caption)
                     .foregroundStyle(.secondary.opacity(0.85))
-            } else {
-                Button {
-                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                    onUnlock()
-                } label: {
-                    Text("Unlock Best Days")
-                        .dlType(.body)
-                        .fontWeight(.semibold)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(
-                            LinearGradient(
-                                colors: [Color.dlIndigo, Color.dlViolet],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            ),
-                            in: RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        )
-                        .foregroundStyle(Color.white)
-                }
-                .buttonStyle(.plain)
             }
         }
         .padding(.horizontal, 24)
@@ -137,32 +110,10 @@ struct BestDaysView: View {
                 BestDayRow(day: day, showContext: false, isLocked: true)
             }
             
-            Button {
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                onUnlock()
-            } label: {
-                HStack {
-                    DLAssetImage.oracleIcon
-                        .renderingMode(.template)
-                        .foregroundStyle(Color.white.opacity(0.85))
-                        .frame(width: 16, height: 16)
-                    Text("Unlock Best Days")
-                }
-                .dlType(.body)
-                .fontWeight(.semibold)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(
-                    LinearGradient(
-                        colors: [Color.dlIndigo, Color.dlViolet],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    ),
-                    in: RoundedRectangle(cornerRadius: 16, style: .continuous)
-                )
-                .foregroundStyle(Color.white)
-            }
-            .buttonStyle(.plain)
+            Text("Unlock to see why these dates matter most.")
+                .dlType(.bodyS)
+                .foregroundStyle(.secondary)
+                .italic()
         }
     }
     

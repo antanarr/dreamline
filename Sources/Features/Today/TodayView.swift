@@ -106,6 +106,9 @@ struct TodayView: View {
                                                            reference: selectedDate)
                     }
                 }
+                .onReceive(NotificationCenter.default.publisher(for: .presentPaywall)) { _ in
+                    showPaywall = true
+                }
                 // Reset one-shot Alignment announcement when the reference date changes
                 .onChange(of: selectedDate) { _, newDate in
                     didAnnounceAlignment = false
@@ -387,7 +390,7 @@ struct TodayView: View {
                 },
                 onUnlock: {
                     paywallContext = .bestDays
-                    showPaywall = true
+                    NotificationCenter.default.post(name: .presentPaywall, object: nil)
                 }
             )
             .revealOnScroll()

@@ -48,18 +48,11 @@ struct YourDayHeroCard: View {
                 .overlay(heroHalo)
             
             VStack(alignment: .leading, spacing: 18) {
-                HStack(spacing: 8) {
-                    DLAssetImage.oracleIcon
-                        .renderingMode(.template)
-                        .foregroundStyle(Color.white.opacity(0.9))
-                        .frame(width: 18, height: 18)
-                    Text("Day at a Glance")
-                }
-                .font(DLFont.body(13))
-                .foregroundStyle(Color.white.opacity(0.9))
-                .padding(.horizontal, 14)
-                .padding(.vertical, 8)
-                .background(Color.white.opacity(0.15), in: Capsule())
+                Text("Your day at a glance")
+                    .font(.caption.weight(.semibold))
+                    .textCase(.uppercase)
+                    .foregroundStyle(.secondary)
+                    .padding(.bottom, 4)
 
                 if FeatureFlags.resonanceUIEnabled, let rb = resonance, rb.isAlignmentEvent {
                     Button {
