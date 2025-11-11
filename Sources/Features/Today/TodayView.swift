@@ -20,179 +20,82 @@ struct TodayView: View {
 
     var body: some View {
         NavigationStack {
-                ScrollView {
-                LazyVStack(alignment: .leading, spacing: 16) {
-                    // Horoscope hero FIRST
-                    if let item = horoscopeVM.item {
-                        YourDayHeroCard(
-                            headline: item.headline,
-                            summary: item.summary,
-                            dreamEnhancement: dreamEnhancement,
-                            doItems: heroActions.do,
-                            dontItems: heroActions.dont,
-                            resonance: item.resonance,
-                            showLogButton: false
-                        )
-                            .fadeIn(delay: 0.05)
-                            .revealOnScroll()
-                    } else if horoscopeVM.loading {
-                        loadingShimmer
-                    } else {
-                        emptyState
-                    }
-                    
-                    if let item = horoscopeVM.item, !item.dreamLinks.isEmpty {
-                        dreamThreadsSection(item: item)
-                            .revealOnScroll()
-                    }
-
-                    if constellation.hasGraph {
-                        ConstellationPreview(
-                            entries: store.entries,
-                            neighbors: constellation.neighbors,
-                            coordinates: constellation.coordinates,
-                            onOpen: { presentConstellation = true }
-                        )
-                        .padding(.horizontal, 20)
-                    }
-                    
-                    // Areas of Life
-                    if let item = horoscopeVM.item {
-                        areasOfLifeSection(item: item)
-                                .revealOnScroll()
-                    }
-                    
-                    // Behind This Forecast
-                    if let item = horoscopeVM.item, !item.transits.isEmpty {
-                        BehindThisForecastView(transits: item.transits)
-                                .revealOnScroll()
-                    }
-                    
-                    // Seasonal Content
-                    SeasonalContentView(
-                        currentZodiacSeason: ZodiacSign.current(),
-                        dreamPatterns: DreamPatternService.shared.analyzePatterns(from: store, days: 30),
-                        isPro: isPro,
-                        onUnlock: {
-                            paywallContext = .dreamPatterns
-                            showPaywall = true
-                        }
-                    )
-                        .revealOnScroll()
-                    
-                    // Best Days
-                    BestDaysView(
-                        days: bestDays,
-                        isPro: isPro,
-                        onViewFull: {
-                            presentCalendar = true
-                        },
-                        onUnlock: {
-                            paywallContext = .bestDays
-                            showPaywall = true
-                        }
-                    )
-                        .revealOnScroll()
-                    
-                    Button {
-                        presentCalendar = true
-                    } label: {
-                        Text("Browse calendar")
-                            .font(.footnote.weight(.semibold))
-                            .foregroundStyle(Color.dlViolet)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("browse-calendar-button")
+            scrollContent
+                .background(Color.clear.dreamlineScreenBackground())
+                .navigationTitle("Today")
+                .toolbar { toolbarContent }
+                .safeRefresh {
+                    await MainActor.run { refreshToken = UUID() }
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
-            }
-            .background(
-                Color.clear
-                    .dreamlineScreenBackground()
-            )
-            .navigationTitle("Today")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        startRecordingOnCompose = false
-                        showRecorder = true
-                    } label: {
-                        Label("Log", systemImage: "plus")
-                    }
-                    .accessibilityLabel("Log a dream")
-                }
-            }
-            .safeRefresh {
-                await MainActor.run { refreshToken = UUID() }
-            }
                 .coordinateSpace(name: "scroll")
-            .task(id: refreshToken) {
-                await vm.load(dreamStore: store, date: selectedDate)
-                await horoscopeVM.load(period: .day,
-                                       tz: TimeZone.current.identifier,
-                                       dreamStore: store,
-                                       reference: selectedDate)
-                do {
-                    let birthISO = try? await ProfileService.shared.birthISO()
-                    bestDays = try await HoroscopeService.shared.fetchBestDays(uid: "me", birthISO: birthISO)
-                } catch {
-                    bestDays = []
+                .task(id: refreshToken, priority: TaskPriority.userInitiated) { await loadHoroscope() }
+                .sheet(isPresented: $showRecorder, onDismiss: { startRecordingOnCompose = false }) {
+                    ComposeDreamView(store: store, startRecordingOnAppear: startRecordingOnCompose)
                 }
-            }
-            .sheet(isPresented: $showRecorder, onDismiss: {
-                startRecordingOnCompose = false
-            }) {
-                ComposeDreamView(store: store, startRecordingOnAppear: startRecordingOnCompose)
-            }
-            .sheet(item: $selectedLifeArea) { area in
-                NavigationStack {
-                    LifeAreaDetailView(
-                        area: area,
-                        transits: horoscopeVM.item?.transits ?? [],
-                        isPro: isPro
-                    )
-                }
-            }
-            .sheet(isPresented: $showPaywall) {
-                PaywallView()
-            }
-            .sheet(isPresented: $presentConstellation) {
-                ConstellationCanvas(
-                    entries: store.entries,
-                    neighbors: constellation.neighbors,
-                    coordinates: constellation.coordinates
-                )
-                .environment(ThemeService.self, theme)
-            }
-            .sheet(isPresented: $presentCalendar) {
-                HoroscopeCalendarView(initialDate: selectedDate) { date in
-                    selectedDate = date
-                    Task {
-                        await horoscopeVM.load(period: .day,
-                                               tz: TimeZone.current.identifier,
-                                               dreamStore: store,
-                                               force: true,
-                                               reference: date)
-                        do {
-                            let birthISO = try? await ProfileService.shared.birthISO()
-                            bestDays = try await HoroscopeService.shared.fetchBestDays(uid: "me", birthISO: birthISO)
-                        } catch {
-                            // keep prior bestDays
-                        }
+                .sheet(item: $selectedLifeArea) { area in
+                    NavigationStack {
+                        LifeAreaDetailView(area: area, transits: horoscopeVM.item?.transits ?? [], isPro: isPro)
                     }
                 }
-                .environment(theme)
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .dlStartVoiceCapture)) { _ in
-                startRecordingOnCompose = true
+                .sheet(isPresented: $showPaywall) { PaywallView() }
+                .sheet(isPresented: $presentConstellation) {
+                    ConstellationCanvas(entries: store.entries, neighbors: constellation.neighbors, coordinates: constellation.coordinates)
+                        .environment(theme)
+                }
+                .sheet(isPresented: $presentCalendar) {
+                    HoroscopeCalendarView(initialDate: selectedDate, onSelect: handleDateSelection)
+                        .environment(theme)
+                }
+                .onReceive(NotificationCenter.default.publisher(for: .dlStartVoiceCapture)) { _ in
+                    startRecordingOnCompose = true
+                    showRecorder = true
+                }
+                .task { await ConstellationStore.shared.rebuild(from: store.entries) }
+                .onReceive(NotificationCenter.default.publisher(for: .dreamsDidChange)) { _ in
+                    Task { await ConstellationStore.shared.rebuild(from: store.entries) }
+                }
+        }
+    }
+    
+    @ViewBuilder
+    private var scrollContent: some View {
+        ScrollView { mainContent }
+    }
+    
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Button {
+                startRecordingOnCompose = false
                 showRecorder = true
+            } label: {
+                Label("Log", systemImage: "plus")
             }
-            .task {
-                await ConstellationStore.shared.rebuild(from: store.entries)
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .dreamsDidChange)) { _ in
-                Task { await ConstellationStore.shared.rebuild(from: store.entries) }
+            .accessibilityLabel("Log a dream")
+        }
+    }
+    
+    @Sendable
+    private func loadHoroscope() async {
+        await vm.load(dreamStore: store, date: selectedDate)
+        await horoscopeVM.load(period: .day, tz: TimeZone.current.identifier, dreamStore: store, reference: selectedDate)
+        do {
+            let birthISO = ProfileService.shared.birth.isoString()
+            bestDays = try await HoroscopeService.shared.fetchBestDays(uid: "me", birthISO: birthISO)
+        } catch {
+            bestDays = []
+        }
+    }
+    
+    private func handleDateSelection(_ date: Date) {
+        selectedDate = date
+        Task {
+            await horoscopeVM.load(period: .day, tz: TimeZone.current.identifier, dreamStore: store, force: true, reference: date)
+            do {
+                let birthISO = ProfileService.shared.birth.isoString()
+                bestDays = try await HoroscopeService.shared.fetchBestDays(uid: "me", birthISO: birthISO)
+            } catch {
+                // keep prior bestDays
             }
         }
     }
@@ -329,7 +232,7 @@ struct TodayView: View {
                                force: true,
                                reference: selectedDate)
         do {
-            let birthISO = try? await ProfileService.shared.birthISO()
+            let birthISO = ProfileService.shared.birth.isoString()
             bestDays = try await HoroscopeService.shared.fetchBestDays(uid: "me", birthISO: birthISO)
         } catch {
             // Keep existing bestDays on failure
@@ -337,6 +240,95 @@ struct TodayView: View {
         
         let successGenerator = UINotificationFeedbackGenerator()
         successGenerator.notificationOccurred(.success)
+    }
+    
+    @ViewBuilder
+    private var mainContent: some View {
+        LazyVStack(alignment: .leading, spacing: 16) {
+            heroSection
+            
+            if let item = horoscopeVM.item, !item.dreamLinks.isEmpty {
+                dreamThreadsSection(item: item)
+                    .revealOnScroll()
+            }
+
+            if constellation.hasGraph {
+                ConstellationPreview(
+                    entries: store.entries,
+                    neighbors: constellation.neighbors,
+                    coordinates: constellation.coordinates,
+                    onOpen: { presentConstellation = true }
+                )
+                .padding(.horizontal, 20)
+            }
+            
+            if let item = horoscopeVM.item {
+                areasOfLifeSection(item: item)
+                    .revealOnScroll()
+            }
+            
+            if let item = horoscopeVM.item, !item.transits.isEmpty {
+                BehindThisForecastView(transits: item.transits)
+                    .revealOnScroll()
+            }
+            
+            SeasonalContentView(
+                currentZodiacSeason: ZodiacSign.current(),
+                dreamPatterns: DreamPatternService.shared.analyzePatterns(from: store, days: 30),
+                isPro: isPro,
+                onUnlock: {
+                    paywallContext = .dreamPatterns
+                    showPaywall = true
+                }
+            )
+            .revealOnScroll()
+            
+            BestDaysView(
+                days: bestDays,
+                isPro: isPro,
+                onViewFull: {
+                    presentCalendar = true
+                },
+                onUnlock: {
+                    paywallContext = .bestDays
+                    showPaywall = true
+                }
+            )
+            .revealOnScroll()
+            
+            Button {
+                presentCalendar = true
+            } label: {
+                Text("Browse calendar")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(Color.dlViolet)
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("browse-calendar-button")
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
+    }
+    
+    @ViewBuilder
+    private var heroSection: some View {
+        if let item = horoscopeVM.item {
+            YourDayHeroCard(
+                headline: item.headline,
+                summary: item.summary,
+                dreamEnhancement: dreamEnhancement,
+                doItems: heroActions.do,
+                dontItems: heroActions.dont,
+                resonance: item.resonance,
+                showLogButton: false
+            )
+            .fadeIn(delay: 0.05)
+            .revealOnScroll()
+        } else if horoscopeVM.loading {
+            loadingShimmer
+        } else {
+            emptyState
+        }
     }
     
     private var loadingShimmer: some View {

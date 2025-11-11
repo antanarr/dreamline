@@ -43,16 +43,19 @@ import FirebaseCore
         Task.detached { [weak self] in
             guard let self else { return }
             do {
-                let vec = try await EmbeddingService.shared.embedChunked(rawText)
-                await MainActor.run {
-                    var updated = insertedEntry
-                    updated.embedding = vec
-                    self.update(updated)
-                }
-                let snapshot = await MainActor.run { self.entries }
-                await ConstellationStore.shared.rebuild(from: snapshot)
-                await MainActor.run {
-                    NotificationCenter.default.post(name: .dreamsDidChange, object: self)
+                let items = [EmbeddingItem(id: insertedEntry.id, text: rawText)]
+                let resultMap = try await EmbeddingService.shared.embed(items: items)
+                if let vec = resultMap[insertedEntry.id] {
+                    await MainActor.run {
+                        var updated = insertedEntry
+                        updated.embedding = vec
+                        self.update(updated)
+                    }
+                    let snapshot = await MainActor.run { self.entries }
+                    await ConstellationStore.shared.rebuild(from: snapshot)
+                    await MainActor.run {
+                        NotificationCenter.default.post(name: .dreamsDidChange, object: self)
+                    }
                 }
             } catch {
                 print("embedding-on-save error: \(error)")

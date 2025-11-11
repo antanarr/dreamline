@@ -16,8 +16,9 @@ struct ConstellationView: View {
                     )
                     let nodeRect = CGRect(x: p.x - 4, y: p.y - 4, width: 8, height: 8)
                     ctx.fill(Path(ellipseIn: nodeRect), with: .color(.white.opacity(0.9)))
-                    for nb in ConstellationStore.shared.topNeighbors(of: d.id) {
-                        if let j = dreams.firstIndex(where: { $0.id == nb.id }) {
+                    if let nodeNeighbors = ConstellationStore.shared.neighbors[d.id] {
+                        for nb in nodeNeighbors {
+                            if let j = dreams.firstIndex(where: { $0.id == nb.id }) {
                             let ang2 = Double(j) / Double(max(1, count)) * .pi * 2
                             let p2 = CGPoint(
                                 x: center.x + CGFloat(cos(ang2)) * r,
@@ -31,6 +32,7 @@ struct ConstellationView: View {
                                 with: .color(.white.opacity(0.2)),
                                 lineWidth: CGFloat(0.5 + Double(nb.weight) * 0.8)
                             )
+                            }
                         }
                     }
                 }

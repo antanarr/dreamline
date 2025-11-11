@@ -526,7 +526,7 @@ struct ComposeDreamView: View {
                             .foregroundStyle(.secondary)
                     }
                 } else if let lastTranscription {
-                    Text("Transcript added: "\(lastTranscription)"")
+                    Text("Transcript added: \"\(lastTranscription)\"")
                         .font(DLFont.body(12))
                         .foregroundStyle(.secondary)
                 }

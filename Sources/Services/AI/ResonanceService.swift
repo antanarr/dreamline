@@ -37,13 +37,15 @@ final class ResonanceService {
             ($0.embedding == nil) && !$0.rawText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         }
         guard !toEmbed.isEmpty else { return }
-        let texts = toEmbed.map { $0.rawText }
+        let items = toEmbed.map { EmbeddingItem(id: $0.id, text: $0.rawText) }
         do {
-            let vectors = try await EmbeddingService.shared.embed(texts)
-            for (dream, vec) in zip(toEmbed, vectors) {
-                var updated = dream
-                updated.embedding = vec
-                updater(updated)
+            let resultMap = try await EmbeddingService.shared.embed(items: items)
+            for dream in toEmbed {
+                if let vec = resultMap[dream.id] {
+                    var updated = dream
+                    updated.embedding = vec
+                    updater(updated)
+                }
             }
         } catch {
             print("ensureEmbeddings error: \(error)")
@@ -60,7 +62,9 @@ final class ResonanceService {
         if hEmbed == nil {
             let text = [headline, summary ?? ""].joined(separator: "\n")
             do {
-                hEmbed = try await EmbeddingService.shared.embedChunked(text)
+                let items = [EmbeddingItem(id: "hero_\(anchorKey)", text: text)]
+                let resultMap = try await EmbeddingService.shared.embed(items: items)
+                hEmbed = resultMap["hero_\(anchorKey)"]
             } catch {
                 print("hero embed failed: \(error)")
             }

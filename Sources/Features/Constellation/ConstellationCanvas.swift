@@ -82,7 +82,7 @@ struct ConstellationCanvas: View {
                     didAutoFit = true
                 }
             }
-            .onChange(of: coordinates.count) { _ in
+            .onChange(of: coordinates.count) {
                 scale = fitScale(for: size)
             }
         }

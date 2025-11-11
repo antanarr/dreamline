@@ -101,5 +101,12 @@ struct BirthProfile: Equatable {
         }
         return components.joined(separator: " · ")
     }
+    
+    func isoString() -> String? {
+        guard instantUTC.timeIntervalSince1970 > 0 else { return nil }
+        let formatter = ISO8601DateFormatter()
+        formatter.timeZone = TimeZone(identifier: tzID) ?? .current
+        return formatter.string(from: instantUTC)
+    }
 }
 

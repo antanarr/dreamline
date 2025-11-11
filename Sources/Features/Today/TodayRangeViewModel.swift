@@ -33,8 +33,8 @@ final class TodayRangeViewModel: ObservableObject {
                 object: nil,
                 queue: .main
             ) { [weak self] _ in
-                guard let self, let item = self.item else { return }
-                Task { @MainActor in
+                Task { @MainActor [weak self] in
+                    guard let self, let item = self.item else { return }
                     await self.rebuildResonance(for: item)
                 }
             }
