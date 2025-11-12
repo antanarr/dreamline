@@ -39,10 +39,11 @@ struct OnboardingFlow: View {
         case .hello:
             VStack(spacing: 28) {
                 hero(imageName: "ob_welcome",
-                     title: "Your dreams remember what you forget.",
-                     subtitle: "Dreamline helps you capture motifs, map them to the sky, and hear from the Oracle.")
+                     title: "Welcome to Dreamline",
+                     subtitle: "The stars are speaking to you — not in words, but in patterns. Each night, your dreams echo what the heavens whisper. Together they reveal your map — written in the skies, reflected in your heart.")
+                    .fadeIn(delay: 0.3)
                 
-                primaryButton(title: "Begin") {
+                primaryButton(title: "Begin My Cosmic Journey") {
                     step = .privacy
                 }
             }
@@ -50,8 +51,9 @@ struct OnboardingFlow: View {
         case .privacy:
             VStack(spacing: 24) {
                 hero(imageName: "ob_privacy",
-                     title: "Your space stays yours.",
+                     title: "Your space stays yours",
                      subtitle: "Lock Dreamline with Face ID or Touch ID. Everything is local-first and cloud optional.")
+                    .fadeIn(delay: 0.2)
                 
                 OnboardingCard {
                     VStack(alignment: .leading, spacing: 16) {
@@ -77,8 +79,9 @@ struct OnboardingFlow: View {
         case .birth:
             VStack(spacing: 24) {
                 hero(imageName: "ob_birth",
-                     title: "Sky context makes motifs sing.",
+                     title: "As above, so within",
                      subtitle: "Add your birth details so Dreamline can align transits with your dreams.")
+                    .fadeIn(delay: 0.2)
                 
                 OnboardingCard {
                     VStack(alignment: .leading, spacing: 14) {
