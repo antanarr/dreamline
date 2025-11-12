@@ -51,6 +51,7 @@ struct YourDayHeroCard: View {
                                 .padding(.horizontal, 14)
                                 .padding(.vertical, 8)
                                 .background(Color.white.opacity(0.18), in: Capsule())
+                                .mysticalGlow(color: .dlMint, radius: 8)
                             Circle()
                                 .strokeBorder(Color.white.opacity(0.22), lineWidth: 2.0)
                                 .scaleEffect(pulse ? 1.18 : 0.95)
@@ -58,6 +59,7 @@ struct YourDayHeroCard: View {
                                 .animation(reduceMotion ? nil : .easeOut(duration: 1.6).repeatForever(autoreverses: false), value: pulse)
                                 .allowsHitTesting(false)
                         }
+                        .goosebumpsMoment()
                     }
                     .buttonStyle(.plain)
                     .onAppear { pulse = true }
@@ -141,6 +143,7 @@ struct YourDayHeroCard: View {
                     .scaledToFill()
                     .opacity(theme.isLight ? 0.38 : 0.5)
                     .blendMode(.screen)
+                    .parallaxDrift(6)
                     .clipShape(shape)
             )
             .overlay(

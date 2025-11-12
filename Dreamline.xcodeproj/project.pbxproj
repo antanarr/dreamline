@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -43,6 +43,7 @@
 		440C691717584556AD64B107 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887E0F168FD8290C58FFDA87 /* TodayView.swift */; };
 		44FD48B77A92857261FCD677 /* AstroCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD0DDE559F74729D34E87944 /* AstroCatalog.swift */; };
 		46687BA0BC22124F5EF0A5B2 /* HoroscopeCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC3FCFE202367BC39AF9CEB /* HoroscopeCalendarView.swift */; };
+		46DC7C5E8187722CFF921A0E /* MagicEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3A7AE024B1F1B05AC5AF83 /* MagicEffects.swift */; };
 		4F6543490A8467B3CF905304 /* DreamStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06EA441B1A159BD5FE16FD39 /* DreamStore.swift */; };
 		51D9B8465BA392C4582B2705 /* AlignmentAheadPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35098EE75E2D9A36590DFB6 /* AlignmentAheadPreview.swift */; };
 		52B7961706079538C4C1315A /* ResonanceServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D89B27499D5EFD3C5196B0D /* ResonanceServiceTests.swift */; };
@@ -50,6 +51,7 @@
 		58A2741BEF73BE969DF165CA /* LifeAreaRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD2B9424D8419D895D3D464 /* LifeAreaRow.swift */; };
 		598E2B2205BACB28ED393E0D /* IAPIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB853D90E0102838F0F5AF1E /* IAPIDs.swift */; };
 		59F706127463A56A1CBFB5B5 /* OracleService+History.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF0C4D94339B5C061B8087F /* OracleService+History.swift */; };
+		5A5BB03F6E23B645DEC764F1 /* ConstellationSpinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7952A7530CCAF3525D0A80B /* ConstellationSpinner.swift */; };
 		5B97E6407F9B2892CFE92886 /* SeasonalContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88E5B0CC7C479BE13D28766 /* SeasonalContentView.swift */; };
 		5C94B184A404CB464C0253A8 /* OracleChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D209B79FF222431A6092FC /* OracleChatService.swift */; };
 		6060EA136A801F3766631452 /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FCD0FAEC6BC42BF47BB7D4E /* InsightsView.swift */; };
@@ -169,7 +171,7 @@
 		32324A8E9CA14135389165C0 /* RecordDreamIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordDreamIntent.swift; sourceTree = "<group>"; };
 		340011767851D63962304ED4 /* HoroscopeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeService.swift; sourceTree = "<group>"; };
 		3632BF117D79CF0FF54C0044 /* TodayPlanetStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPlanetStrip.swift; sourceTree = "<group>"; };
-		37032F96872F6A7224C4582E /* Dreamline.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dreamline.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		37032F96872F6A7224C4582E /* Dreamline.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Dreamline.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		398EF054DACE29F26878BA0C /* VoiceRecorderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceRecorderService.swift; sourceTree = "<group>"; };
 		3ADCF73542DD9467DD55D017 /* DreamDetailExtras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamDetailExtras.swift; sourceTree = "<group>"; };
 		4088626376277D9767BB486B /* TodayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModel.swift; sourceTree = "<group>"; };
@@ -198,6 +200,7 @@
 		68C151CDD228236CC7035AF6 /* ResonanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResonanceService.swift; sourceTree = "<group>"; };
 		6BA486A9910ED3B90E59C850 /* ColorTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorTokens.swift; sourceTree = "<group>"; };
 		6CAEA38A41CB54C41CA4A40A /* BestDayInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BestDayInfo.swift; sourceTree = "<group>"; };
+		6E3A7AE024B1F1B05AC5AF83 /* MagicEffects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagicEffects.swift; sourceTree = "<group>"; };
 		723E6A52D7B333E782EE0FF6 /* AstroGlossary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AstroGlossary.swift; sourceTree = "<group>"; };
 		738C88E69026F7ECD6BAAAA1 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		73B92519A92C5836BB447CAF /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -216,7 +219,7 @@
 		9CF93AAA997B4645833FF477 /* AstroIconButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AstroIconButton.swift; sourceTree = "<group>"; };
 		9D0AC8CC3B4066313CFEFE20 /* DreamPattern.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamPattern.swift; sourceTree = "<group>"; };
 		9D89B27499D5EFD3C5196B0D /* ResonanceServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResonanceServiceTests.swift; sourceTree = "<group>"; };
-		9F6438CFC912BED768EC0C9B /* DreamlineTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DreamlineTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F6438CFC912BED768EC0C9B /* DreamlineTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DreamlineTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A14ADF2DA28CBC8074349E0D /* TodayStructuredView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayStructuredView.swift; sourceTree = "<group>"; };
 		A32ADC0D196DC4835745CE17 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		A4996D980DFADEE9D1C0605C /* ConstellationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstellationStore.swift; sourceTree = "<group>"; };
@@ -241,6 +244,7 @@
 		D41E3AE5D7CD6A912C26DB35 /* DreamlineApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamlineApp.swift; sourceTree = "<group>"; };
 		D5133FA7FF9DABF20AFD0402 /* SymbolHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolHeatmapView.swift; sourceTree = "<group>"; };
 		D553A904BE255279105578BF /* SymbolExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolExtractor.swift; sourceTree = "<group>"; };
+		D7952A7530CCAF3525D0A80B /* ConstellationSpinner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstellationSpinner.swift; sourceTree = "<group>"; };
 		D7BF23FE386FF90AB3195484 /* EmbeddingServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddingServiceTests.swift; sourceTree = "<group>"; };
 		D98087626DB91A9B288047F8 /* Resonance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Resonance.swift; sourceTree = "<group>"; };
 		DA8A51D3FDCC9C7141D5AB65 /* TodayRangeViewModel+Resonance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TodayRangeViewModel+Resonance.swift"; sourceTree = "<group>"; };
@@ -263,7 +267,7 @@
 		FB853D90E0102838F0F5AF1E /* IAPIDs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPIDs.swift; sourceTree = "<group>"; };
 		FB8FCAAF460C3928C9A82B1D /* ConstellationCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstellationCanvas.swift; sourceTree = "<group>"; };
 		FD1083DC6763C08039F9061A /* BestDaysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BestDaysView.swift; sourceTree = "<group>"; };
-		FEA8C576AF8E38D2CBE3A1C6 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		FEA8C576AF8E38D2CBE3A1C6 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -288,6 +292,8 @@
 				2B801626EA2D4D15B0A98D01 /* Animations.swift */,
 				1F251211FF73A6629D5FDD45 /* AssetImage.swift */,
 				6BA486A9910ED3B90E59C850 /* ColorTokens.swift */,
+				D7952A7530CCAF3525D0A80B /* ConstellationSpinner.swift */,
+				6E3A7AE024B1F1B05AC5AF83 /* MagicEffects.swift */,
 				C082D508A5BE853682686929 /* OracleShimmer.swift */,
 				738C88E69026F7ECD6BAAAA1 /* Theme.swift */,
 				0210D4A191E832AFC80267C4 /* ThemeService.swift */,
@@ -756,6 +762,7 @@
 			packageReferences = (
 				30C69CED65BC08B13AD1F6A9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -821,6 +828,7 @@
 				61626DA4ED5343D116CC4EC0 /* ColorTokens.swift in Sources */,
 				1539DE8108F265A3B1B7FDD1 /* ConstellationCanvas.swift in Sources */,
 				0A97B7395CE8094FCFD53F07 /* ConstellationPreview.swift in Sources */,
+				5A5BB03F6E23B645DEC764F1 /* ConstellationSpinner.swift in Sources */,
 				DDC59E26E9C19F8C0982D3A6 /* ConstellationStore.swift in Sources */,
 				635464FF785C26754F456772 /* ConstellationView.swift in Sources */,
 				74DE7A7EA110E04B88F04624 /* ContentView.swift in Sources */,
@@ -855,6 +863,7 @@
 				5351F603D1A9D1A9D043D15B /* JournalView.swift in Sources */,
 				E546B5784D7399FBE6E9A597 /* LifeAreaDetailView.swift in Sources */,
 				58A2741BEF73BE969DF165CA /* LifeAreaRow.swift in Sources */,
+				46DC7C5E8187722CFF921A0E /* MagicEffects.swift in Sources */,
 				9B19CF277A18B7E6C07E7DCA /* NotificationService.swift in Sources */,
 				1C1F8082BD8EBF24AAF46190 /* Notifications.swift in Sources */,
 				A4A5C4DF0140CC9F30F80CEE /* OnboardingFlow.swift in Sources */,
@@ -924,7 +933,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = P3MNVS9Z4U;
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -998,7 +1006,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = P3MNVS9Z4U;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

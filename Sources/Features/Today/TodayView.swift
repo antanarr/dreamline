@@ -473,31 +473,35 @@ struct TodayView: View {
     }
     
     private var loadingShimmer: some View {
-        RoundedRectangle(cornerRadius: 28, style: .continuous)
-            .fill(
-                LinearGradient(
-                    colors: [
-                        Color.dlViolet.opacity(theme.isLight ? 0.25 : 0.35),
-                        Color.dlIndigo.opacity(theme.isLight ? 0.2 : 0.3)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
+        ZStack {
+            RoundedRectangle(cornerRadius: 32, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: theme.palette.horoscopeCardBackground,
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
                 )
-            )
-            .overlay(
-                VStack(alignment: .leading, spacing: 16) {
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(Color.white.opacity(0.25))
-                        .frame(width: 200, height: 18)
-                        .shimmer()
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(Color.white.opacity(0.18))
-                        .frame(width: 260, height: 14)
-                        .shimmer()
-                }
-                .padding(28)
-            )
-            .padding(.horizontal, 20)
+                .overlay(
+                    DLAssetImage.starGrid
+                        .resizable(resizingMode: .tile)
+                        .scaleEffect(0.6)
+                        .opacity(0.15)
+                        .blendMode(.screen)
+                )
+            
+            VStack(spacing: 20) {
+                ConstellationSpinner(size: 80, dotCount: 6, color: .white.opacity(0.9))
+                
+                Text("Reading the stars...")
+                    .dlType(.body)
+                    .foregroundStyle(.white.opacity(0.85))
+            }
+            .padding(40)
+        }
+        .frame(height: 280)
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
     }
     
     private var emptyState: some View {
