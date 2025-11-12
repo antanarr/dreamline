@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -98,6 +98,7 @@
 		B07234DE31905C50E563EB5F /* SymbolExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D553A904BE255279105578BF /* SymbolExtractor.swift */; };
 		B196BB7F6D5FB63A1AA6FA35 /* FeatureFlags.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4B7E3A5E4A81C66376EA133 /* FeatureFlags.swift */; };
 		B32232A9AE9899A04406063A /* OracleService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E07790A9FE0B47C5A4AA6466 /* OracleService.swift */; };
+		B3FCBB682E463950DCCCD267 /* DeepDiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FF41A85254E535B3EECC6 /* DeepDiveView.swift */; };
 		B63C2AC82E479B6E7B294702 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 251D4D9ABAB61BE6FA0E7ACD /* GoogleService-Info.plist */; };
 		B889283D8B8C8007676D1ED6 /* ProBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6207F442AB09923F40F1984B /* ProBadge.swift */; };
 		B8A97A59714A9C3A0ED914C1 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99088FFDF6AE6507637CFCA7 /* Typography.swift */; };
@@ -175,7 +176,7 @@
 		32324A8E9CA14135389165C0 /* RecordDreamIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordDreamIntent.swift; sourceTree = "<group>"; };
 		340011767851D63962304ED4 /* HoroscopeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeService.swift; sourceTree = "<group>"; };
 		3632BF117D79CF0FF54C0044 /* TodayPlanetStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPlanetStrip.swift; sourceTree = "<group>"; };
-		37032F96872F6A7224C4582E /* Dreamline.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dreamline.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		37032F96872F6A7224C4582E /* Dreamline.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Dreamline.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		398EF054DACE29F26878BA0C /* VoiceRecorderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceRecorderService.swift; sourceTree = "<group>"; };
 		3ADCF73542DD9467DD55D017 /* DreamDetailExtras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamDetailExtras.swift; sourceTree = "<group>"; };
 		4088626376277D9767BB486B /* TodayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModel.swift; sourceTree = "<group>"; };
@@ -214,6 +215,7 @@
 		7B078092D64F5C5D7AC7B6C1 /* EntitlementsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementsService.swift; sourceTree = "<group>"; };
 		861F4409E3A5F962980D7B2E /* InsightsHeatmapSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsHeatmapSection.swift; sourceTree = "<group>"; };
 		887E0F168FD8290C58FFDA87 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
+		888FF41A85254E535B3EECC6 /* DeepDiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepDiveView.swift; sourceTree = "<group>"; };
 		89FC095E215D4EABD2332256 /* RemoteConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfigTests.swift; sourceTree = "<group>"; };
 		8CB7A4A2D534E142CE71FDA9 /* AppEnv.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnv.swift; sourceTree = "<group>"; };
 		8D84C2E36FA13CA977D77446 /* TodayRangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayRangeView.swift; sourceTree = "<group>"; };
@@ -273,7 +275,7 @@
 		FB853D90E0102838F0F5AF1E /* IAPIDs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPIDs.swift; sourceTree = "<group>"; };
 		FB8FCAAF460C3928C9A82B1D /* ConstellationCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstellationCanvas.swift; sourceTree = "<group>"; };
 		FD1083DC6763C08039F9061A /* BestDaysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BestDaysView.swift; sourceTree = "<group>"; };
-		FEA8C576AF8E38D2CBE3A1C6 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
+		FEA8C576AF8E38D2CBE3A1C6 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -472,6 +474,7 @@
 				77AB4061BECB32A5C0F26350 /* BehindThisForecastView.swift */,
 				42F3D8784B829FDFE209E3B3 /* BestDaysTeaser.swift */,
 				FD1083DC6763C08039F9061A /* BestDaysView.swift */,
+				888FF41A85254E535B3EECC6 /* DeepDiveView.swift */,
 				62C5EC0BED0E43C602C41120 /* LifeAreaDetailView.swift */,
 				FAD2B9424D8419D895D3D464 /* LifeAreaRow.swift */,
 				6207F442AB09923F40F1984B /* ProBadge.swift */,
@@ -771,6 +774,7 @@
 			packageReferences = (
 				30C69CED65BC08B13AD1F6A9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -843,6 +847,7 @@
 				74DE7A7EA110E04B88F04624 /* ContentView.swift in Sources */,
 				DBCD129255DF0684E1A908E2 /* CopyEngine.swift in Sources */,
 				6CADC6136D5BFB57D69C51A2 /* DLAnalytics.swift in Sources */,
+				B3FCBB682E463950DCCCD267 /* DeepDiveView.swift in Sources */,
 				EE532EF1CD26802316CF2437 /* DeepReadGenerator.swift in Sources */,
 				0AC0536EC58E209CCD2060CD /* DreamDetailExtras.swift in Sources */,
 				CDD6557BCC6284E214FB1730 /* DreamDetailScreen.swift in Sources */,
@@ -944,7 +949,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = P3MNVS9Z4U;
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (

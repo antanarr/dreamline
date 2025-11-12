@@ -18,6 +18,11 @@ public enum DLAnalytics {
         case dreamSaved(hasSymbols: Bool, lenChars: Int, embeddedOK: Bool)
         case calendarVisit(dateOffsetDays: Int)
         case paywallOpen(source: PaywallSource, secondsSinceAppear: TimeInterval)
+        case oracleCTAClick(isPro: Bool)
+        case deepReadView(wordCount: Int)
+        case deepReadFetch(latencyMs: Int, model: String)
+        case allAboutYouView
+        case reportPurchase(price: String, source: String)
     }
 
     @inlinable
@@ -38,6 +43,16 @@ public enum DLAnalytics {
             print("[analytics] calendar_visit offset_days=\(dateOffsetDays)")
         case let .paywallOpen(source, secondsSinceAppear):
             print("[analytics] paywall_open source=\(source.rawValue) sinceAppear=\(String(format: "%.2f", secondsSinceAppear))")
+        case let .oracleCTAClick(isPro):
+            print("[analytics] oracle_cta_click isPro=\(isPro)")
+        case let .deepReadView(wordCount):
+            print("[analytics] deep_read_view wordCount=\(wordCount)")
+        case let .deepReadFetch(latencyMs, model):
+            print("[analytics] deep_read_fetch latency=\(latencyMs)ms model=\(model)")
+        case .allAboutYouView:
+            print("[analytics] all_about_you_view")
+        case let .reportPurchase(price, source):
+            print("[analytics] report_purchase price=\(price) source=\(source)")
         }
         #endif
     }

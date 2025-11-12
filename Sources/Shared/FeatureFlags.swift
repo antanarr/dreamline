@@ -9,5 +9,14 @@ public enum FeatureFlags {
 
     /// Alignment Ahead (forward resonance windows) UI.
     public static var alignmentAheadEnabled: Bool = true
+    
+    /// Extended Oracle explanations (lead + body paragraphs)
+    public static var oracleExplanationsEnabled: Bool = true
+    
+    /// Oracle paywall for deeper readings
+    public static var oraclePaywallEnabled: Bool = true
+    
+    /// "All About You" personalized report
+    public static var oracleAllAboutYouEnabled: Bool = true
 }
 

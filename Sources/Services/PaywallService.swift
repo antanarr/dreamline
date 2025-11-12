@@ -16,6 +16,7 @@ import SwiftUI
         case bestDays
         case diveDeeper(areaId: String)
         case unlimitedInterpretations
+        case deeperReading
         
         var title: String {
             switch self {
@@ -29,6 +30,8 @@ import SwiftUI
                 return "Dive Deeper with Pro"
             case .unlimitedInterpretations:
                 return "Unlimited Interpretations"
+            case .deeperReading:
+                return "Deeper Oracle Readings"
             }
         }
         
@@ -44,6 +47,8 @@ import SwiftUI
                 return "Get deeper insights with astrological explanations and dream correlations."
             case .unlimitedInterpretations:
                 return "Upgrade to Pro for unlimited dream interpretations and full access to all features."
+            case .deeperReading:
+                return "See how your dreams and today's sky rhyme. Personalized deep dives and daily resonance with Pro."
             }
         }
     }

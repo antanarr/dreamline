@@ -126,7 +126,7 @@ public actor ResonanceService {
                              createdAt: t.dream.createdAt)
             }
 
-        let bundle = ResonanceBundle(anchorKey: key,
+        var bundle = ResonanceBundle(anchorKey: key,
                                      headline: headline,
                                      summary: summary.isEmpty ? nil : summary,
                                      horoscopeEmbedding: hVec,
@@ -141,6 +141,30 @@ public actor ResonanceService {
                                            topScore: bundle.topHits.first?.score ?? 0))
 
         cache[key] = (bundle, now)
+        
+        // Generate Oracle explanation if alignment event
+        if bundle.isAlignmentEvent, let firstHit = bundle.topHits.first {
+            let expl = await CopyEngine.shared.alignmentExplainer(
+                overlap: firstHit.overlapSymbols,
+                headline: headline,
+                summary: summary,
+                score: firstHit.score
+            )
+            bundle = ResonanceBundle(
+                anchorKey: bundle.anchorKey,
+                headline: bundle.headline,
+                summary: bundle.summary,
+                horoscopeEmbedding: bundle.horoscopeEmbedding,
+                topHits: bundle.topHits,
+                dynamicThreshold: bundle.dynamicThreshold,
+                explanation: OracleExplanation(
+                    lead: expl.lead,
+                    body: expl.body,
+                    chips: expl.chips
+                )
+            )
+        }
+        
         if bundle.isAlignmentEvent {
             lastBundleByAnchor[key] = bundle
             return bundle

@@ -76,5 +76,32 @@ enum PromptBook {
     No emojis. No questions. No "unlock".
     JSON ONLY: {"line":"…"}
     """
+    
+    /// Alignment deep dive (120-250 words, personalized reflection)
+    /// INPUT JSON: { "overlap": [String], "headline": String, "summary": String, "profile": {...}, "lang": String }
+    /// OUTPUT JSON: { "body": String }
+    static let alignmentDeepDive = """
+    Write a reflective deep dive in {{lang}}.
+    FRAME: recognition, not prediction. Modern mystic; one idea per sentence.
+    INPUT: { "overlap": [String], "headline": String, "summary": String, "profile": { "name": String?, "sun": String, "moon": String?, "rising": String?, "age": Int?, "pronouns": String? } }
+    REQUIREMENTS:
+    - 120–250 words; link recent dream motifs to today's sky.
+    - Personalize gently with profile when present.
+    - End with one reflective question.
+    OUTPUT (JSON only):
+    {"body":"..."}
+    """
+
+    /// All About You personalized report
+    /// INPUT JSON: { "profile": {...}, "motifs7d": [String], "stats": {...}, "lang": String }
+    /// OUTPUT JSON: { "title": String, "sections": [{"heading": String, "body": String}] }
+    static let allAboutYouReport = """
+    Compose a structured personal report in {{lang}}.
+    FRAME: recognition; no advice; no hype; grade 7–9 readability.
+    INPUT: { "profile": {...}, "motifs7d":[String], "stats": {"nDreams":Int,"avgLen":Int?} }
+    SECTIONS (in order): Motifs, Thresholds, Emotional Weather, Guidance, Practices.
+    OUTPUT (JSON only):
+    {"title":"All About You","sections":[{"heading":"Motifs","body":"..."},{"heading":"Thresholds","body":"..."},{"heading":"Emotional Weather","body":"..."},{"heading":"Guidance","body":"..."},{"heading":"Practices","body":"..."}]}
+    """
 }
 

@@ -29,6 +29,9 @@ struct TodayView: View {
     @State private var appearTime: Date = Date()
     // Loading UX
     @State private var showSpinner = false
+    // Deep dive
+    @State private var presentDeepDive = false
+    @State private var deepDiveBody: String?
     
     // Forces layout to recompute when data appears (avoids VStack child-size cache bugs)
     private var reflowKey: String {
@@ -89,16 +92,57 @@ struct TodayView: View {
                 }) {
                     if let id = selectedAlignedDreamID,
                        let binding = bindingForEntry(id: id) {
-                        QuickReadInterpretationView(entry: binding,
-                                                    overlapSymbols: quickReadSymbols,
-                                                    score: quickReadScore,
-                                                    onOpenDream: {
-                                                        presentAlignedDream = true
-                                                    })
+                        QuickReadInterpretationView(
+                            entry: binding,
+                            resonance: horoscopeVM.item?.resonance,
+                            overlapSymbols: quickReadSymbols,
+                            score: quickReadScore,
+                            onOpenDream: {
+                                presentAlignedDream = true
+                            },
+                            onDeeperReading: {
+                                if !isPro {
+                                    // Free users: show paywall
+                                    paywallContext = .deeperReading
+                                    presentQuickRead = false
+                                    showPaywall = true
+                                    DLAnalytics.log(.oracleCTAClick(isPro: false))
+                                } else {
+                                    // Pro users: generate deep dive
+                                    Task {
+                                        DLAnalytics.log(.oracleCTAClick(isPro: true))
+                                        if let r = horoscopeVM.item?.resonance,
+                                           let first = r.topHits.first {
+                                            let body = await CopyEngine.shared.alignmentDeepDive(
+                                                overlap: first.overlapSymbols,
+                                                headline: r.headline,
+                                                summary: r.summary ?? "",
+                                                profile: nil
+                                            )
+                                            deepDiveBody = body
+                                            presentQuickRead = false
+                                            presentDeepDive = true
+                                            DLAnalytics.log(.deepReadView(wordCount: body.split(separator: " ").count))
+                                        }
+                                    }
+                                }
+                            }
+                        )
                         .environment(theme)
                     } else {
                         Text("Dream not found")
                             .font(.headline)
+                            .padding()
+                    }
+                }
+                .sheet(isPresented: $presentDeepDive) {
+                    if let text = deepDiveBody {
+                        NavigationStack {
+                            DeepDiveView(text: text)
+                                .environment(theme)
+                        }
+                    } else {
+                        ProgressView()
                             .padding()
                     }
                 }

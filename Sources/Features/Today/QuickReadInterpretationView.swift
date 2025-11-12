@@ -4,11 +4,14 @@ import SwiftUI
 /// Shows overlap symbols and a subtle score hint; avoids "AI mechanics".
 struct QuickReadInterpretationView: View {
     @Binding var entry: DreamEntry
+    let resonance: ResonanceBundle?
     let overlapSymbols: [String]
     let score: Float
     let onOpenDream: () -> Void
+    var onDeeperReading: (() -> Void)? = nil
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(EntitlementsService.self) private var entitlements
     @State private var h1: String = "Your dream speaks"
     @State private var sub: String = "Let the pattern name itself."
 
@@ -34,10 +37,42 @@ struct QuickReadInterpretationView: View {
                 }
             }
 
-            Text("There’s a strong echo here.")
+            Text("There's a strong echo here.")
                 .font(DLFont.body(13))
                 .foregroundStyle(.secondary)
                 .opacity(score >= 0.82 ? 1.0 : (score >= 0.78 ? 0.9 : 0.7))
+            
+            // Extended Oracle explanation (if available)
+            if FeatureFlags.oracleExplanationsEnabled, let ex = resonance?.explanation {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(ex.lead)
+                        .font(DLFont.body(15).weight(.medium))
+                        .foregroundStyle(.primary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    
+                    if let bodyText = ex.body, !bodyText.isEmpty {
+                        Text(bodyText)
+                            .font(DLFont.body(14))
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    
+                    if let onDeeper = onDeeperReading {
+                        Button {
+                            onDeeper()
+                        } label: {
+                            Text(entitlements.tier == .pro ? "Deeper reading" : "Deeper reading · Pro")
+                                .font(.footnote.weight(.semibold))
+                                .underline()
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.top, 4)
+                    }
+                }
+                .padding(.top, 8)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Oracle guidance")
+            }
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("From your dream")

@@ -36,6 +36,15 @@ actor CopyEngine {
         }
         return ("Alignment Ahead", "When the sky is likely to echo your current thread.", "See Alignment Ahead")
     }
+    
+    // MARK: Alignment Deep Dive
+    func alignmentDeepDive(overlap: [String], headline: String, summary: String, profile: OracleUserProfile?, locale: Locale = .current) async -> String {
+        let lang = languageTag(locale)
+        if let out = await backend.alignmentDeepDive(overlap: overlap, headline: headline, summary: summary, profile: profile, lang: lang) {
+            return out.body
+        }
+        return fallback.alignmentDeepDive(overlap: overlap, headline: headline, summary: summary)
+    }
 
     // LANGUAGE helper (BCP‑47-ish)
     private func languageTag(_ locale: Locale) -> String {
@@ -62,6 +71,35 @@ private struct AlignmentAheadTeaserOut: Decodable {
     let subtitle: String
     let cta: String
 }
+private struct AlignmentDeepDiveOut: Decodable {
+    let body: String
+}
+private struct AllAboutYouReportOut: Decodable {
+    let title: String
+    let sections: [Section]
+    struct Section: Decodable {
+        let heading: String
+        let body: String
+    }
+}
+
+public struct OracleUserProfile: Codable {
+    public var name: String?
+    public var sun: String
+    public var moon: String?
+    public var rising: String?
+    public var age: Int?
+    public var pronouns: String?
+    
+    public init(name: String? = nil, sun: String, moon: String? = nil, rising: String? = nil, age: Int? = nil, pronouns: String? = nil) {
+        self.name = name
+        self.sun = sun
+        self.moon = moon
+        self.rising = rising
+        self.age = age
+        self.pronouns = pronouns
+    }
+}
 
 // MARK: - Backend Protocol
 
@@ -69,6 +107,7 @@ private protocol CopyBackend {
     func quickReadLead(overlap: [String], score: Float, lang: String) async -> QuickReadLeadOut?
     func alignmentExplainer(overlap: [String], headline: String, summary: String, score: Float, lang: String) async -> AlignmentExplainerOut?
     func alignmentAheadTeaser(weekday: String, lang: String) async -> AlignmentAheadTeaserOut?
+    func alignmentDeepDive(overlap: [String], headline: String, summary: String, profile: OracleUserProfile?, lang: String) async -> AlignmentDeepDiveOut?
 }
 
 // MARK: - OpenAI Responses Backend
@@ -104,6 +143,13 @@ private final class ModelCopyBackend: CopyBackend {
     func alignmentAheadTeaser(weekday: String, lang: String) async -> AlignmentAheadTeaserOut? {
         let input: [String: Any] = ["weekday": weekday, "lang": lang]
         return await call(prompt: PromptBook.alignmentAheadTeaser, input: input, as: AlignmentAheadTeaserOut.self)
+    }
+    
+    func alignmentDeepDive(overlap: [String], headline: String, summary: String, profile: OracleUserProfile?, lang: String) async -> AlignmentDeepDiveOut? {
+        let profileData = try? JSONEncoder().encode(profile ?? OracleUserProfile(sun: "unknown"))
+        let profileJSON = profileData.flatMap { try? JSONSerialization.jsonObject(with: $0) } ?? [:]
+        let input: [String: Any] = ["overlap": overlap, "headline": headline, "summary": summary, "profile": profileJSON, "lang": lang]
+        return await call(prompt: PromptBook.alignmentDeepDive, input: input, as: AlignmentDeepDiveOut.self)
     }
 
     // Core call to OpenAI Responses API
@@ -196,6 +242,11 @@ private final class LocalTemplateBackend: CopyBackend {
         )
     }
     
+    func alignmentDeepDive(overlap: [String], headline: String, summary: String, profile: OracleUserProfile?, lang: String) async -> AlignmentDeepDiveOut? {
+        let result = alignmentDeepDive(overlap: overlap, headline: headline, summary: summary)
+        return AlignmentDeepDiveOut(body: result)
+    }
+    
     func quickReadLines(overlap: [String], score: Float) -> (h1: String, sub: String) {
         let motif = overlap.first?.replacingOccurrences(of: "_", with: " ")
         let h1: String
@@ -219,6 +270,11 @@ private final class LocalTemplateBackend: CopyBackend {
         let body = "Recognition rarely arrives with trumpets. Notice the repeat and move gently toward it."
         let chips = Array(overlap.prefix(2)).map { $0.replacingOccurrences(of: "_", with: " ") }
         return (lead, body, chips)
+    }
+    
+    func alignmentDeepDive(overlap: [String], headline: String, summary: String) -> String {
+        let motif = overlap.first?.replacingOccurrences(of: "_", with: " ") ?? "what you're already circling"
+        return "Themes repeat until they root. Your recent dreams keep brushing \(motif). Today's sky mirrors the same contour. Treat the echo as permission, not pressure. Follow the small nudge that keeps returning. What opens if you take one careful step toward it?"
     }
 }
 
