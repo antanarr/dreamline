@@ -382,7 +382,7 @@ struct TodayView: View {
     
     @ViewBuilder
     private var mainContent: some View {
-        LazyVStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 16) {
             heroSection
             
             if let item = horoscopeVM.item, !item.dreamLinks.isEmpty {
