@@ -50,9 +50,8 @@ struct DreamlineApp: App {
             }
             .preferredColorScheme(themeService.mode.preferredColorScheme)
             .task {
-                // Show launch screen for minimum 1 second (feels intentional, not jarring)
-                try? await Task.sleep(nanoseconds: 1_000_000_000)
-                withAnimation(.easeOut(duration: 0.6)) {
+                // Dismiss launch screen as soon as ready (no artificial delay)
+                withAnimation(.easeOut(duration: 0.4)) {
                     isInitializing = false
                 }
             }
