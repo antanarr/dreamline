@@ -18,11 +18,7 @@ struct YourDayHeroCard: View {
     @State private var pulse = false
     
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            backgroundCard
-                .overlay(heroHalo)
-            
-            VStack(alignment: .leading, spacing: 18) {
+        VStack(alignment: .leading, spacing: 18) {
                 // Header badge
                 HStack(spacing: 8) {
                     DLAssetImage.oracleIcon
@@ -112,9 +108,13 @@ struct YourDayHeroCard: View {
                     }
                 }
             }
-            .padding(28)
-        }
-        .fixedSize(horizontal: false, vertical: true)
+        .padding(28)
+        .background(
+            ZStack {
+                backgroundCard
+                heroHalo
+            }
+        )
         .padding(.horizontal, 20)
         .padding(.top, 8)
         .task {
