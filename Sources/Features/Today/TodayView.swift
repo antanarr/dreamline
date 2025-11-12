@@ -29,6 +29,12 @@ struct TodayView: View {
     @State private var appearTime: Date = Date()
     // Loading UX
     @State private var showSpinner = false
+    
+    // Forces layout to recompute when data appears (avoids VStack child-size cache bugs)
+    private var reflowKey: String {
+        let h = horoscopeVM.item?.headline ?? "nil"
+        return "\(h)|\(store.entries.count)"
+    }
 
     var body: some View {
         NavigationStack {
@@ -443,6 +449,7 @@ struct TodayView: View {
             .buttonStyle(.plain)
             .accessibilityIdentifier("browse-calendar-button")
         }
+        .id(reflowKey)
         .padding(.horizontal, 16)
         .padding(.top, 8)
     }

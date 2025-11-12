@@ -90,12 +90,15 @@ struct YourDayHeroCard: View {
             .buttonStyle(.plain)
         }
         .padding(24)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        // Defensive floor so the row can never collapse while text streams in:
+        .frame(minHeight: 220)
         .background(
             RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .fill(theme.palette.cardFillPrimary)
         )
-        .overlay(alignment: .center) {
-            // Decorative art that never affects layout. No GeometryReader; clipped by mask.
+        // Decorative art: masked to the card; visual-only; no GeometryReader/offset in layout path.
+        .overlay {
             ZStack {
                 DLAssetImage.nebula
                     .resizable()
@@ -109,10 +112,8 @@ struct YourDayHeroCard: View {
                     .opacity(0.08)
                     .allowsHitTesting(false)
             }
-            .clipped()
-            .allowsHitTesting(false)
+            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         }
-        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         .padding(.horizontal, 20)
         .padding(.top, 8)
         .accessibilityElement(children: .contain)
