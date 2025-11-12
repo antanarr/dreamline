@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 struct YourDayHeroCard: View {
     let headline: String
@@ -13,201 +12,109 @@ struct YourDayHeroCard: View {
     var onDiveDeeper: (() -> Void)?
     
     @Environment(ThemeService.self) private var theme: ThemeService
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var animateHalo = false
-    @State private var pulse = false
     
     var body: some View {
+        // CONTENT drives layout height. Background art is clipped to the card and doesn't use GeometryReader.
         VStack(alignment: .leading, spacing: 18) {
-                // Header badge
+            // Header badge
+            Text("Your day at a glance")
+                .font(.caption.weight(.semibold))
+                .textCase(.uppercase)
+                .foregroundStyle(.secondary)
+            
+            // Alignment pill (optional, subtle)
+            if FeatureFlags.resonanceUIEnabled, let rb = resonance, rb.isAlignmentEvent {
+                Button {
+                    DLAnalytics.log(.alignmentTapthrough(dest: .dreamDetail))
+                    onAlignmentTap?()
+                } label: {
+                    Text("Today's Alignment")
+                        .font(.footnote.weight(.semibold))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.dlMint.opacity(0.16), in: Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Open today's alignment")
+            }
+            
+            // Headline & summary (readable on dark)
+            Text(headline)
+                .font(.system(size: 24, weight: .bold, design: .serif))
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            Text(summary)
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            // Optional overlap chips (trim to 2)
+            if let first = resonance?.topHits.first, !first.overlapSymbols.isEmpty {
+                let chips = first.overlapSymbols.prefix(ResonanceConfig.OVERLAP_MAX_VISUAL)
                 HStack(spacing: 8) {
-                    DLAssetImage.oracleIcon
-                        .renderingMode(.template)
-                        .foregroundStyle(Color.white.opacity(0.9))
-                        .frame(width: 18, height: 18)
-                    Text("Day at a Glance")
-                }
-                .font(DLFont.body(13))
-                .foregroundStyle(Color.white.opacity(0.9))
-                .padding(.horizontal, 14)
-                .padding(.vertical, 8)
-                .background(Color.white.opacity(0.15), in: Capsule())
-
-                // Alignment pill (if resonance detected)
-                if FeatureFlags.resonanceUIEnabled, let rb = resonance, rb.isAlignmentEvent {
-                    Button {
-                        DLAnalytics.log(.alignmentTapthrough(dest: .dreamDetail))
-                        onAlignmentTap?()
-                    } label: {
-                        ZStack {
-                            Label("Today's Alignment", systemImage: "sparkles")
-                                .font(DLFont.body(13))
-                                .foregroundStyle(Color.white.opacity(0.95))
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 8)
-                                .background(Color.white.opacity(0.18), in: Capsule())
-                                .mysticalGlow(color: .dlMint, radius: 8)
-                            Circle()
-                                .strokeBorder(Color.white.opacity(0.22), lineWidth: 2.0)
-                                .scaleEffect(pulse ? 1.18 : 0.95)
-                                .opacity(pulse ? 0.0 : 0.6)
-                                .animation(reduceMotion ? nil : .easeOut(duration: 1.6).repeatForever(autoreverses: false), value: pulse)
-                                .allowsHitTesting(false)
-                        }
-                        .goosebumpsMoment()
-                    }
-                    .buttonStyle(.plain)
-                    .onAppear { pulse = true }
-                    .accessibilityLabel("Today's Alignment")
-                    .accessibilityValue(alignmentValue(rb))
-                    .accessibilityAddTraits(.updatesFrequently)
-                }
-                
-                // Main content container - FIX: Add proper spacing and containment
-                VStack(alignment: .leading, spacing: 14) {
-                    Text(headline)
-                        .dlType(.titleXL)
-                        .fontWeight(.bold)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .lineSpacing(4)
-                        .foregroundStyle(Color.white)
-                    
-                    if !summary.isEmpty {
-                        Text(summary)
-                            .dlType(.body)
-                            .foregroundStyle(Color.white.opacity(0.92))
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    // Overlap symbol chips (under main content)
-                    if let r = resonance,
-                       let first = r.topHits.first,
-                       !first.overlapSymbols.isEmpty {
-                        HStack(spacing: 8) {
-                            ForEach(Array(first.overlapSymbols.prefix(ResonanceConfig.OVERLAP_MAX_VISUAL)), id: \.self) { sym in
-                                Text(sym.replacingOccurrences(of: "_", with: " "))
-                                    .font(DLFont.body(13))
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 6)
-                                    .background(Color.white.opacity(0.16), in: Capsule())
-                                    .foregroundStyle(.white)
-                            }
-                        }
-                        .accessibilityLabel("Overlapping symbols: \(first.overlapSymbols.prefix(ResonanceConfig.OVERLAP_MAX_VISUAL).joined(separator: ", "))")
-                    }
-                    
-                    // Action chips
-                    if !doItems.isEmpty || !dontItems.isEmpty {
-                        ActionChips(doItems: Array(doItems.prefix(2)),
-                                    dontItems: Array(dontItems.prefix(2)))
-                    }
-                    
-                    // Dream enhancement pill
-                    if let enhancement = dreamEnhancement, !enhancement.isEmpty {
-                        dreamEnhancementPill(enhancement)
+                    ForEach(Array(chips), id: \.self) { sym in
+                        Text(sym.replacingOccurrences(of: "_", with: " "))
+                            .font(.caption.weight(.semibold))
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(Color.dlMint.opacity(0.12), in: Capsule())
+                            .foregroundStyle(Color.dlMint)
                     }
                 }
+                .accessibilityLabel("Overlapping symbols")
             }
-        .padding(28)
-        .background(
-            ZStack {
-                backgroundCard
-                heroHalo
+            
+            // Do/Don't chips (quiet)
+            if !doItems.isEmpty || !dontItems.isEmpty {
+                ActionChips(doItems: Array(doItems.prefix(2)),
+                           dontItems: Array(dontItems.prefix(2)))
             }
-        )
-        .padding(.horizontal, 20)
-        .padding(.top, 8)
-        .task {
-            withAnimation(.easeInOut(duration: 2.4).repeatForever(autoreverses: true)) {
-                animateHalo = true
+            
+            // Optional dream enhancement line
+            if let tip = dreamEnhancement, !tip.isEmpty {
+                Text(tip)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 6)
             }
+            
+            // Explain link (free quick read)
+            Button {
+                onExplainResonance?()
+            } label: {
+                Text("Why this resonates")
+                    .font(.footnote.weight(.semibold))
+                    .underline()
+            }
+            .buttonStyle(.plain)
         }
-    }
-    
-    // MARK: - Background Components
-    
-    private var backgroundCard: some View {
-        RoundedRectangle(cornerRadius: 32, style: .continuous)
-            .fill(
-                LinearGradient(
-                    colors: theme.palette.horoscopeCardBackground,
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .overlay(
-                GeometryReader { geo in
-                    DLAssetImage.nebula
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: geo.size.width, height: geo.size.height)
-                        .opacity(0.15)
-                        .parallaxDrift(6)
-                        .clipped()
-                }
-            )
-            .overlay(
+        .padding(24)
+        .background(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(theme.palette.cardFillPrimary)
+        )
+        .overlay(alignment: .center) {
+            // Decorative art that never affects layout. No GeometryReader; clipped by mask.
+            ZStack {
+                DLAssetImage.nebula
+                    .resizable()
+                    .scaledToFill()
+                    .opacity(0.12)
+                    .allowsHitTesting(false)
+                
                 DLAssetImage.starGrid
                     .resizable(resizingMode: .tile)
                     .scaleEffect(0.6)
                     .opacity(0.08)
-            )
-            .compositingGroup()
-            .drawingGroup()
-    }
-    
-    private var heroHalo: some View {
-        Circle()
-            .fill(
-                RadialGradient(
-                    colors: [
-                        Color.white.opacity(0.32),
-                        Color.white.opacity(0.0)
-                    ],
-                    center: .topTrailing,
-                    startRadius: animateHalo ? 140 : 120,
-                    endRadius: animateHalo ? 320 : 260
-                )
-            )
-            .frame(width: 420, height: 420)
-            .offset(x: 120, y: -140)
-            .allowsHitTesting(false)
-    }
-    
-    // MARK: - Enhancement Pill
-    
-    private func dreamEnhancementPill(_ enhancement: String) -> some View {
-        HStack(alignment: .top, spacing: 10) {
-            DLAssetImage.symbol("ocean")
-                .renderingMode(.original)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 24, height: 24)
-                .padding(10)
-                .background(Color.white.opacity(0.16), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-            
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Dream weaving")
-                    .dlType(.caption)
-                    .foregroundStyle(Color.white.opacity(0.85))
-                Text(enhancement)
-                    .dlType(.body)
-                    .foregroundStyle(Color.white.opacity(0.92))
-                    .fixedSize(horizontal: false, vertical: true)
+                    .allowsHitTesting(false)
             }
+            .clipped()
+            .allowsHitTesting(false)
         }
-        .padding(16)
-        .background(Color.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Dream weaving. \(enhancement)")
-    }
-    
-    // MARK: - Helpers
-    
-    private func alignmentValue(_ rb: ResonanceBundle) -> String {
-        if let hit = rb.topHits.first, let first = hit.overlapSymbols.first {
-            return first.replacingOccurrences(of: "_", with: " ")
-        }
-        return "Active"
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+        .accessibilityElement(children: .contain)
     }
 }

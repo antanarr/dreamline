@@ -55,7 +55,8 @@ extension View {
 
 // MARK: - Parallax Drift
 
-/// Gentle parallax effect that responds to scroll or device motion
+/// Gentle parallax effect - VISUAL ONLY, doesn't affect layout
+/// Uses overlay + offset so parent's layout size is unchanged
 struct ParallaxDrift: ViewModifier {
     let magnitude: CGFloat
     @State private var offset: CGSize = .zero
@@ -63,25 +64,32 @@ struct ParallaxDrift: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .offset(offset)
-            .onAppear {
-                if !reduceMotion {
-                    withAnimation(
-                        .easeInOut(duration: 8.0)
-                        .repeatForever(autoreverses: true)
-                    ) {
-                        offset = CGSize(
-                            width: magnitude * 0.3,
-                            height: magnitude * 0.5
-                        )
+            .overlay {
+                // Visual-only drift layer
+                content
+                    .offset(offset)
+                    .allowsHitTesting(false)
+                    .onAppear {
+                        if !reduceMotion {
+                            withAnimation(
+                                .easeInOut(duration: 8.0)
+                                .repeatForever(autoreverses: true)
+                            ) {
+                                offset = CGSize(
+                                    width: magnitude * 0.3,
+                                    height: magnitude * 0.5
+                                )
+                            }
+                        }
                     }
-                }
             }
+            .mask(content) // Clip to original bounds
     }
 }
 
 extension View {
     /// Subtle drift animation for depth (magnitude in points)
+    /// LAYOUT-SAFE: Uses overlay so doesn't affect measured size
     func parallaxDrift(_ magnitude: CGFloat = 8) -> some View {
         modifier(ParallaxDrift(magnitude: magnitude))
     }

@@ -90,6 +90,7 @@
 		9C33E5ABEFF33AB3131490D0 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 738C88E69026F7ECD6BAAAA1 /* Theme.swift */; };
 		A496513B265C9D08C3042F45 /* HistorySummarizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEDAD901BDCB3CA0756CBA2B /* HistorySummarizerTests.swift */; };
 		A4A5C4DF0140CC9F30F80CEE /* OnboardingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6708ADB7D0E1E21AA637735 /* OnboardingFlow.swift */; };
+		A6223B81AB29B8021DE1C962 /* TodayLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2787221BD4EBD92E19A7D00D /* TodayLoadingView.swift */; };
 		A7C2CB8E0C0F6F87B989947B /* PushService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529E8FF6611032F53F615B44 /* PushService.swift */; };
 		A847A3DC773226A07B122D0E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3FF3DDA91EF58FE6C4AB617 /* AppDelegate.swift */; };
 		A94B71BB92A944CBE86A7250 /* DreamPatternService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568233B5D519B5E62BE515D9 /* DreamPatternService.swift */; };
@@ -165,6 +166,7 @@
 		25AEDB146923930B3320E920 /* QuickReadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickReadView.swift; sourceTree = "<group>"; };
 		25C436F5531E47A44992601D /* InterpretCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterpretCoordinator.swift; sourceTree = "<group>"; };
 		26D84B7B2FF4632DCB00AD53 /* HoroscopeRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeRange.swift; sourceTree = "<group>"; };
+		2787221BD4EBD92E19A7D00D /* TodayLoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayLoadingView.swift; sourceTree = "<group>"; };
 		28C6E640392CFD0784669257 /* ConstellationPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstellationPreview.swift; sourceTree = "<group>"; };
 		28D0CB80DC9AA648A91D58EA /* EmbeddingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddingService.swift; sourceTree = "<group>"; };
 		29AE82C180EEBF259A9DD9C2 /* FirebaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseService.swift; sourceTree = "<group>"; };
@@ -475,6 +477,7 @@
 				6207F442AB09923F40F1984B /* ProBadge.swift */,
 				62A3D5E30117D05DFB25CCA0 /* QuickReadInterpretationView.swift */,
 				F88E5B0CC7C479BE13D28766 /* SeasonalContentView.swift */,
+				2787221BD4EBD92E19A7D00D /* TodayLoadingView.swift */,
 				3632BF117D79CF0FF54C0044 /* TodayPlanetStrip.swift */,
 				8D84C2E36FA13CA977D77446 /* TodayRangeView.swift */,
 				C628EAE28AA0A4A941ACF716 /* TodayRangeViewModel.swift */,
@@ -908,6 +911,7 @@
 				DAF91D3AC3072E647348B6E8 /* SymbolSeasonalityDetailView.swift in Sources */,
 				9C33E5ABEFF33AB3131490D0 /* Theme.swift in Sources */,
 				9BBDEA2D11EAD59A9B38B358 /* ThemeService.swift in Sources */,
+				A6223B81AB29B8021DE1C962 /* TodayLoadingView.swift in Sources */,
 				05421E04D4B9E952D95139AE /* TodayPlanetStrip.swift in Sources */,
 				D6E5EA57803D78C199994371 /* TodayRangeView.swift in Sources */,
 				B93F2B91EA0B2A5FDA347B6A /* TodayRangeViewModel+Resonance.swift in Sources */,

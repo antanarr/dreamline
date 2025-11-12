@@ -27,10 +27,12 @@ struct TodayView: View {
     @State private var quickReadSymbols: [String] = []
     @State private var quickReadScore: Float = 0
     @State private var appearTime: Date = Date()
+    // Loading UX
+    @State private var showSpinner = false
 
     var body: some View {
         NavigationStack {
-            scrollContent
+            mainContentWithLoading
                 .background(Color.clear.dreamlineScreenBackground())
                 .navigationTitle("Today")
                 .toolbar { toolbarContent }
@@ -123,7 +125,31 @@ struct TodayView: View {
                     DLAnalytics.log(.calendarVisit(dateOffsetDays: offset))
                 }
         }
-        .onAppear { appearTime = Date() }
+        .onAppear {
+            appearTime = Date()
+            showSpinner = false
+            if horoscopeVM.item == nil && horoscopeVM.loading {
+                Task {
+                    try? await Task.sleep(nanoseconds: 600_000_000) // 0.6s, avoid flicker
+                    if horoscopeVM.item == nil && horoscopeVM.loading {
+                        await MainActor.run { showSpinner = true }
+                    }
+                }
+            }
+        }
+        .onChange(of: horoscopeVM.loading) { _, nowLoading in
+            if !nowLoading { showSpinner = false }
+        }
+    }
+    
+    @ViewBuilder
+    private var mainContentWithLoading: some View {
+        if horoscopeVM.item == nil && horoscopeVM.loading {
+            TodayLoadingView(showSpinner: showSpinner)
+                .transition(.opacity)
+        } else {
+            scrollContent
+        }
     }
     
     @ViewBuilder

@@ -66,7 +66,7 @@ struct QuickReadInterpretationView: View {
         .padding(20)
         .background(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(.ultraThinMaterial)
+                .fill(Color(hex: 0x1A1F3A))
         )
         .padding()
         .accessibilityElement(children: .contain)
