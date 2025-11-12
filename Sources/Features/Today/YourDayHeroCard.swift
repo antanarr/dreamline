@@ -127,9 +127,7 @@ struct YourDayHeroCard: View {
     // MARK: - Background Components
     
     private var backgroundCard: some View {
-        let shape = RoundedRectangle(cornerRadius: 32, style: .continuous)
-        
-        return shape
+        RoundedRectangle(cornerRadius: 32, style: .continuous)
             .fill(
                 LinearGradient(
                     colors: theme.palette.horoscopeCardBackground,
@@ -137,33 +135,25 @@ struct YourDayHeroCard: View {
                     endPoint: .bottomTrailing
                 )
             )
-            .background(
-                // Ensure fully opaque base
-                shape.fill(theme.isLight ? Color.white : Color.black)
-            )
             .overlay(
-                DLAssetImage.nebula
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .opacity(theme.isLight ? 0.38 : 0.5)
-                    .blendMode(.screen)
-                    .parallaxDrift(6)
-                    .clipped()
+                GeometryReader { geo in
+                    DLAssetImage.nebula
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: geo.size.width, height: geo.size.height)
+                        .opacity(0.15)
+                        .parallaxDrift(6)
+                        .clipped()
+                }
             )
             .overlay(
                 DLAssetImage.starGrid
                     .resizable(resizingMode: .tile)
                     .scaleEffect(0.6)
-                    .opacity(theme.isLight ? 0.12 : 0.2)
-                    .blendMode(.screen)
+                    .opacity(0.08)
             )
-            .overlay(
-                DLAssetImage.grain
-                    .resizable(resizingMode: .tile)
-                    .opacity(theme.isLight ? 0.05 : 0.08)
-                    .blendMode(.plusLighter)
-            )
-            .clipShape(shape)
+            .compositingGroup()
+            .drawingGroup()
     }
     
     private var heroHalo: some View {
