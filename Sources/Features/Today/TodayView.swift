@@ -331,11 +331,18 @@ struct TodayView: View {
     private func announceAlignmentIfNeeded() {
         guard !didAnnounceAlignment else { return }
         didAnnounceAlignment = true
+        
+        // Haptic
         let impact = UIImpactFeedbackGenerator(style: .light)
         impact.prepare()
         impact.impactOccurred()
+        
+        // Sound (if enabled)
+        AmbientSoundService.shared.playAlignmentChime()
+        
+        // VoiceOver
         if UIAccessibility.isVoiceOverRunning {
-            UIAccessibility.post(notification: .announcement, argument: "Today’s Alignment")
+            UIAccessibility.post(notification: .announcement, argument: "Today's Alignment")
         }
     }
 
