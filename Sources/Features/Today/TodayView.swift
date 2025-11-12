@@ -170,7 +170,7 @@ struct TodayView: View {
                 startRecordingOnCompose = false
                 showRecorder = true
             } label: {
-                Label("Log", systemImage: "plus")
+                Label("Log Dream", systemImage: "plus")
             }
             .accessibilityLabel("Log a dream")
         }
