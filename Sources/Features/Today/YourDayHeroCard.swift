@@ -128,41 +128,41 @@ struct YourDayHeroCard: View {
     private var backgroundCard: some View {
         let shape = RoundedRectangle(cornerRadius: 32, style: .continuous)
         
-        return GeometryReader { geo in
-            shape
-                .fill(
-                    LinearGradient(
-                        colors: theme.palette.horoscopeCardBackground,
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
+        return shape
+            .fill(
+                LinearGradient(
+                    colors: theme.palette.horoscopeCardBackground,
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
                 )
-                .overlay(
-                    DLAssetImage.nebula
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: geo.size.width, height: geo.size.height)
-                        .opacity(theme.isLight ? 0.38 : 0.5)
-                        .blendMode(.screen)
-                        .parallaxDrift(6)
-                        .clipShape(shape)
-                )
-                .overlay(
-                    DLAssetImage.starGrid
-                        .resizable(resizingMode: .tile)
-                        .scaleEffect(0.6)
-                        .opacity(theme.isLight ? 0.12 : 0.2)
-                        .blendMode(.screen)
-                        .clipShape(shape)
-                )
-                .overlay(
-                    DLAssetImage.grain
-                        .resizable(resizingMode: .tile)
-                        .opacity(theme.isLight ? 0.05 : 0.08)
-                        .blendMode(.plusLighter)
-                        .clipShape(shape)
-                )
-        }
+            )
+            .background(
+                // Ensure fully opaque base
+                shape.fill(theme.isLight ? Color.white : Color.black)
+            )
+            .overlay(
+                DLAssetImage.nebula
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .opacity(theme.isLight ? 0.38 : 0.5)
+                    .blendMode(.screen)
+                    .parallaxDrift(6)
+                    .clipped()
+            )
+            .overlay(
+                DLAssetImage.starGrid
+                    .resizable(resizingMode: .tile)
+                    .scaleEffect(0.6)
+                    .opacity(theme.isLight ? 0.12 : 0.2)
+                    .blendMode(.screen)
+            )
+            .overlay(
+                DLAssetImage.grain
+                    .resizable(resizingMode: .tile)
+                    .opacity(theme.isLight ? 0.05 : 0.08)
+                    .blendMode(.plusLighter)
+            )
+            .clipShape(shape)
     }
     
     private var heroHalo: some View {
