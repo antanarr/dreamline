@@ -729,16 +729,21 @@ struct ComposeDreamView: View {
             return
         }
         
+        print("[ComposeDream] Starting interpretation for text: \(trimmed.prefix(50))...")
+        
         // Optional audio handling (kept for future) — not surfaced in UI now
         let storedURL = audioURL.flatMap(persistRecording)
         
         // Interpret using cloud client when configured, otherwise stub
         let client: OracleClient = {
             let baseURL = (Bundle.main.object(forInfoDictionaryKey: "FunctionsBaseURL") as? String) ?? ""
+            print("[ComposeDream] Using client: \(baseURL.isEmpty ? "StubOracleClient" : "CloudOracleClient at \(baseURL)")")
             return baseURL.isEmpty ? StubOracleClient() : CloudOracleClient()
         }()
         let coordinator = InterpretCoordinator(oracle: client)
         let interpreted = await coordinator.runInterpret(dreamText: trimmed)
+        
+        print("[ComposeDream] Interpretation result: \(interpreted != nil ? "success" : "nil - using fallback")")
         
         // Create and save entry with interpretation when available
         var entry = DreamEntry(rawText: trimmed, transcriptURL: storedURL)
@@ -747,22 +752,28 @@ struct ComposeDreamView: View {
             entry.themes = result.extraction.archetypes
             entry.interpretation = result.interpretation
             entry.oracleSummary = result.interpretation.summary
+            print("[ComposeDream] Set interpretation with headline: \(result.interpretation.headline)")
         } else {
             entry.extractedSymbols = extractQuickMotifs(from: trimmed)
             let fallbackInterpretation = OracleService().interpret(text: trimmed)
             entry.interpretation = fallbackInterpretation
             entry.oracleSummary = fallbackInterpretation.summary
+            print("[ComposeDream] Using fallback interpretation with headline: \(fallbackInterpretation.headline)")
         }
         
         store.entries.insert(entry, at: 0)
+        print("[ComposeDream] Entry saved to store. Total entries: \(store.entries.count)")
+        
         Feedback.success()
         
         // Present Quick Read (uses summary/symbols if present)
         savedEntry = entry
         showQuickRead = true
+        print("[ComposeDream] Set savedEntry and showQuickRead=true, should show sheet now")
         
         // Dismiss compose view (Quick Read appears modally)
         dismiss()
+        print("[ComposeDream] Dismissed compose view")
     }
     
     private func extractQuickMotifs(from text: String) -> [String] {
