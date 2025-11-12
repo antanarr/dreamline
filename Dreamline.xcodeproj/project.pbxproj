@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -172,7 +172,7 @@
 		32324A8E9CA14135389165C0 /* RecordDreamIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordDreamIntent.swift; sourceTree = "<group>"; };
 		340011767851D63962304ED4 /* HoroscopeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeService.swift; sourceTree = "<group>"; };
 		3632BF117D79CF0FF54C0044 /* TodayPlanetStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPlanetStrip.swift; sourceTree = "<group>"; };
-		37032F96872F6A7224C4582E /* Dreamline.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Dreamline.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		37032F96872F6A7224C4582E /* Dreamline.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dreamline.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		398EF054DACE29F26878BA0C /* VoiceRecorderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceRecorderService.swift; sourceTree = "<group>"; };
 		3ADCF73542DD9467DD55D017 /* DreamDetailExtras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamDetailExtras.swift; sourceTree = "<group>"; };
 		4088626376277D9767BB486B /* TodayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModel.swift; sourceTree = "<group>"; };
@@ -269,7 +269,7 @@
 		FB853D90E0102838F0F5AF1E /* IAPIDs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPIDs.swift; sourceTree = "<group>"; };
 		FB8FCAAF460C3928C9A82B1D /* ConstellationCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstellationCanvas.swift; sourceTree = "<group>"; };
 		FD1083DC6763C08039F9061A /* BestDaysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BestDaysView.swift; sourceTree = "<group>"; };
-		FEA8C576AF8E38D2CBE3A1C6 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		FEA8C576AF8E38D2CBE3A1C6 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -765,7 +765,6 @@
 			packageReferences = (
 				30C69CED65BC08B13AD1F6A9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -937,6 +936,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = P3MNVS9Z4U;
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (

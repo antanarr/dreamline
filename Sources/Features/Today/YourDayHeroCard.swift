@@ -20,7 +20,6 @@ struct YourDayHeroCard: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             backgroundCard
-                .parallax(12)
                 .overlay(heroHalo)
             
             VStack(alignment: .leading, spacing: 18) {
@@ -129,38 +128,41 @@ struct YourDayHeroCard: View {
     private var backgroundCard: some View {
         let shape = RoundedRectangle(cornerRadius: 32, style: .continuous)
         
-        return shape
-            .fill(
-                LinearGradient(
-                    colors: theme.palette.horoscopeCardBackground,
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
+        return GeometryReader { geo in
+            shape
+                .fill(
+                    LinearGradient(
+                        colors: theme.palette.horoscopeCardBackground,
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
                 )
-            )
-            .overlay(
-                DLAssetImage.nebula
-                    .resizable()
-                    .scaledToFill()
-                    .opacity(theme.isLight ? 0.38 : 0.5)
-                    .blendMode(.screen)
-                    .parallaxDrift(6)
-                    .clipShape(shape)
-            )
-            .overlay(
-                DLAssetImage.starGrid
-                    .resizable(resizingMode: .tile)
-                    .scaleEffect(0.6)
-                    .opacity(theme.isLight ? 0.12 : 0.2)
-                    .blendMode(.screen)
-                    .clipShape(shape)
-            )
-            .overlay(
-                DLAssetImage.grain
-                    .resizable(resizingMode: .tile)
-                    .opacity(theme.isLight ? 0.05 : 0.08)
-                    .blendMode(.plusLighter)
-                    .clipShape(shape)
-            )
+                .overlay(
+                    DLAssetImage.nebula
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: geo.size.width, height: geo.size.height)
+                        .opacity(theme.isLight ? 0.38 : 0.5)
+                        .blendMode(.screen)
+                        .parallaxDrift(6)
+                        .clipShape(shape)
+                )
+                .overlay(
+                    DLAssetImage.starGrid
+                        .resizable(resizingMode: .tile)
+                        .scaleEffect(0.6)
+                        .opacity(theme.isLight ? 0.12 : 0.2)
+                        .blendMode(.screen)
+                        .clipShape(shape)
+                )
+                .overlay(
+                    DLAssetImage.grain
+                        .resizable(resizingMode: .tile)
+                        .opacity(theme.isLight ? 0.05 : 0.08)
+                        .blendMode(.plusLighter)
+                        .clipShape(shape)
+                )
+        }
     }
     
     private var heroHalo: some View {
