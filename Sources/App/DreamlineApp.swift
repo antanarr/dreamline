@@ -7,6 +7,7 @@ struct DreamlineApp: App {
     @State private var dreamStore = DreamStore()
     @State private var entitlementsService = EntitlementsService()
     @State private var themeService = ThemeService()
+    @State private var isInitializing = true
     @Environment(\.scenePhase) private var scenePhase
     
     var firebaseState: FirebaseBootstrapState {
@@ -23,23 +24,38 @@ struct DreamlineApp: App {
     
     var body: some Scene {
         WindowGroup {
-            Group {
-                switch firebaseState {
-                case .configured:
-                    RootRouterView(firebaseState: firebaseState)
-                        .environment(dreamStore)
-                        .environment(entitlementsService)
-                        .environment(themeService)
-                        .onOpenURL { url in
-                            handleDeepLink(url)
+            ZStack {
+                if isInitializing {
+                    LaunchScreen()
+                        .transition(.opacity)
+                } else {
+                    Group {
+                        switch firebaseState {
+                        case .configured:
+                            RootRouterView(firebaseState: firebaseState)
+                                .environment(dreamStore)
+                                .environment(entitlementsService)
+                                .environment(themeService)
+                                .onOpenURL { url in
+                                    handleDeepLink(url)
+                                }
+                        case .missingPlist:
+                            Text("Firebase configuration missing")
+                        case .notAvailable:
+                            Text("Firebase not available")
                         }
-                case .missingPlist:
-                    Text("Firebase configuration missing")
-                case .notAvailable:
-                    Text("Firebase not available")
+                    }
+                    .transition(.opacity)
                 }
             }
             .preferredColorScheme(themeService.mode.preferredColorScheme)
+            .task {
+                // Show launch screen for minimum 1 second (feels intentional, not jarring)
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                withAnimation(.easeOut(duration: 0.6)) {
+                    isInitializing = false
+                }
+            }
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
