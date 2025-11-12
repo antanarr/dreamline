@@ -431,6 +431,15 @@ struct TodayView: View {
                     selectedAlignedDreamID = topID
                     presentAlignedDream = true
                 },
+                onExplainResonance: {
+                    guard FeatureFlags.resonanceUIEnabled,
+                          let bundle = item.resonance,
+                          let hit = bundle.topHits.first else { return }
+                    selectedAlignedDreamID = hit.dreamID
+                    quickReadSymbols = hit.overlapSymbols
+                    quickReadScore = hit.score
+                    presentQuickRead = true
+                },
                 onDiveDeeper: {
                     if let bundle = item.resonance, let hit = bundle.topHits.first {
                         selectedAlignedDreamID = hit.dreamID
@@ -441,15 +450,6 @@ struct TodayView: View {
                         quickReadSymbols = []
                         quickReadScore = 0
                     }
-                    presentQuickRead = true
-                },
-                onExplainResonance: {
-                    guard FeatureFlags.resonanceUIEnabled,
-                          let bundle = item.resonance,
-                          let hit = bundle.topHits.first else { return }
-                    selectedAlignedDreamID = hit.dreamID
-                    quickReadSymbols = hit.overlapSymbols
-                    quickReadScore = hit.score
                     presentQuickRead = true
                 }
             )
